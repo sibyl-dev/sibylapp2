@@ -19,13 +19,17 @@ num_to_show = importance["Importance Value"] / max(importance["Importance Value"
 num_to_show = num_to_show.apply(np.ceil).astype("int")
 importance["Importance"] = [("🟪" * n + "⬜" * (emoji_length - n) + "⬆") for n in num_to_show]
 predictions = app.predict(sample)
+average_pred = np.average(list(predictions.values()))
 
-row = st.sidebar.selectbox("Select a house", sample.index)
+sample_options = {f'House {key} (${predictions[key]:,.2f})' : key for key in sample.index}
+
+chosen_option = st.sidebar.selectbox("Select a house", sample_options)
+row = sample_options[chosen_option]
 
 st.title("Sibyl")
 
 pred = predictions[row]
-st.sidebar.metric("Predicted price", f'${pred:,.2f}')
+st.sidebar.metric("Predicted price", f'${pred:,.2f}', delta=f'{(pred-average_pred):,.2f}')
 
 if 'show_more' not in st.session_state:
     st.session_state['show_more'] = False
