@@ -146,3 +146,8 @@ cython_debug/
 
 # PyCharm
 .idea/
+
+# Data
+data.csv
+model.pkl
+features.csv

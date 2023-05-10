@@ -1,12 +1,13 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from pyreal.sample_applications import ames_housing
+
+import data
 
 st.set_page_config(layout="wide")
 
-X, y = ames_housing.load_data(include_targets=True)
-app = ames_housing.load_app()
+X, app, format_func = data.get_application("turbines")
+
 sample = X.iloc[0:10]
 
 emoji_length = 8
@@ -21,15 +22,15 @@ importance["Importance"] = [("🟪" * n + "⬜" * (emoji_length - n) + "⬆") fo
 predictions = app.predict(sample)
 average_pred = np.average(list(predictions.values()))
 
-sample_options = {f'House {key} (${predictions[key]:,.2f})' : key for key in sample.index}
+sample_options = {f'Entity {key} (' + format_func(predictions[key]) + ')': key for key in sample.index}
 
-chosen_option = st.sidebar.selectbox("Select a house", sample_options)
+chosen_option = st.sidebar.selectbox("Select an entity", sample_options)
 row = sample_options[chosen_option]
 
 st.title("Sibyl")
 
 pred = predictions[row]
-st.sidebar.metric("Predicted price", f'${pred:,.2f}', delta=f'{(pred-average_pred):,.2f}')
+st.sidebar.metric("Prediction", format_func(pred))
 
 if 'show_more' not in st.session_state:
     st.session_state['show_more'] = False
