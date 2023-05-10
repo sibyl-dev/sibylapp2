@@ -2,14 +2,12 @@ import pandas as pd
 import pickle
 from pyreal import RealApp
 from pyreal.sample_applications import ames_housing
+import streamlit as st
 
 
+@st.cache_data
 def get_application(application):
     if application == "turbines":
-
-        def format_func(pred):
-            return "failure" if pred else "normal"
-
         data = pd.read_csv("data.csv")
         y = data["label"]
         X = data.drop("label", axis="columns")
@@ -21,8 +19,6 @@ def get_application(application):
 
         model = pickle.load(open("model.pkl", "rb"))
 
-        print(model.predict(X.drop("eid", axis="columns")))
-
         realApp = RealApp(
             model,
             X_train_orig=X,
@@ -31,16 +27,25 @@ def get_application(application):
             feature_descriptions=feature_descriptions,
         )
 
-        return X, realApp, format_func
+        return X, realApp
 
     elif application == "housing":
-
-        def format_func(pred):
-            return "${:,.2f}".format(pred)
-
         X = ames_housing.load_data()
         realApp = ames_housing.load_app()
 
-        return X, realApp, format_func
+        return X, realApp
 
     return None, None
+
+
+def get_format_func(application):
+    # This function is separate from get_application because functions can't be cached
+    if application == "turbines":
+        def format_func(pred):
+            return "failure" if pred else "normal"
+        return format_func
+    if application == "housing":
+        def format_func(pred):
+            return "${:,.2f}".format(pred)
+        return format_func
+

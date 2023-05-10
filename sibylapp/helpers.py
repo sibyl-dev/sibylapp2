@@ -1,3 +1,6 @@
+import time
+
+
 def process_show_more(to_show_, show_more_):
     if not show_more_:
         return to_show_[0:10]

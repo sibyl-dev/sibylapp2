@@ -6,7 +6,8 @@ st.set_page_config(layout="wide")
 st.title("Sibyl")
 
 # Prepping data -----------------------------
-X, app, format_func = data.get_application("housing")
+X, app = data.get_application("turbines")
+format_func = data.get_format_func("turbines")
 sample = X.iloc[0:10]
 
 # Prepping explanations ---------------------
