@@ -10,6 +10,20 @@ def fetch_model_id():
     return model_id
 
 
+def fetch_eids():
+    entities = session.get(BASE_URL + "entities").json()["entities"]
+    return [entry["eid"] for entry in entities]
+
+
+def fetch_predictions(eids):
+    predictions = {}
+    for eid in eids:
+        request_str = BASE_URL + "prediction?model_id=" + fetch_model_id() + "&eid=" + str(eid)
+        prediction = session.get(request_str).json()["output"]
+        predictions[eid] = prediction
+    return predictions
+
+
 def fetch_contributions(eids):
     features = session.get(BASE_URL + "features").json()["features"]
     features_df = pd.DataFrame(features)

@@ -14,7 +14,7 @@ def show_table(df):
 
 
 @st.cache_data
-def compute_importance(_app):
+def compute_importance():
     importance = api.fetch_importance()
     importance = importance.rename(
         columns={

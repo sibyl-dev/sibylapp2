@@ -1,6 +1,5 @@
 import streamlit as st
-from sibylapp import importance, data, contributions, model, api, categories
-import numpy as np
+from sibylapp import importance, contributions, model, api, categories, config
 
 
 st.set_page_config(layout="wide")
@@ -15,17 +14,19 @@ if "filters" not in st.session_state:
     st.session_state["filters"] = []
 
 # Prepping data -----------------------------
-X, app = data.get_application("turbines")
-format_func = data.get_format_func("turbines")
-sample = X.iloc[0:10]
-eids = range(0, 2)
+def format_func(s):
+    return str(s)
+
+eids = api.fetch_eids()
+if config.MAX_ENTITIES is not None:
+    eids = eids[:config.MAX_ENTITIES]
 
 # Prepping explanations ---------------------
 contribution_results = contributions.compute_contributions(eids)
-importance_results = importance.compute_importance(app)
+importance_results = importance.compute_importance()
 
 # Prepping predictions -----------------------
-predictions = model.predictions(app, sample)
+predictions = model.predictions(eids)
 
 # Sidebar ------------------------------------
 sample_options = {
