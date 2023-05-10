@@ -41,11 +41,14 @@ def get_application(application):
 def get_format_func(application):
     # This function is separate from get_application because functions can't be cached
     if application == "turbines":
+
         def format_func(pred):
             return "failure" if pred else "normal"
+
         return format_func
     if application == "housing":
+
         def format_func(pred):
             return "${:,.2f}".format(pred)
-        return format_func
 
+        return format_func
