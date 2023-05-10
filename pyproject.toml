@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "sibylapp2"
+version = "0.1.0"
+description = ""
+authors = ["zyteka <zyteka@mit.edu>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8, <3.11, !=3.9.7"
+streamlit = "^1.22.0"
+pyreal = "^0.4.1"
+xgboost = "0.90"
+black = "^23.3.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
