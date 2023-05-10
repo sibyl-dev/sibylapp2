@@ -6,6 +6,14 @@ import numpy as np
 st.set_page_config(layout="wide")
 st.title("Sibyl")
 
+# Fill session storage
+if "show_more" not in st.session_state:
+    st.session_state["show_more"] = False
+if "search_term" not in st.session_state:
+    st.session_state["search_term"] = None
+if "filters" not in st.session_state:
+    st.session_state["filters"] = []
+
 # Prepping data -----------------------------
 X, app = data.get_application("turbines")
 format_func = data.get_format_func("turbines")
@@ -29,19 +37,17 @@ pred = predictions[row]
 st.sidebar.metric("Prediction", format_func(pred))
 
 # Global options ------------------------------
-if "show_more" not in st.session_state:
-    st.session_state["show_more"] = False
 st.checkbox("Show all features", key="show_more")
 
 exp = st.expander("Search and filter")
 with exp:
-    search = st.text_input("Search features")
-    categories = st.multiselect("Filter by category", categories.get_category_list())
+    st.session_state["search_term"] = st.text_input("Search features")
+    st.session_state["filters"] = st.multiselect("Filter by category", categories.get_category_list())
 
 
 tab1, tab2 = st.tabs(["Feature Contributions", "Feature Importance"])
 with tab1:
-    contributions.view(contribution_results[row], search, categories)
+    contributions.view(contribution_results[row])
 
 with tab2:
-    importance.view(importance_results, search)
+    importance.view(importance_results)

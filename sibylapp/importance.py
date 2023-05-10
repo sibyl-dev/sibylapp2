@@ -1,13 +1,29 @@
 import numpy as np
 import streamlit as st
 from sibylapp.config import BAR_LENGTH
-from sibylapp.helpers import process_search, process_show_more
+from sibylapp.helpers import process_options
+from sibylapp import api
+
+
+def show_table(df):
+    st.table(
+        df.drop("Importance Value", axis="columns").set_index(
+            "Category", verify_integrity=False
+        )
+    )
 
 
 @st.cache_data
 def compute_importance(_app):
-    importance = _app.produce_feature_importance()
-    importance.set_index("Feature Name", inplace=True)
+    importance = api.fetch_importance()
+    importance = importance.rename(
+        columns={
+            "importances": "Importance",
+            "category": "Category",
+            "description": "Feature",
+        }
+    )
+    importance = importance[["Category", "Feature", "Importance"]]  # reorder
     importance["Importance Value"] = importance["Importance"]
     num_to_show = (
         importance["Importance Value"]
@@ -22,9 +38,7 @@ def compute_importance(_app):
     return importance
 
 
-def view(to_show, search):
+def view(to_show):
     to_show = to_show.sort_values(by="Importance Value", axis="index", ascending=False)
-    to_show = process_search(
-        process_show_more(to_show, st.session_state["show_more"]), search
-    )
-    st.table(to_show.drop("Importance Value", axis="columns"))
+    to_show = process_options(to_show)
+    show_table(to_show)

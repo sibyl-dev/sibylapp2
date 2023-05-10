@@ -26,6 +26,18 @@ def fetch_contributions(eids):
     return results
 
 
+def fetch_importance():
+    features = session.get(BASE_URL + "features").json()["features"]
+    features_df = pd.DataFrame(features)
+    features_df = features_df.set_index("name")
+
+    importance = session.get(
+        BASE_URL + "importance?model_id=" + fetch_model_id()
+    ).json()
+    importance_df = pd.DataFrame(importance)
+    return pd.concat([features_df, importance_df], axis=1)
+
+
 def fetch_categories():
     categories = session.get(BASE_URL + "categories").json()["categories"]
     return pd.DataFrame(categories)
