@@ -41,7 +41,7 @@ with exp:
 
 tab1, tab2 = st.tabs(["Feature Contributions", "Feature Importance"])
 with tab1:
-    contributions.view(contribution_results[row], search)
+    contributions.view(contribution_results[row], search, categories)
 
 with tab2:
     importance.view(importance_results, search)
