@@ -1,1 +1,0 @@
-BAR_LENGTH = 8

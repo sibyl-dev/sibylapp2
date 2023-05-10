@@ -1,13 +1,11 @@
 import numpy as np
 import streamlit as st
-from sibylapp.configurations import BAR_LENGTH
+from sibylapp.config import BAR_LENGTH
 from sibylapp.helpers import process_search, process_show_more
-import time
 
 
 @st.cache_data
 def compute_contributions(_app, sample):
-    print("COMPUTING CONTRIBUTIONS")
     contributions = _app.produce_feature_contributions(sample)
     for eid in contributions:
         contributions[eid]["Contribution Value"] = contributions[eid]["Contribution"]

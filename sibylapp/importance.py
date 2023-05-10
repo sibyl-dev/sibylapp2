@@ -1,6 +1,6 @@
 import numpy as np
 import streamlit as st
-from sibylapp.configurations import BAR_LENGTH
+from sibylapp.config import BAR_LENGTH
 from sibylapp.helpers import process_search, process_show_more
 
 
