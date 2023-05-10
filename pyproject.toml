@@ -10,6 +10,7 @@ python = "^3.8, <3.11, !=3.9.7"
 streamlit = "^1.22.0"
 pyreal = "^0.4.1"
 xgboost = "0.90"
+black = "^23.3.0"
 
 
 [build-system]

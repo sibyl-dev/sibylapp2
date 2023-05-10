@@ -6,6 +6,7 @@ from pyreal.sample_applications import ames_housing
 
 def get_application(application):
     if application == "turbines":
+
         def format_func(pred):
             return "failure" if pred else "normal"
 
@@ -22,11 +23,18 @@ def get_application(application):
 
         print(model.predict(X.drop("eid", axis="columns")))
 
-        realApp = RealApp(model, X_train_orig=X, y_train=y, id_column="eid", feature_descriptions=feature_descriptions)
+        realApp = RealApp(
+            model,
+            X_train_orig=X,
+            y_train=y,
+            id_column="eid",
+            feature_descriptions=feature_descriptions,
+        )
 
         return X, realApp, format_func
 
     elif application == "housing":
+
         def format_func(pred):
             return "${:,.2f}".format(pred)
 
