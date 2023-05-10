@@ -49,7 +49,6 @@ def compute_contributions(eids):
             else ("⬇" + "⬜" * (BAR_LENGTH + n) + neg_em * -n)
             for n in num_to_show
         ]
-
     return contributions
 
 

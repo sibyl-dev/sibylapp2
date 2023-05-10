@@ -1,5 +1,5 @@
 import streamlit as st
-from sibylapp import importance, contributions, model, api, context, config
+from sibylapp import importance, contributions, model, context, config, entities
 from sibylapp.context import get_term
 
 
@@ -15,9 +15,7 @@ if "filters" not in st.session_state:
     st.session_state["filters"] = []
 
 # Prepping data -----------------------------
-eids = api.fetch_eids()
-if config.MAX_ENTITIES is not None:
-    eids = eids[:config.MAX_ENTITIES]
+eids = entities.get_eids(max_entities=config.MAX_ENTITIES)
 
 # Prepping explanations ---------------------
 contribution_results = contributions.compute_contributions(eids)
