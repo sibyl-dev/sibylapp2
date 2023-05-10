@@ -1,15 +1,24 @@
 import numpy as np
 import streamlit as st
-from sibylapp.config import BAR_LENGTH
+from sibylapp.config import BAR_LENGTH, FLIP_COLORS
 from sibylapp.helpers import process_options
 from sibylapp import api
+from sibylapp.context import get_term
+import time
+
+if FLIP_COLORS:
+    pos_em = "🟥"
+    neg_em = "🟦"
+else:
+    pos_em = "🟦"
+    neg_em = "🟥"
 
 
 def show_table(df):
     st.table(
         df.drop("Contribution Value", axis="columns").set_index(
             "Category", verify_integrity=False
-        )
+        ).rename(columns={"Contribution": get_term("Contribution"), "Feature": get_term("Feature")})
     )
 
 
@@ -35,9 +44,9 @@ def compute_contributions(eids):
         )
         num_to_show = num_to_show.apply(np.ceil).astype("int")
         contributions[eid]["Contribution"] = [
-            ("🟦" * n + "⬜" * (BAR_LENGTH - n) + "⬆")
+            (pos_em * n + "⬜" * (BAR_LENGTH - n) + "⬆")
             if n > 0
-            else ("⬇" + "⬜" * (BAR_LENGTH + n) + "🟥" * -n)
+            else ("⬇" + "⬜" * (BAR_LENGTH + n) + neg_em * -n)
             for n in num_to_show
         ]
 
@@ -52,14 +61,14 @@ def view(to_show):
     if sort_by == "Side-by-side":
         col1, col2 = st.columns(2)
         with col1:
-            st.subheader("Negative features")
+            st.subheader(get_term("Negative"))
             to_show_neg = to_show[to_show["Contribution Value"] < 0].sort_values(
                 by="Contribution", axis="index", ascending=False
             )
             to_show_neg = process_options(to_show_neg)
             show_table(to_show_neg)
         with col2:
-            st.subheader("Positive features")
+            st.subheader(get_term("Positive"))
             to_show_pos = to_show[to_show["Contribution Value"] >= 0].sort_values(
                 by="Contribution", axis="index", ascending=False
             )

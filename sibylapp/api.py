@@ -55,3 +55,8 @@ def fetch_importance():
 def fetch_categories():
     categories = session.get(BASE_URL + "categories").json()["categories"]
     return pd.DataFrame(categories)
+
+
+def fetch_terms():
+    context_id = session.get(BASE_URL + "contexts").json()["contexts"][0]["id"]
+    return session.get(BASE_URL + "context/" + context_id).json()["context"]["terms"]
