@@ -2,7 +2,7 @@ import numpy as np
 import streamlit as st
 from sibylapp.config import BAR_LENGTH, FLIP_COLORS
 from sibylapp.helpers import process_options
-from sibylapp import api
+from sibylapp import api, helpers
 from sibylapp.context import get_term
 import time
 
@@ -42,19 +42,8 @@ def compute_contributions(eids):
         contributions[eid] = contributions[eid][
             ["Category", "Feature", "Value", "Contribution"]
         ]  # reorder
-        contributions[eid]["Contribution Value"] = contributions[eid]["Contribution"]
-        num_to_show = (
-            contributions[eid]["Contribution"]
-            / max(contributions[eid]["Contribution"].abs())
-            * BAR_LENGTH
-        )
-        num_to_show = num_to_show.apply(np.ceil).astype("int")
-        contributions[eid]["Contribution"] = [
-            (pos_em * n + "⬜" * (BAR_LENGTH - n) + "⬆")
-            if n > 0
-            else ("⬇" + "⬜" * (BAR_LENGTH + n) + neg_em * -n)
-            for n in num_to_show
-        ]
+        contributions[eid]["Contribution Value"] = contributions[eid]["Contribution"].copy()
+        contributions[eid]["Contribution"] = helpers.generate_bars(contributions[eid]["Contribution"])
     return contributions
 
 

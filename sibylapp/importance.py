@@ -2,7 +2,7 @@ import numpy as np
 import streamlit as st
 from sibylapp.config import BAR_LENGTH
 from sibylapp.helpers import process_options
-from sibylapp import api
+from sibylapp import api, helpers
 from sibylapp.context import get_term
 
 
@@ -30,16 +30,8 @@ def compute_importance():
         }
     )
     importance = importance[["Category", "Feature", "Importance"]]  # reorder
-    importance["Importance Value"] = importance["Importance"]
-    num_to_show = (
-        importance["Importance Value"]
-        / max(importance["Importance Value"].abs())
-        * BAR_LENGTH
-    )
-    num_to_show = num_to_show.apply(np.ceil).astype("int")
-    importance["Importance"] = [
-        ("🟪" * n + "⬜" * (BAR_LENGTH - n) + "⬆") for n in num_to_show
-    ]
+    importance["Importance Value"] = importance["Importance"].copy()
+    importance["Importance"] = helpers.generate_bars(importance["Importance"], neutral=True)
 
     return importance
 
