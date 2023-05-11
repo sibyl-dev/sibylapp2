@@ -7,5 +7,5 @@ FLIP_COLORS = True  # If true, positive contributions will be red
 
 
 def pred_format_func(pred):
-    # return "${:,.2f}".format(pred)
-    return "failure" if pred else "normal"
+    return "${:,.2f}".format(pred)
+    # return "failure" if pred else "normal"

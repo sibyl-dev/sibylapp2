@@ -36,10 +36,11 @@ def compute_contributions(eids):
                 "contributions": "Contribution",
                 "category": "Category",
                 "description": "Feature",
+                "value": "Value"
             }
         )
         contributions[eid] = contributions[eid][
-            ["Category", "Feature", "Contribution"]
+            ["Category", "Feature", "Value", "Contribution"]
         ]  # reorder
         contributions[eid]["Contribution Value"] = contributions[eid]["Contribution"]
         num_to_show = (
