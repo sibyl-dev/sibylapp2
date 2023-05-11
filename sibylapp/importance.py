@@ -31,7 +31,9 @@ def compute_importance():
     )
     importance = importance[["Category", "Feature", "Importance"]]  # reorder
     importance["Importance Value"] = importance["Importance"].copy()
-    importance["Importance"] = helpers.generate_bars(importance["Importance"], neutral=True)
+    importance["Importance"] = helpers.generate_bars(
+        importance["Importance"], neutral=True
+    )
 
     return importance
 

@@ -45,10 +45,12 @@ def generate_bars(values, neutral=False):
         else:
             return math.ceil(x - 0.5)
 
-    num_to_show = (values / max(values.abs()) * BAR_LENGTH)
+    num_to_show = values / max(values.abs()) * BAR_LENGTH
     num_to_show = num_to_show.apply(round_away_from_zero).astype("int")
     if neutral:
-        return [(NEUT_EM * n + BLANK_EM * (BAR_LENGTH - n) + UP_ARROW) for n in num_to_show]
+        return [
+            (NEUT_EM * n + BLANK_EM * (BAR_LENGTH - n) + UP_ARROW) for n in num_to_show
+        ]
     else:
         return [
             (POS_EM * n + BLANK_EM * (BAR_LENGTH - n) + UP_ARROW)

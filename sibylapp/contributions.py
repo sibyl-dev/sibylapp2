@@ -36,14 +36,18 @@ def compute_contributions(eids):
                 "contributions": "Contribution",
                 "category": "Category",
                 "description": "Feature",
-                "value": "Value"
+                "value": "Value",
             }
         )
         contributions[eid] = contributions[eid][
             ["Category", "Feature", "Value", "Contribution"]
         ]  # reorder
-        contributions[eid]["Contribution Value"] = contributions[eid]["Contribution"].copy()
-        contributions[eid]["Contribution"] = helpers.generate_bars(contributions[eid]["Contribution"])
+        contributions[eid]["Contribution Value"] = contributions[eid][
+            "Contribution"
+        ].copy()
+        contributions[eid]["Contribution"] = helpers.generate_bars(
+            contributions[eid]["Contribution"]
+        )
     return contributions
 
 
