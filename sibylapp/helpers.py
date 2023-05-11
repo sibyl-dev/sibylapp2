@@ -2,8 +2,7 @@ import streamlit as st
 
 
 def process_options(to_show):
-    return process_search(
-        process_filter(process_show_more(to_show)))
+    return process_search(process_filter(process_show_more(to_show)))
 
 
 def process_show_more(to_show):
@@ -14,7 +13,9 @@ def process_show_more(to_show):
 
 def process_search(to_show):
     if st.session_state["search_term"] is not None:
-        to_show = to_show[to_show["Feature"].str.contains(st.session_state["search_term"], case=False)]
+        to_show = to_show[
+            to_show["Feature"].str.contains(st.session_state["search_term"], case=False)
+        ]
     return to_show
 
 

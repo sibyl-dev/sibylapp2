@@ -26,7 +26,10 @@ predictions = model.predictions(eids)
 
 # Sidebar ------------------------------------
 sample_options = {
-    f"{get_term('Entity')} {key} (" + config.pred_format_func(predictions[key]) + ")": key for key in eids
+    f"{get_term('Entity')} {key} ("
+    + config.pred_format_func(predictions[key])
+    + ")": key
+    for key in eids
 }
 
 chosen_option = st.sidebar.selectbox("Select %s" % get_term("Entity"), sample_options)
@@ -39,11 +42,17 @@ st.checkbox("Show all", key="show_more")
 
 exp = st.expander("Search and filter")
 with exp:
-    st.session_state["search_term"] = st.text_input("Search by %s" % get_term("Feature").lower())
-    st.session_state["filters"] = st.multiselect("Filter by category", context.get_category_list())
+    st.session_state["search_term"] = st.text_input(
+        "Search by %s" % get_term("Feature").lower()
+    )
+    st.session_state["filters"] = st.multiselect(
+        "Filter by category", context.get_category_list()
+    )
 
 
-tab1, tab2 = st.tabs([get_term("Feature Contributions"), get_term("Feature Importance")])
+tab1, tab2 = st.tabs(
+    [get_term("Feature Contributions"), get_term("Feature Importance")]
+)
 with tab1:
     contributions.view(contribution_results[row])
 

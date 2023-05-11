@@ -16,9 +16,14 @@ else:
 
 def show_table(df):
     st.table(
-        df.drop("Contribution Value", axis="columns").set_index(
-            "Category", verify_integrity=False
-        ).rename(columns={"Contribution": get_term("Contribution"), "Feature": get_term("Feature")})
+        df.drop("Contribution Value", axis="columns")
+        .set_index("Category", verify_integrity=False)
+        .rename(
+            columns={
+                "Contribution": get_term("Contribution"),
+                "Feature": get_term("Feature"),
+            }
+        )
     )
 
 

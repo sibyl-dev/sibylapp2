@@ -8,9 +8,14 @@ from sibylapp.context import get_term
 
 def show_table(df):
     st.table(
-        df.drop("Importance Value", axis="columns").set_index(
-            "Category", verify_integrity=False
-        ).rename(columns={"Importance": get_term("Importance"), "Feature": get_term("Feature")})
+        df.drop("Importance Value", axis="columns")
+        .set_index("Category", verify_integrity=False)
+        .rename(
+            columns={
+                "Importance": get_term("Importance"),
+                "Feature": get_term("Feature"),
+            }
+        )
     )
 
 

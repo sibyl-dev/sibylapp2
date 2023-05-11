@@ -18,7 +18,9 @@ def fetch_eids():
 def fetch_predictions(eids):
     predictions = {}
     for eid in eids:
-        request_str = BASE_URL + "prediction?model_id=" + fetch_model_id() + "&eid=" + str(eid)
+        request_str = (
+            BASE_URL + "prediction?model_id=" + fetch_model_id() + "&eid=" + str(eid)
+        )
         prediction = session.get(request_str).json()["output"]
         predictions[eid] = prediction
     return predictions
