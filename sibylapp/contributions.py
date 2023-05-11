@@ -1,35 +1,57 @@
 import numpy as np
 import streamlit as st
-from sibylapp.configurations import BAR_LENGTH
-from sibylapp.helpers import process_search, process_show_more
+from sibylapp.config import BAR_LENGTH, FLIP_COLORS
+from sibylapp.helpers import process_options
+from sibylapp import api, helpers
+from sibylapp.context import get_term
 import time
+
+if FLIP_COLORS:
+    pos_em = "🟥"
+    neg_em = "🟦"
+else:
+    pos_em = "🟦"
+    neg_em = "🟥"
+
+
+def show_table(df):
+    st.table(
+        df.drop("Contribution Value", axis="columns")
+        .set_index("Category", verify_integrity=False)
+        .rename(
+            columns={
+                "Contribution": get_term("Contribution"),
+                "Feature": get_term("Feature"),
+            }
+        )
+    )
 
 
 @st.cache_data
-def compute_contributions(_app, sample):
-    print("COMPUTING CONTRIBUTIONS")
-    contributions = _app.produce_feature_contributions(sample)
+def compute_contributions(eids):
+    contributions = api.fetch_contributions(eids)
     for eid in contributions:
-        contributions[eid]["Contribution Value"] = contributions[eid]["Contribution"]
-        contributions[eid].drop("Average/Mode", axis="columns", inplace=True)
-        contributions[eid].set_index("Feature Name", inplace=True)
-        num_to_show = (
-            contributions[eid]["Contribution"]
-            / max(contributions[eid]["Contribution"].abs())
-            * BAR_LENGTH
+        contributions[eid] = contributions[eid].rename(
+            columns={
+                "contributions": "Contribution",
+                "category": "Category",
+                "description": "Feature",
+                "value": "Value",
+            }
         )
-        num_to_show = num_to_show.apply(np.ceil).astype("int")
-        contributions[eid]["Contribution"] = [
-            ("🟦" * n + "⬜" * (BAR_LENGTH - n) + "⬆")
-            if n > 0
-            else ("⬇" + "⬜" * (BAR_LENGTH + n) + "🟥" * -n)
-            for n in num_to_show
-        ]
-
+        contributions[eid] = contributions[eid][
+            ["Category", "Feature", "Value", "Contribution"]
+        ]  # reorder
+        contributions[eid]["Contribution Value"] = contributions[eid][
+            "Contribution"
+        ].copy()
+        contributions[eid]["Contribution"] = helpers.generate_bars(
+            contributions[eid]["Contribution"]
+        )
     return contributions
 
 
-def view(to_show, search):
+def view(to_show):
     sort_by = st.selectbox(
         "Sort order", ["Absolute", "Ascending", "Descending", "Side-by-side"]
     )
@@ -37,23 +59,19 @@ def view(to_show, search):
     if sort_by == "Side-by-side":
         col1, col2 = st.columns(2)
         with col1:
-            st.subheader("Negative features")
+            st.subheader(get_term("Negative"))
             to_show_neg = to_show[to_show["Contribution Value"] < 0].sort_values(
                 by="Contribution", axis="index", ascending=False
             )
-            to_show_neg = process_search(
-                process_show_more(to_show_neg, st.session_state["show_more"]), search
-            )
-            st.table(to_show_neg.drop("Contribution Value", axis="columns"))
+            to_show_neg = process_options(to_show_neg)
+            show_table(to_show_neg)
         with col2:
-            st.subheader("Positive features")
+            st.subheader(get_term("Positive"))
             to_show_pos = to_show[to_show["Contribution Value"] >= 0].sort_values(
                 by="Contribution", axis="index", ascending=False
             )
-            to_show_pos = process_search(
-                process_show_more(to_show_pos, st.session_state["show_more"]), search
-            )
-            st.table(to_show_pos.drop("Contribution Value", axis="columns"))
+            to_show_pos = process_options(to_show_pos)
+            show_table(to_show_pos)
     else:
         if sort_by == "Absolute":
             to_show = to_show.reindex(
@@ -65,7 +83,5 @@ def view(to_show, search):
             to_show = to_show.sort_values(
                 by="Contribution Value", axis="index", ascending=False
             )
-        to_show = process_search(
-            process_show_more(to_show, st.session_state["show_more"]), search
-        )
-        st.table(to_show.drop("Contribution Value", axis="columns"))
+        to_show = process_options(to_show)
+        show_table(to_show)
