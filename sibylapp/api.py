@@ -1,6 +1,7 @@
 from sibylapp.config import BASE_URL
 import requests
 import pandas as pd
+import streamlit as st
 
 session = requests.Session()
 cache = {}
@@ -15,7 +16,11 @@ def fetch_model_id():
 
 
 def fetch_eids():
-    entities = session.get(BASE_URL + "entities").json()["entities"]
+    response = session.get(BASE_URL + "entities")
+    if response.status_code != 200:
+        st.error("Error fetching eids. %s: %s" % (response.status_code, response.reason))
+        st.stop()
+    entities = response.json()["entities"]
     return [entry["eid"] for entry in entities]
 
 
