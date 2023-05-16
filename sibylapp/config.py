@@ -7,7 +7,7 @@ FLIP_COLORS = True  # If true, positive contributions will be red
 
 
 def pred_format_func(pred):  # Function to use to format the prediction values from model
-    return dollar_format(pred)  # See pre-written options below for defaults
+    return format_dollar(pred)  # See pre-written options below for defaults
 
 
 # OTHER CONFIGURATIONS ============================================================================
@@ -16,18 +16,22 @@ MAX_ENTITIES = 10  # Maximum number of entities to select from. Set this to None
 
 
 # PRE-WRITTEN FORMAT FUNCTION OPTIONS =============================================================
-def no_format(pred):
+def format_none(pred):
     return pred
 
 
-def dollar_format(pred):
+def format_dollar(pred):
     return "${:,.2f}".format(pred)
 
 
-def class_name_format(pred, class_names):
+def format_class_name(pred, class_names):
     return class_names[int(pred)]
 
 
-def boolean_name_format(pred, pos_name, neg_name):
+def format_boolean_name(pred, pos_name, neg_name):
     return pos_name if pred else neg_name
+
+
+def format_number(pred, decimals=2):
+    return "{:,.{prec}f}".format(pred, prec=decimals)
 
