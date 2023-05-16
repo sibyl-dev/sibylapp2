@@ -1,6 +1,6 @@
 # API CONFIGURATIONS ==============================================================================
-BASE_URL = "https://dai-iberdrola-api.lids.mit.edu/api/v1"
-CERT_PATHS = None
+BASE_URL = "http://localhost:3000/api/v1/"
+CERT = None
 
 # APPLICATION-SPECIFIC CONFIGURATIONS =============================================================
 FLIP_COLORS = True  # If true, positive contributions will be red
