@@ -1,10 +1,10 @@
 import numpy as np
 import streamlit as st
-from sibylapp.config import BAR_LENGTH, FLIP_COLORS
+from sibylapp.config import FLIP_COLORS
 from sibylapp.helpers import process_options
 from sibylapp import api, helpers
 from sibylapp.context import get_term
-import time
+from st_aggrid import GridOptionsBuilder, AgGrid
 
 if FLIP_COLORS:
     pos_em = "🟥"
@@ -15,16 +15,15 @@ else:
 
 
 def show_table(df):
-    st.table(
-        df.drop("Contribution Value", axis="columns")
-        .set_index("Category", verify_integrity=False)
-        .rename(
+    #df = df.set_index("Category", verify_integrity=False)
+    df = df.drop("Contribution Value", axis="columns").rename(
             columns={
                 "Contribution": get_term("Contribution"),
                 "Feature": get_term("Feature"),
             }
         )
-    )
+    builder = GridOptionsBuilder.from_dataframe(df)
+    AgGrid(df, fit_columns_on_grid_load=True, gridOptions=builder.build())
 
 
 @st.cache_data
