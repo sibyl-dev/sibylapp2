@@ -15,12 +15,17 @@ def view():
 
     st.checkbox("Show all", key="show_more", value=st.session_state["show_more"])
 
-    exp = st.expander("Search and filter", expanded=st.session_state["expanded_search_bar"])
-    print(exp.expanded)
+    exp = st.expander(
+        "Search and filter", expanded=st.session_state["expanded_search_bar"]
+    )
+
     with exp:
         st.session_state["search_term"] = st.text_input(
-            "Search by %s" % get_term("Feature").lower(), value=st.session_state["search_term"]
+            "Search by %s" % get_term("Feature").lower(),
+            value=st.session_state["search_term"],
         )
         st.session_state["filters"] = st.multiselect(
-            "Filter by category", context.get_category_list(), default=st.session_state["filters"]
+            "Filter by category",
+            context.get_category_list(),
+            default=st.session_state["filters"],
         )

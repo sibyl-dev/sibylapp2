@@ -11,6 +11,7 @@ streamlit = "^1.22.0"
 pyreal = "^0.4.1"
 xgboost = "0.90"
 black = "^23.3.0"
+plotly = "^5.14.1"
 
 
 [build-system]
