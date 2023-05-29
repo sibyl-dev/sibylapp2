@@ -33,8 +33,10 @@ st.sidebar.metric(get_term("Prediction"), config.pred_format_func(pred))
 filtering.view()
 
 
-tab1, = st.tabs(
-    [get_term("Feature Contributions"),]
+(tab1,) = st.tabs(
+    [
+        get_term("Feature Contributions"),
+    ]
 )
 with tab1:
     contributions.view(contribution_results[row])

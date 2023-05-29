@@ -1,4 +1,3 @@
-import numpy as np
 import streamlit as st
 from sibylapp.config import FLIP_COLORS
 from sibylapp.helpers import process_options
@@ -16,11 +15,11 @@ else:
 
 def show_table(df):
     df = df.drop("Contribution Value", axis="columns").rename(
-            columns={
-                "Contribution": get_term("Contribution"),
-                "Feature": get_term("Feature"),
-            }
-        )
+        columns={
+            "Contribution": get_term("Contribution"),
+            "Feature": get_term("Feature"),
+        }
+    )
     AgGrid(df, fit_columns_on_grid_load=True)
 
 

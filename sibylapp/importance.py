@@ -1,6 +1,4 @@
-import numpy as np
 import streamlit as st
-from sibylapp.config import BAR_LENGTH
 from sibylapp.helpers import process_options
 from sibylapp import api, helpers
 from sibylapp.context import get_term
@@ -9,11 +7,11 @@ from st_aggrid import AgGrid
 
 def show_table(df):
     df = df.drop("Importance Value", axis="columns").rename(
-            columns={
-                "Importance": get_term("Importance"),
-                "Feature": get_term("Feature"),
-            }
-        )
+        columns={
+            "Importance": get_term("Importance"),
+            "Feature": get_term("Feature"),
+        }
+    )
     AgGrid(df, fit_columns_on_grid_load=True)
 
 
