@@ -14,8 +14,10 @@ importance_results = importance.compute_importance()
 filtering.view()
 
 
-tab1, = st.tabs(
-    [get_term("Feature Importance"), ]
+(tab1,) = st.tabs(
+    [
+        get_term("Feature Importance"),
+    ]
 )
 with tab1:
     importance.view(importance_results)

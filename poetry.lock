@@ -1400,6 +1400,18 @@ files = [
 six = ">=1.5"
 
 [[package]]
+name = "python-decouple"
+version = "3.8"
+description = "Strict separation of settings from code."
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "python-decouple-3.8.tar.gz", hash = "sha256:ba6e2657d4f376ecc46f77a3a615e058d93ba5e465c01bbe57289bfb7cce680f"},
+    {file = "python_decouple-3.8-py3-none-any.whl", hash = "sha256:d0d45340815b25f4de59c974b855bb38d03151d81b037d9e3f463b0c9f8cbd66"},
+]
+
+[[package]]
 name = "pytz"
 version = "2023.3"
 description = "World timezone definitions, modern and historical"
@@ -1858,6 +1870,23 @@ watchdog = {version = "*", markers = "platform_system != \"Darwin\""}
 snowflake = ["snowflake-snowpark-python"]
 
 [[package]]
+name = "streamlit-aggrid"
+version = "0.3.4.post3"
+description = "Streamlit component implementation of ag-grid"
+category = "main"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "streamlit-aggrid-0.3.4.post3.tar.gz", hash = "sha256:0cb9332199e7735289a673efabc913e1a3466cc188bc025bec2c50c32ab1989a"},
+    {file = "streamlit_aggrid-0.3.4.post3-py3-none-any.whl", hash = "sha256:b909117eb90cfdb855b1c74e694e9ec97554c101baaafb7339eaf885d1f4e49c"},
+]
+
+[package.dependencies]
+pandas = ">=1.2"
+python-decouple = ">=3.6,<4.0"
+streamlit = ">=0.87.0"
+
+[[package]]
 name = "tenacity"
 version = "8.2.2"
 description = "Retry code until it succeeds"
@@ -2135,4 +2164,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8, <3.11, !=3.9.7"
-content-hash = "5eec660c7d8b2852f56e9d0bb0f15667a5fd15491ae9dd99bf6b4985ab38dcd1"
+content-hash = "a06713c9e5e872abed954296cd25e4f6917cba3638e4ef875fdb5a6f08b9ce61"
