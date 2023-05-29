@@ -4,7 +4,7 @@ from sibylapp.config import FLIP_COLORS
 from sibylapp.helpers import process_options
 from sibylapp import api, helpers
 from sibylapp.context import get_term
-from st_aggrid import GridOptionsBuilder, AgGrid
+from st_aggrid import AgGrid
 
 if FLIP_COLORS:
     pos_em = "🟥"
@@ -15,15 +15,13 @@ else:
 
 
 def show_table(df):
-    #df = df.set_index("Category", verify_integrity=False)
     df = df.drop("Contribution Value", axis="columns").rename(
             columns={
                 "Contribution": get_term("Contribution"),
                 "Feature": get_term("Feature"),
             }
         )
-    builder = GridOptionsBuilder.from_dataframe(df)
-    AgGrid(df, fit_columns_on_grid_load=True, gridOptions=builder.build())
+    AgGrid(df, fit_columns_on_grid_load=True)
 
 
 @st.cache_data

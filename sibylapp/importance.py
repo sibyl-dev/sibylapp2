@@ -4,19 +4,17 @@ from sibylapp.config import BAR_LENGTH
 from sibylapp.helpers import process_options
 from sibylapp import api, helpers
 from sibylapp.context import get_term
+from st_aggrid import AgGrid
 
 
 def show_table(df):
-    st.table(
-        df.drop("Importance Value", axis="columns")
-        .set_index("Category", verify_integrity=False)
-        .rename(
+    df = df.drop("Importance Value", axis="columns").rename(
             columns={
                 "Importance": get_term("Importance"),
                 "Feature": get_term("Feature"),
             }
         )
-    )
+    AgGrid(df, fit_columns_on_grid_load=True)
 
 
 @st.cache_data
