@@ -25,13 +25,18 @@ def show_table(df):
 
 
 @st.cache_data
-def compute_contributions(eids):
-    contributions = api.fetch_contributions(eids)
+def get_contributions(eids):
+    return api.fetch_contributions(eids)
+
+
+@st.cache_data
+def format_contributions_for_details(eids):
+    contributions = get_contributions(eids)
     for eid in contributions:
         contributions[eid] = contributions[eid].rename(
             columns={
                 "category": "Category",
-                "description": "Feature",
+                "Feature Name": "Feature",
                 "Feature Value": "Value",
                 "Average/Mode": "Average/Mode Value"
             }
@@ -48,7 +53,8 @@ def compute_contributions(eids):
     return contributions
 
 
-def view(to_show):
+def view(row):
+    to_show = format_contributions_for_details(row)
     sort_by = st.selectbox(
         "Sort order", ["Absolute", "Ascending", "Descending", "Side-by-side"]
     )

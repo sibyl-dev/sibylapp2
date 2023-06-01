@@ -7,7 +7,6 @@ session = requests.Session()
 session.headers.update({'Access-Control-Allow-Origin': '*'})
 if CERT is not None:
     session.cert = CERT
-cache = {}
 
 
 def api_get(url):
@@ -29,10 +28,7 @@ def api_post(url, json):
 
 
 def fetch_model_id():
-    if "model_id" in cache:
-        return cache["model_id"]
     model_id = api_get("models/")["models"][0]["id"]
-    cache["model_id"] = model_id
     return model_id
 
 
@@ -51,12 +47,9 @@ def fetch_predictions(eids):
 
 
 def fetch_features():
-    if "features" in cache:
-        return cache["features"]
     features = api_get("features/")["features"]
-    features_df = pd.DataFrame(features)
+    features_df = pd.DataFrame(features).rename(columns={"description": "Feature Name"})
     features_df = features_df.set_index("name")
-    cache["features"] = features_df
     return features_df
 
 
