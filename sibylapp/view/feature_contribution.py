@@ -1,16 +1,9 @@
 import streamlit as st
-from sibylapp.config import FLIP_COLORS
-from sibylapp.helpers import process_options
-from sibylapp import api, helpers, entities
-from sibylapp.context import get_term
+from sibylapp.view.utils.helpers import process_options
+from sibylapp.view.utils import helpers
+from sibylapp.compute import contributions
+from sibylapp.compute.context import get_term
 from st_aggrid import AgGrid
-
-if FLIP_COLORS:
-    pos_em = "🟥"
-    neg_em = "🟦"
-else:
-    pos_em = "🟦"
-    neg_em = "🟥"
 
 
 def show_table(df):
@@ -23,37 +16,28 @@ def show_table(df):
     AgGrid(df, fit_columns_on_grid_load=True)
 
 
-@st.cache_data
-def get_contributions(eids):
-    return api.fetch_contributions(eids)
+@st.cache_data(show_spinner=False)
+def format_contributions_to_view(contribution_df):
+    contribution_df = contribution_df.rename(
+        columns={
+            "category": "Category",
+            "Feature Name": "Feature",
+            "Feature Value": "Value",
+            "Average/Mode": "Average/Mode Value",
+        }
+    )
+    contribution_df = contribution_df[
+        ["Category", "Feature", "Value", "Average/Mode Value", "Contribution"]
+    ]  # reorder
+    contribution_df["Contribution Value"] = contribution_df["Contribution"].copy()
+    contribution_df["Contribution"] = helpers.generate_bars(
+        contribution_df["Contribution"]
+    )
+    return contribution_df
 
 
-@st.cache_data
-def format_contributions_for_details(eids):
-    contributions = get_contributions(eids)
-    for eid in contributions:
-        contributions[eid] = contributions[eid].rename(
-            columns={
-                "category": "Category",
-                "Feature Name": "Feature",
-                "Feature Value": "Value",
-                "Average/Mode": "Average/Mode Value",
-            }
-        )
-        contributions[eid] = contributions[eid][
-            ["Category", "Feature", "Value", "Average/Mode Value", "Contribution"]
-        ]  # reorder
-        contributions[eid]["Contribution Value"] = contributions[eid][
-            "Contribution"
-        ].copy()
-        contributions[eid]["Contribution"] = helpers.generate_bars(
-            contributions[eid]["Contribution"]
-        )
-    return contributions
-
-
-def view(row):
-    to_show = format_contributions_for_details(row)[row]
+def view(eid):
+    to_show = format_contributions_to_view(contributions.get_contributions(eid)[eid])
     sort_by = st.selectbox(
         "Sort order", ["Absolute", "Ascending", "Descending", "Side-by-side"]
     )
