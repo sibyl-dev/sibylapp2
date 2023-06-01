@@ -15,11 +15,11 @@ else:
 
 def show_table(df):
     df = df.drop("Contribution Value", axis="columns").rename(
-            columns={
-                "Contribution": get_term("Contribution"),
-                "Feature": get_term("Feature"),
-            }
-        )
+        columns={
+            "Contribution": get_term("Contribution"),
+            "Feature": get_term("Feature"),
+        }
+    )
     builder = GridOptionsBuilder.from_dataframe(df)
     AgGrid(df, fit_columns_on_grid_load=True, gridOptions=builder.build())
 
@@ -38,7 +38,7 @@ def format_contributions_for_details(eids):
                 "category": "Category",
                 "Feature Name": "Feature",
                 "Feature Value": "Value",
-                "Average/Mode": "Average/Mode Value"
+                "Average/Mode": "Average/Mode Value",
             }
         )
         contributions[eid] = contributions[eid][

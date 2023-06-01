@@ -9,7 +9,9 @@ import matplotlib.pyplot as plt
 def generate_feature_plot(feature):
     eids = entities.get_eids(1000)
     predictions = model.predictions(eids)
-    feature_scatter_plot(contributions.get_contributions(eids), feature, predictions=predictions)
+    feature_scatter_plot(
+        contributions.get_contributions(eids), feature, predictions=predictions
+    )
     st.pyplot(plt.gcf(), use_container_width=False)
     plt.clf()
 

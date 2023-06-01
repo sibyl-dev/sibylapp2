@@ -4,7 +4,7 @@ import pandas as pd
 import streamlit as st
 
 session = requests.Session()
-session.headers.update({'Access-Control-Allow-Origin': '*'})
+session.headers.update({"Access-Control-Allow-Origin": "*"})
 if CERT is not None:
     session.cert = CERT
 
@@ -13,7 +13,10 @@ def api_get(url):
     fetch_url = BASE_URL + url
     response = session.get(fetch_url)
     if response.status_code != 200:
-        st.error("Error with GET(%s). %s: %s" % (fetch_url, response.status_code, response.reason))
+        st.error(
+            "Error with GET(%s). %s: %s"
+            % (fetch_url, response.status_code, response.reason)
+        )
         st.stop()
     return response.json()
 
@@ -22,7 +25,10 @@ def api_post(url, json):
     fetch_url = BASE_URL + url
     response = session.post(fetch_url, json=json)
     if response.status_code != 200:
-        st.error("Error with POST(%s). %s: %s" % (fetch_url, response.status_code, response.reason))
+        st.error(
+            "Error with POST(%s). %s: %s"
+            % (fetch_url, response.status_code, response.reason)
+        )
         st.stop()
     return response.json()
 
@@ -62,7 +68,9 @@ def fetch_contributions(eids):
     contributions = api_post("multi_contributions/", json)["contributions"]
     results = {}
     for eid in contributions:
-        results[eid] = pd.concat([features_df, pd.read_json(contributions[eid], orient="index")], axis=1)
+        results[eid] = pd.concat(
+            [features_df, pd.read_json(contributions[eid], orient="index")], axis=1
+        )
     return results
 
 
