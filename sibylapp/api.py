@@ -38,11 +38,8 @@ def fetch_eids():
 
 
 def fetch_predictions(eids):
-    predictions = {}
-    for eid in eids:
-        url = "prediction?model_id=" + fetch_model_id() + "&eid=" + str(eid)
-        prediction = api_get(url)["output"]
-        predictions[eid] = prediction
+    json = {"eids": eids, "model_id": fetch_model_id()}
+    predictions = api_post("multi_prediction", json)["predictions"]
     return predictions
 
 

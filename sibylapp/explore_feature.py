@@ -1,13 +1,16 @@
 import streamlit as st
 from sibylapp.context import get_term
-from sibylapp import contributions, entities, api, model
+from sibylapp import contributions, entities, api, model, config
 from pyreal.visualize import feature_scatter_plot
 import matplotlib.pyplot as plt
 
 
+@st.cache_data
 def generate_feature_plot(feature):
-    feature_scatter_plot(contributions.get_contributions(entities.get_eids()), feature, predictions=model.predictions(entities.get_eids()))
-    st.pyplot(plt.gcf())
+    eids = entities.get_eids(1000)
+    predictions = model.predictions(eids)
+    feature_scatter_plot(contributions.get_contributions(eids), feature, predictions=predictions)
+    st.pyplot(plt.gcf(), use_container_width=False)
     plt.clf()
 
 

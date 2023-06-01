@@ -54,7 +54,7 @@ def format_contributions_for_details(eids):
 
 
 def view(row):
-    to_show = format_contributions_for_details(row)["0"]
+    to_show = format_contributions_for_details(row)[row]
     sort_by = st.selectbox(
         "Sort order", ["Absolute", "Ascending", "Descending", "Side-by-side"]
     )
