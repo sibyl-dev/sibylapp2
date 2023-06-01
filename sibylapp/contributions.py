@@ -3,7 +3,7 @@ from sibylapp.config import FLIP_COLORS
 from sibylapp.helpers import process_options
 from sibylapp import api, helpers, entities
 from sibylapp.context import get_term
-from st_aggrid import GridOptionsBuilder, AgGrid
+from st_aggrid import AgGrid
 
 if FLIP_COLORS:
     pos_em = "🟥"
@@ -20,8 +20,7 @@ def show_table(df):
             "Feature": get_term("Feature"),
         }
     )
-    builder = GridOptionsBuilder.from_dataframe(df)
-    AgGrid(df, fit_columns_on_grid_load=True, gridOptions=builder.build())
+    AgGrid(df, fit_columns_on_grid_load=True)
 
 
 @st.cache_data
