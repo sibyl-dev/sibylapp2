@@ -34,7 +34,8 @@ def compute_importance():
     return importance
 
 
-def view(to_show):
+def view():
+    to_show = compute_importance()
     to_show = to_show.sort_values(by="Importance Value", axis="index", ascending=False)
     to_show = process_options(to_show)
     show_table(to_show)

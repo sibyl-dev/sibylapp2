@@ -17,6 +17,8 @@ BAR_LENGTH = 8  # Number of squares to use for contribution/importance bars
 MAX_ENTITIES = (
     10  # Maximum number of entities to select from. Set this to None to use all
 )
+DATASET_SIZE = 1000  # Max number of entities to use for dataset-wide visualizations
+LOAD_UPFRONT = True  # If true, run heavy computations on initial load, else greedily run as needed
 
 
 # PRE-WRITTEN FORMAT FUNCTION OPTIONS =============================================================

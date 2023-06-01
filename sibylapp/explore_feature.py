@@ -5,12 +5,14 @@ from pyreal.visualize import feature_scatter_plot
 import matplotlib.pyplot as plt
 
 
-@st.cache_data
+@st.cache_data(show_spinner="Generating plot...")
 def generate_feature_plot(feature):
-    eids = entities.get_eids(1000)
-    predictions = model.predictions(eids)
+    if "dataset_eids" not in st.session_state:
+        st.session_state["dataset_eids"] = entities.get_eids(1000)
+    predictions = model.get_predictions(st.session_state["dataset_eids"])
+    contributions_results = contributions.get_contributions(st.session_state["dataset_eids"])
     feature_scatter_plot(
-        contributions.get_contributions(eids), feature, predictions=predictions
+        contributions_results, feature, predictions=predictions
     )
     st.pyplot(plt.gcf(), use_container_width=False)
     plt.clf()

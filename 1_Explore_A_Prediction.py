@@ -1,30 +1,21 @@
 import streamlit as st
-from sibylapp import contributions, model, config, entities, filtering
+from sibylapp import contributions, model, config, filtering, setup
 from sibylapp.context import get_term
 
-st.set_page_config(layout="wide")
-st.title("Sibyl")
-
-# Prepping data -----------------------------
-if "eids" not in st.session_state:
-    st.session_state["eids"] = entities.get_eids(max_entities=config.MAX_ENTITIES)
-
-
-# Prepping predictions -----------------------
-if "predictions" not in st.session_state:
-    st.session_state["predictions"] = model.predictions(st.session_state["eids"])
+setup.setup_page()
 
 # Sidebar ------------------------------------
+predictions = model.get_predictions(st.session_state["eids"])
 sample_options = {
     f"{get_term('Entity')} {key} ("
-    + config.pred_format_func(st.session_state["predictions"][key])
+    + config.pred_format_func(predictions[key])
     + ")": key
     for key in st.session_state["eids"]
 }
 
 chosen_option = st.sidebar.selectbox("Select %s" % get_term("Entity"), sample_options)
-row = sample_options[chosen_option]
-pred = st.session_state["predictions"][row]
+eid = sample_options[chosen_option]
+pred = predictions[eid]
 st.sidebar.metric(get_term("Prediction"), config.pred_format_func(pred))
 
 # Global options ------------------------------
@@ -37,4 +28,4 @@ filtering.view()
     ]
 )
 with tab1:
-    contributions.view(row)
+    contributions.view(eid)
