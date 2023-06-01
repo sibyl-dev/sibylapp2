@@ -1,8 +1,7 @@
-import numpy as np
 import streamlit as st
 from sibylapp.config import FLIP_COLORS
 from sibylapp.helpers import process_options
-from sibylapp import api, helpers
+from sibylapp import api, helpers, entities
 from sibylapp.context import get_term
 from st_aggrid import GridOptionsBuilder, AgGrid
 
@@ -15,7 +14,6 @@ else:
 
 
 def show_table(df):
-    #df = df.set_index("Category", verify_integrity=False)
     df = df.drop("Contribution Value", axis="columns").rename(
             columns={
                 "Contribution": get_term("Contribution"),
@@ -32,14 +30,14 @@ def compute_contributions(eids):
     for eid in contributions:
         contributions[eid] = contributions[eid].rename(
             columns={
-                "contributions": "Contribution",
                 "category": "Category",
                 "description": "Feature",
-                "value": "Value",
+                "Feature Value": "Value",
+                "Average/Mode": "Average/Mode Value"
             }
         )
         contributions[eid] = contributions[eid][
-            ["Category", "Feature", "Value", "Contribution"]
+            ["Category", "Feature", "Value", "Average/Mode Value", "Contribution"]
         ]  # reorder
         contributions[eid]["Contribution Value"] = contributions[eid][
             "Contribution"
@@ -54,6 +52,9 @@ def view(to_show):
     sort_by = st.selectbox(
         "Sort order", ["Absolute", "Ascending", "Descending", "Side-by-side"]
     )
+    show_average = st.checkbox("Show average values?")
+    if not show_average:
+        to_show = to_show.drop("Average/Mode Value", axis="columns")
 
     if sort_by == "Side-by-side":
         col1, col2 = st.columns(2)

@@ -68,15 +68,11 @@ def fetch_entity(eid):
 
 def fetch_contributions(eids):
     features_df = fetch_features()
-
+    json = {"eids": eids, "model_id": fetch_model_id()}
+    contributions = api_post("multi_contributions/", json)["contributions"]
     results = {}
-    for eid in eids:
-        json = {"eid": eid, "model_id": fetch_model_id()}
-        contributions = api_post("contributions/", json)
-        contribution_df = pd.DataFrame(contributions)
-        feature_values = fetch_entity(eid)
-        result = pd.concat([features_df, feature_values, contribution_df], axis=1)
-        results[eid] = result
+    for eid in contributions:
+        results[eid] = pd.concat([features_df, pd.read_json(contributions[eid], orient="index")], axis=1)
     return results
 
 
