@@ -7,7 +7,6 @@ session = requests.Session()
 session.headers.update({"Access-Control-Allow-Origin": "*"})
 if CERT is not None:
     session.cert = CERT
-cache = {}
 
 
 def api_get(url):
@@ -35,10 +34,7 @@ def api_post(url, json):
 
 
 def fetch_model_id():
-    if "model_id" in cache:
-        return cache["model_id"]
     model_id = api_get("models/")["models"][0]["id"]
-    cache["model_id"] = model_id
     return model_id
 
 
@@ -48,21 +44,15 @@ def fetch_eids():
 
 
 def fetch_predictions(eids):
-    predictions = {}
-    for eid in eids:
-        url = "prediction?model_id=" + fetch_model_id() + "&eid=" + str(eid)
-        prediction = api_get(url)["output"]
-        predictions[eid] = prediction
+    json = {"eids": eids, "model_id": fetch_model_id()}
+    predictions = api_post("multi_prediction", json)["predictions"]
     return predictions
 
 
 def fetch_features():
-    if "features" in cache:
-        return cache["features"]
     features = api_get("features/")["features"]
-    features_df = pd.DataFrame(features)
+    features_df = pd.DataFrame(features).rename(columns={"description": "Feature Name"})
     features_df = features_df.set_index("name")
-    cache["features"] = features_df
     return features_df
 
 
@@ -74,15 +64,13 @@ def fetch_entity(eid):
 
 def fetch_contributions(eids):
     features_df = fetch_features()
-
+    json = {"eids": eids, "model_id": fetch_model_id()}
+    contributions = api_post("multi_contributions/", json)["contributions"]
     results = {}
-    for eid in eids:
-        json = {"eid": eid, "model_id": fetch_model_id()}
-        contributions = api_post("contributions/", json)
-        contribution_df = pd.DataFrame(contributions)
-        feature_values = fetch_entity(eid)
-        result = pd.concat([features_df, feature_values, contribution_df], axis=1)
-        results[eid] = result
+    for eid in contributions:
+        results[eid] = pd.concat(
+            [features_df, pd.read_json(contributions[eid], orient="index")], axis=1
+        )
     return results
 
 

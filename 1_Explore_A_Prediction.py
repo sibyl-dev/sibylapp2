@@ -9,8 +9,6 @@ st.title("Sibyl")
 if "eids" not in st.session_state:
     st.session_state["eids"] = entities.get_eids(max_entities=config.MAX_ENTITIES)
 
-# Prepping explanations ---------------------
-contribution_results = contributions.compute_contributions(st.session_state["eids"])
 
 # Prepping predictions -----------------------
 if "predictions" not in st.session_state:
@@ -39,4 +37,4 @@ filtering.view()
     ]
 )
 with tab1:
-    contributions.view(contribution_results[row])
+    contributions.view(row)
