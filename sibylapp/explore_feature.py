@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 
 def generate_feature_plot(feature):
-    feature_scatter_plot(contributions.get_all_contributions(), feature, predictions=model.predictions(entities.get_eids()))
+    feature_scatter_plot(contributions.get_contributions(entities.get_eids()), feature, predictions=model.predictions(entities.get_eids()))
     st.pyplot(plt.gcf())
     plt.clf()
 

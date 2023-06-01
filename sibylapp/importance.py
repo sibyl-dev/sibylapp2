@@ -26,7 +26,7 @@ def compute_importance():
         columns={
             "importances": "Importance",
             "category": "Category",
-            "description": "Feature",
+            "Feature Name": "Feature",
         }
     )
     importance = importance[["Category", "Feature", "Importance"]]  # reorder
