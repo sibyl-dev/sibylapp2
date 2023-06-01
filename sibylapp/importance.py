@@ -42,3 +42,4 @@ def view(to_show):
     to_show = to_show.sort_values(by="Importance Value", axis="index", ascending=False)
     to_show = process_options(to_show)
     show_table(to_show)
+    return to_show["Feature"]
