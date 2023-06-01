@@ -8,7 +8,9 @@ def compute_contributions(eids):
     if "contributions" not in st.session_state:
         st.session_state["contributions"] = contributions
     else:
-        st.session_state["contributions"] = dict(st.session_state["contributions"], **contributions)
+        st.session_state["contributions"] = dict(
+            st.session_state["contributions"], **contributions
+        )
     return contributions
 
 

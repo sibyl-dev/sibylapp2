@@ -8,7 +8,9 @@ def compute_predictions(eids):
     if "predictions" not in st.session_state:
         st.session_state["predictions"] = predictions
     else:
-        st.session_state["predictions"] = dict(st.session_state["predictions"], **predictions)
+        st.session_state["predictions"] = dict(
+            st.session_state["predictions"], **predictions
+        )
     return predictions
 
 
@@ -20,4 +22,3 @@ def get_predictions(eids):
         if len(missing_eids) > 0:
             compute_predictions(missing_eids)
     return {eid: st.session_state["predictions"][eid] for eid in eids}
-

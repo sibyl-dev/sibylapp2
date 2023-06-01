@@ -29,9 +29,7 @@ def format_contributions_to_view(contribution_df):
     contribution_df = contribution_df[
         ["Category", "Feature", "Value", "Average/Mode Value", "Contribution"]
     ]  # reorder
-    contribution_df["Contribution Value"] = contribution_df[
-        "Contribution"
-    ].copy()
+    contribution_df["Contribution Value"] = contribution_df["Contribution"].copy()
     contribution_df["Contribution"] = helpers.generate_bars(
         contribution_df["Contribution"]
     )

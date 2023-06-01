@@ -12,11 +12,15 @@ def setup_page():
         st.session_state["eids"] = entities.get_eids(max_entities=config.MAX_ENTITIES)
 
     if "dataset_eids" not in st.session_state:
-        st.session_state["dataset_eids"] = entities.get_eids(max_entities=config.DATASET_SIZE)
+        st.session_state["dataset_eids"] = entities.get_eids(
+            max_entities=config.DATASET_SIZE
+        )
 
     # Populate cache -----------------------------
     if config.LOAD_UPFRONT:
-        all_eids = list(set(st.session_state["eids"] + st.session_state["dataset_eids"]))
+        all_eids = list(
+            set(st.session_state["eids"] + st.session_state["dataset_eids"])
+        )
         model.get_predictions(all_eids)
         contributions.get_contributions(all_eids)
         importance.compute_importance()
