@@ -1,6 +1,6 @@
 import streamlit as st
-from sibylapp.context import get_term
-from sibylapp import contributions, entities, api, model, config
+from sibylapp.compute.context import get_term
+from sibylapp.compute import contributions, model, entities
 from pyreal.visualize import feature_scatter_plot
 import matplotlib.pyplot as plt
 

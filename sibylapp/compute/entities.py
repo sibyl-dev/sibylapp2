@@ -1,4 +1,4 @@
-from sibylapp import api
+from sibylapp.compute import api
 import streamlit as st
 
 

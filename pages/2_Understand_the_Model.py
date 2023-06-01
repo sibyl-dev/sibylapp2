@@ -1,6 +1,7 @@
 import streamlit as st
-from sibylapp import importance, filtering, explore_feature, entities, config, setup
-from sibylapp.context import get_term
+from sibylapp.view.utils import filtering, setup
+from sibylapp.view import explore_feature, feature_importance
+from sibylapp.compute.context import get_term
 
 
 setup.setup_page()
@@ -14,7 +15,7 @@ tab1, tab2 = st.tabs(
     [get_term("Feature Importance"), "Explore a %s" % get_term("Feature")]
 )
 with tab1:
-    features = importance.view()
+    features = feature_importance.view()
 
 with tab2:
     explore_feature.view(features)

@@ -1,5 +1,5 @@
 import streamlit as st
-from sibylapp import api
+from sibylapp.compute import api
 
 
 @st.cache_data(show_spinner="Computing model predictions...")

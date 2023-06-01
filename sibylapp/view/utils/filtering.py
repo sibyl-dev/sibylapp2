@@ -1,6 +1,6 @@
 import streamlit as st
-from sibylapp.context import get_term
-from sibylapp import context
+from sibylapp.compute.context import get_term
+from sibylapp.compute import context
 
 
 def view():

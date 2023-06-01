@@ -1,5 +1,6 @@
 import streamlit as st
-from sibylapp import contributions, model, config, entities, importance
+from sibylapp import config
+from sibylapp.compute import importance, contributions, model, entities
 
 
 def setup_page():

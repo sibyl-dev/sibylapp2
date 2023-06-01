@@ -1,6 +1,9 @@
 import streamlit as st
-from sibylapp import contributions, model, config, filtering, setup
-from sibylapp.context import get_term
+from sibylapp import config
+from sibylapp.view.utils import filtering, setup
+from sibylapp.compute import model
+from sibylapp.view import feature_contribution
+from sibylapp.compute.context import get_term
 
 setup.setup_page()
 
@@ -28,4 +31,4 @@ filtering.view()
     ]
 )
 with tab1:
-    contributions.view(eid)
+    feature_contribution.view(eid)
