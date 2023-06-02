@@ -14,6 +14,7 @@ def compute_contributions(eids):
     return contributions
 
 
+@st.cache_data(show_spinner="Getting contributions...")
 def get_contributions(eids):
     if "contributions" not in st.session_state:
         compute_contributions(eids)

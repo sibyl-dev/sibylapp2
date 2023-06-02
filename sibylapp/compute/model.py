@@ -14,6 +14,7 @@ def compute_predictions(eids):
     return predictions
 
 
+@st.cache_data(show_spinner="Getting predictions...")
 def get_predictions(eids):
     if "predictions" not in st.session_state:
         compute_predictions(eids)
