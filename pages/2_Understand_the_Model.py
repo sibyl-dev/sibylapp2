@@ -22,7 +22,7 @@ with tab1:
     features = feature_importance.view()
 
 with tab2:
-    feature_distributions.view()
+    feature_distributions.view(features)
 
 with tab3:
     explore_feature.view(features)

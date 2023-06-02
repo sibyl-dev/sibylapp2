@@ -7,6 +7,8 @@ import pandas as pd
 from pyreal.visualize import swarm_plot
 import matplotlib.pyplot as plt
 import numpy as np
+import plotly.graph_objects as go
+import plotly.express as px
 
 
 def show_table(df):
@@ -72,7 +74,18 @@ def generate_swarm_plot(contribution_dict):
     return plt.gcf()
 
 
-def view():
+def generate_feature_plot(feature, contribution_dict):
+    data = pd.DataFrame([contribution_dict[eid][contribution_dict[eid]["Feature Name"] == feature]["Feature Value"] for eid in contribution_dict]).squeeze()
+    if pd.api.types.is_numeric_dtype(pd.to_numeric(data, errors="ignore")):
+        trace1 = go.Box(x=data, boxpoints='all', name=feature)
+        fig = go.Figure(data=[trace1])
+        return fig
+    else:
+        fig = px.pie(data, values=data.value_counts().values, names=data.value_counts().index, title=feature)
+        return fig
+
+
+def view(features):
     if "dataset_eids" not in st.session_state:
         st.session_state["dataset_eids"] = entities.get_eids(config.DATASET_SIZE)
     predictions = model.get_predictions(st.session_state["dataset_eids"])
@@ -87,7 +100,7 @@ def view():
     min_diff = min([a[i + 1] - a[i] for i in range(size) if i+1 < size])
     pred_range = st.slider("Predictions to visualize", min_pred, max_pred, (min_pred, max_pred), step=min_diff)
 
-    subtab1, subtab2 = st.tabs(["Average Contribution Table", "Summary plot"])
+    subtab1, subtab2, subtab3 = st.tabs(["Average Contribution Table", "Summary plot", "Feature Distributions"])
     with subtab1:
         sort_by = st.selectbox(
             "Sort order", ["Absolute", "Ascending", "Descending", "Side-by-side"]
@@ -101,77 +114,6 @@ def view():
     with subtab2:
         st.pyplot(generate_swarm_plot(contributions_in_range), clear_figure=True)
 
-
-"""
-import streamlit as st
-from sibylapp import entities, api, contributions, helpers
-from sibylapp.config import pred_format_func
-import numpy as np
-import pandas as pd
-from pyreal.visualize import swarm_plot
-import matplotlib.pyplot as plt
-from plotly.express import strip
-
-
-def format_contributions(df):
-    df = df.drop(["Contribution"], axis="columns")
-    return df.rename(
-        columns={
-            "Value": "Feature Value",
-            "Contribution Value": "Contribution",
-            "Feature": "Feature Name",
-        }
-    )
-
-
-def view(contribution_results, predictions, categorical=True, nbins=2):
-    prediction_lst = list(predictions.values())
-    max_val = max(prediction_lst)
-    min_val = min(prediction_lst)
-
-    all_eids = {}
-    if not categorical:
-        total_range = (max_val - min_val) / nbins
-        thresholds = [min_val + n * total_range for n in range(nbins)]
-        thresholds.append(max_val + 1)
-        clss = [
-            pred_format_func(thresholds[i]) + "-" + pred_format_func(thresholds[i + 1])
-            for i in range(nbins)
-        ]
-        for i in range(nbins):
-            eids = [
-                x
-                for x in predictions
-                if thresholds[i] <= predictions[x] < thresholds[i + 1]
-            ]
-            all_eids[clss[i]] = eids
-
-    if categorical:
-        for cls in np.unqiue(prediction_lst):
-            eids = [x for x in predictions if predictions[x] == cls]
-            all_eids[cls] = eids
-
-    cls = st.selectbox("Prediction", list(all_eids.keys()))
-
-    st.text("Average contributions for prediction: " + cls)
-
-    cls_contributions = {
-        eid: format_contributions(contribution_results[eid]) for eid in all_eids[cls]
-    }
-    averaged = pd.concat(
-        [cls_contributions[eid]["Contribution"] for eid in cls_contributions], axis=1
-    ).mean(axis=1)
-    to_show = contribution_results[next(iter(contribution_results))]
-    to_show["Contribution Value"] = averaged
-    to_show["Contribution"] = helpers.generate_bars(to_show["Contribution Value"])
-    contributions.view(to_show.drop("Value", axis="columns"))
-
-    #st.write(pd.concat(cls_contributions, axis=0))
-    #fig = strip(pd.concat(cls_contributions, axis=0), x="Contribution", y="Feature Name", color="Feature Value")
-    #st.plotly_chart(fig)
-
-    swarm_plot(cls_contributions)
-    st.pyplot(plt.gcf())
-    plt.clf()
-
-"""
+    with subtab3:
+        feature = st.selectbox("Select a %s" % context.get_term("feature"), features, key="feature distribution feature select")
+        st.plotly_chart(generate_feature_plot(feature, contributions_in_range), clear_figure=True)
