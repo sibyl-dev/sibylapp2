@@ -17,8 +17,7 @@ def compute_contributions(eids):
 def get_contributions(eids):
     if "contributions" not in st.session_state:
         compute_contributions(eids)
-    else:
-        missing_eids = list(set(eids) - st.session_state["contributions"].keys())
-        if len(missing_eids) > 0:
-            compute_contributions(missing_eids)
+    missing_eids = list(set(eids) - st.session_state["contributions"].keys())
+    if len(missing_eids) > 0:
+        compute_contributions(missing_eids)
     return {eid: st.session_state["contributions"][eid] for eid in eids}
