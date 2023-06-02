@@ -140,7 +140,7 @@ def view(features):
         relevant_contributions = get_relevant_contributions(
             [chosen_pred], predictions, contributions_results
         )
-    elif len(np.unique(pred_values) < 6):
+    elif len(np.unique(pred_values) < 6) or not pd.api.types.is_numeric_dtype(pd.Series(pred_values)):
         chosen_preds = st.multiselect(
             "Predictions to visualize",
             [pred for pred in np.unique(pred_values)],
@@ -181,5 +181,5 @@ def view(features):
             key="feature distribution feature select",
         )
         st.plotly_chart(
-            generate_feature_plot(feature, relevant_contributions), clear_figure=True
+            generate_feature_plot(feature, relevant_contributions), clear_figure=True, use_container_width=True
         )
