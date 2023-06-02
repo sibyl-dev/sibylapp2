@@ -14,8 +14,7 @@ def generate_feature_plot(feature):
         st.session_state["dataset_eids"]
     )
     feature_scatter_plot(contributions_results, feature, predictions=predictions)
-    st.pyplot(plt.gcf(), use_container_width=False)
-    plt.clf()
+    st.pyplot(plt.gcf(), use_container_width=False, clear_figure=True)
 
 
 def view(features):

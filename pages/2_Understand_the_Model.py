@@ -14,7 +14,7 @@ filtering.view()
 tab1, tab2, tab3 = st.tabs(
     [
         get_term("Feature Importance"),
-        "%s Distributions" % get_term("Feature"),
+        "Summary by Prediction",
         "Explore a %s" % get_term("Feature"),
     ]
 )

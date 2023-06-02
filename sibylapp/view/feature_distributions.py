@@ -53,7 +53,7 @@ def generate_distribution_table(contributions_in_range):
     })[["Category", "Feature"]]
 
     to_show["Contribution Value"] = averaged
-    to_show["Contribution"] = generate_bars(to_show["Contribution Value"])
+    to_show["Average Contribution"] = generate_bars(to_show["Contribution Value"])
     to_show["Distribution"] = quantiles
     return to_show
 
@@ -87,16 +87,19 @@ def view():
     min_diff = min([a[i + 1] - a[i] for i in range(size) if i+1 < size])
     pred_range = st.slider("Predictions to visualize", min_pred, max_pred, (min_pred, max_pred), step=min_diff)
 
-    sort_by = st.selectbox(
-        "Sort order", ["Absolute", "Ascending", "Descending", "Side-by-side"]
-    )
+    subtab1, subtab2 = st.tabs(["Average Contribution Table", "Summary plot"])
+    with subtab1:
+        sort_by = st.selectbox(
+            "Sort order", ["Absolute", "Ascending", "Descending", "Side-by-side"]
+        )
 
-    contributions_in_range = get_relevant_contributions(pred_range, predictions, contributions_results)
+        contributions_in_range = get_relevant_contributions(pred_range, predictions, contributions_results)
 
-    to_show = generate_distribution_table(contributions_in_range)
-    show_sorted_contributions(to_show, sort_by, show_table)
+        to_show = generate_distribution_table(contributions_in_range)
+        show_sorted_contributions(to_show, sort_by, show_table)
 
-    st.pyplot(generate_swarm_plot(contributions_in_range))
+    with subtab2:
+        st.pyplot(generate_swarm_plot(contributions_in_range), clear_figure=True)
 
 
 """
