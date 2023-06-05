@@ -48,7 +48,7 @@ def aggregate(row):
 
 
 @st.cache_data(show_spinner="Getting global contributions...")
-def generate_distribution_table(contributions_in_range):
+def generate_distribution_table(contributions_in_range, show_distributions):
     averaged = pd.concat(
         [contributions_in_range[eid]["Contribution"] for eid in contributions_in_range],
         axis=1,
@@ -71,7 +71,8 @@ def generate_distribution_table(contributions_in_range):
 
     to_show["Contribution Value"] = averaged
     to_show["Average Contribution"] = generate_bars(to_show["Contribution Value"])
-    to_show["Distribution"] = quantiles
+    if show_distributions:
+        to_show["Distribution"] = quantiles
     return to_show
 
 
@@ -109,8 +110,12 @@ def view_table(relevant_contributions):
     sort_by = st.selectbox(
         "Sort order", ["Absolute", "Ascending", "Descending", "Side-by-side"]
     )
+    show_distributions = st.checkbox("Show feature distributions?",
+                                     help="Add a column that shows [min - Q1 - median - Q3 - max] "
+                                          "values for numeric features, or value percentages for "
+                                          "categorical features.")
 
-    to_show = generate_distribution_table(relevant_contributions)
+    to_show = generate_distribution_table(relevant_contributions, show_distributions)
     show_sorted_contributions(to_show, sort_by, show_table)
     return to_show
 
