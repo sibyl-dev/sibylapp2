@@ -12,7 +12,10 @@ filtering.view()
 
 
 tab1, tab2 = st.tabs(
-    [get_term("Feature Importance"), "Explore a %s" % get_term("Feature")]
+    [
+        get_term("Feature Importance"),
+        "Explore a %s" % get_term("Feature"),
+    ]
 )
 with tab1:
     features = feature_importance.view()
