@@ -1,8 +1,28 @@
 import streamlit as st
-from sibylapp.compute import context
+from sibylapp.compute import context, model
+from sibylapp import config
 
 
-def view():
+def view_entity_select():
+    def format_func(s):
+        return f"{context.get_term('Entity')} {s} (" + config.pred_format_func(predictions[s]) + ")"
+    predictions = model.get_predictions(st.session_state["eids"])
+
+    if "eid" in st.session_state:
+        st.session_state["select_eid_index"] = st.session_state["eids"].index(
+            st.session_state["eid"])
+    else:
+        st.session_state["select_eid_index"] = 0
+
+    st.session_state["eid"] = st.sidebar.selectbox("Select %s" % context.get_term("Entity"),
+                                                   st.session_state["eids"],
+                                                   format_func=format_func,
+                                                   index=st.session_state["select_eid_index"])
+    pred = predictions[st.session_state["eid"]]
+    st.sidebar.metric(context.get_term("Prediction"), config.pred_format_func(pred))
+
+
+def view_filtering():
     if "show_more" not in st.session_state:
         st.session_state["show_more"] = False
     if "search_term" not in st.session_state:

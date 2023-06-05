@@ -27,7 +27,7 @@ setup.setup_page()
 
 
 # Global options ------------------------------
-filtering.view()
+filtering.view_filtering()
 
 # Compute all data ----------------------------
 if "dataset_eids" not in st.session_state:

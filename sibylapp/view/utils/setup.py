@@ -3,8 +3,8 @@ from sibylapp import config
 from sibylapp.compute import importance, contributions, model, entities
 
 
-def setup_page():
-    st.set_page_config(layout="wide")
+def setup_page(page_title=None):
+    st.set_page_config(layout="wide", page_title=page_title)
     st.title("Sibyl")
 
     # Selecting eids -----------------------------
