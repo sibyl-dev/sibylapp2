@@ -45,7 +45,7 @@ def fetch_eids():
 
 def fetch_predictions(eids):
     json = {"eids": eids, "model_id": fetch_model_id()}
-    predictions = api_post("multi_prediction", json)["predictions"]
+    predictions = api_post("multi_prediction/", json)["predictions"]
     return predictions
 
 
