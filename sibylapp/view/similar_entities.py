@@ -7,7 +7,7 @@ from sklearn.neighbors import KDTree
 @st.cache_data
 def get_similar_entities(eid):
     result = api.fetch_similar_examples([eid])
-    st.write(result)
+    st.write(result[eid])
 
 
 def view(eid):

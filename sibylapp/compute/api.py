@@ -65,13 +65,13 @@ def fetch_entity(eid):
 def fetch_contributions(eids):
     features_df = fetch_features()
     json = {"eids": eids, "model_id": fetch_model_id()}
-    contributions = api_post("multi_contributions/", json)["contributions"]
-    results = {}
-    for eid in contributions:
-        results[eid] = pd.concat(
-            [features_df, pd.read_json(contributions[eid], orient="index")], axis=1
+    result = api_post("multi_contributions/", json)["contributions"]
+    contributions = {}
+    for eid in result:
+        contributions[eid] = pd.concat(
+            [features_df, pd.read_json(result[eid], orient="index")], axis=1
         )
-    return results
+    return contributions
 
 
 def fetch_importance():
@@ -86,11 +86,10 @@ def fetch_similar_examples(eids):
     features_df = fetch_features()
     json = {"eids": eids, "model_id": fetch_model_id()}
     result = api_post("similar_entities/", json)["similar_entities"]
-    st.write(result)
     similar_entities = {}
     for eid in result:
         similar_entities[eid] = pd.concat(
-            [features_df, pd.read_json(similar_entities[eid]["X"], orient="index")], axis=1
+            [features_df, pd.read_json(result[eid]["X"], orient="index")], axis=1
         )
     return similar_entities
 
