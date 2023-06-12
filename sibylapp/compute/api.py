@@ -82,6 +82,19 @@ def fetch_importance():
     return pd.concat([features_df, importance_df], axis=1)
 
 
+def fetch_similar_examples(eids):
+    features_df = fetch_features()
+    json = {"eids": eids, "model_id": fetch_model_id()}
+    result = api_post("similar_entities/", json)["similar_entities"]
+    st.write(result)
+    similar_entities = {}
+    for eid in result:
+        similar_entities[eid] = pd.concat(
+            [features_df, pd.read_json(similar_entities[eid]["X"], orient="index")], axis=1
+        )
+    return similar_entities
+
+
 def fetch_categories():
     categories = api_get("categories/")["categories"]
     return pd.DataFrame(categories)
