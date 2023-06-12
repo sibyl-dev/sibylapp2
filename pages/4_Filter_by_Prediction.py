@@ -66,8 +66,8 @@ else:
 
 
 tab1, tab2, tab3 = st.tabs(
-        ["Average Contribution Table", "Summary plot", "Feature Distributions"]
-    )
+    ["Average Contribution Table", "Summary plot", "Feature Distributions"]
+)
 
 with tab1:
     table = by_prediction.view_table(relevant_contributions)

@@ -88,9 +88,17 @@ def fetch_similar_examples(eids):
     result = api_post("similar_entities/", json)["similar_entities"]
     similar_entities = {}
     for eid in result:
-        similar_entities[eid] = pd.concat(
-            [features_df, pd.read_json(result[eid]["X"], orient="index")], axis=1
-        )
+        y = pd.read_json(result[eid]["y"], orient="index")
+        similar_entities[eid] = {
+            "X": pd.concat(
+                [
+                    features_df[["Feature Name", "category"]],
+                    pd.read_json(result[eid]["X"], orient="index").T,
+                ],
+                axis=1,
+            ),
+            "y": y,
+        }
     return similar_entities
 
 

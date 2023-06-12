@@ -11,5 +11,3 @@ setup.setup_page()
 filtering.view_entity_select()
 
 similar_entities.view(st.session_state["eid"])
-
-
