@@ -30,12 +30,8 @@ setup.setup_page()
 filtering.view_filtering()
 
 # Compute all data ----------------------------
-if "dataset_eids" not in st.session_state:
-    st.session_state["dataset_eids"] = entities.get_eids(config.DATASET_SIZE)
-predictions = model.get_predictions(st.session_state["dataset_eids"])
-contributions_results = contributions.get_contributions(
-    st.session_state["dataset_eids"]
-)
+predictions = model.get_dataset_predictions()
+contributions_results = contributions.get_dataset_contributions()
 
 # Select predictions of interest --------------
 pred_values = list(predictions.values())
