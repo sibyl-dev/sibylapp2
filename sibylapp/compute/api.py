@@ -88,7 +88,7 @@ def fetch_similar_examples(eids):
     result = api_post("similar_entities/", json)["similar_entities"]
     similar_entities = {}
     for eid in result:
-        y = pd.read_json(result[eid]["y"], orient="index")
+        y = pd.read_json(result[eid]["y"], orient="index").T
         X = pd.concat(
                 [
                     features_df[["Feature Name", "category"]],
@@ -97,10 +97,10 @@ def fetch_similar_examples(eids):
                 axis=1,
             )
         X.columns = X.columns.astype(str)
-        y.index = y.index.map(str)
+        y.columns = y.columns.astype(str)
         if str(eid) not in X:
             X = pd.concat([X, fetch_entity(eid)], axis=1)
-            y[eid] = "N/A"
+        y[str(eid)] = "N/A"
         similar_entities[eid] = {
             "X": X,
             "y": y,

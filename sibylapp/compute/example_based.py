@@ -9,7 +9,6 @@ def get_similar_entities(eid):
     x = result[eid]["X"]
     x = x.rename(columns={"Feature Name": "Feature", "category": "Category"})
     y = result[eid]["y"]
-    y_row = y.T
-    y_row["Feature"] = "Real Target Value"
+    y["Feature"] = "Real Target Value"
 
-    return pd.concat([y_row, x], axis=0)
+    return x, y
