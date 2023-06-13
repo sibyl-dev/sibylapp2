@@ -98,10 +98,9 @@ def fetch_similar_examples(eids):
             )
         X.columns = X.columns.astype(str)
         y.index = y.index.map(str)
-        if str(eid) in X:
-            X = X.drop(columns=str(eid))
-        if str(eid) in y.index:
-            y = y.drop(str(eid))
+        if str(eid) not in X:
+            X = pd.concat([X, fetch_entity(eid)], axis=1)
+            y[eid] = "N/A"
         similar_entities[eid] = {
             "X": X,
             "y": y,
