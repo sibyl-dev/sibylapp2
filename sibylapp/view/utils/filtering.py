@@ -30,7 +30,7 @@ def view_entity_select():
     st.sidebar.metric(context.get_term("Prediction"), config.pred_format_func(pred))
 
 
-def view_filtering():
+def view_filtering(include_show_more=True):
     if "show_more" not in st.session_state:
         st.session_state["show_more"] = False
     if "search_term" not in st.session_state:
@@ -38,7 +38,10 @@ def view_filtering():
     if "filters" not in st.session_state:
         st.session_state["filters"] = []
 
-    st.checkbox("Show all", key="show_more", value=st.session_state["show_more"])
+    if include_show_more:
+        st.checkbox("Show all", key="show_more", value=st.session_state["show_more"])
+    else:
+        st.session_state["show_more"] = True
 
     if (
         "search_term" in st.session_state and len(st.session_state["search_term"]) > 0

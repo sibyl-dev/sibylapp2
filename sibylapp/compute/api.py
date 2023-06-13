@@ -90,12 +90,12 @@ def fetch_similar_examples(eids):
     for eid in result:
         y = pd.read_json(result[eid]["y"], orient="index").T
         X = pd.concat(
-                [
-                    features_df[["Feature Name", "category"]],
-                    pd.read_json(result[eid]["X"], orient="index").T,
-                ],
-                axis=1,
-            )
+            [
+                features_df[["Feature Name", "category"]],
+                pd.read_json(result[eid]["X"], orient="index").T,
+            ],
+            axis=1,
+        )
         X.columns = X.columns.astype(str)
         y.columns = y.columns.astype(str)
         if str(eid) not in X:

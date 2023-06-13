@@ -8,6 +8,6 @@ setup.setup_page()
 
 # Sidebar ------------------------------------
 filtering.view_entity_select()
-filtering.view_filtering()
+filtering.view_filtering(include_show_more=False)
 
 similar_entities.view(st.session_state["eid"])
