@@ -3,8 +3,8 @@ from sibylapp.compute import context
 from sibylapp.view.utils.helpers import (
     generate_bars,
     show_sorted_contributions,
-    process_options,
 )
+from sibylapp.view.utils.filtering import process_options
 from st_aggrid import AgGrid
 import pandas as pd
 from pyreal.visualize import swarm_plot
