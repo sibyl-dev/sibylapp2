@@ -6,9 +6,10 @@ from sibylapp.compute import api, context
 @st.cache_data
 def get_similar_entities(eid):
     result = api.fetch_similar_examples([eid])
-    X = result[eid]["X"]
+    x = result[eid]["X"]
+    x = x.rename(columns={"Feature Name": "Feature", "category": "Category"})
     y = result[eid]["y"]
     y_row = y.T
-    y_row["Feature Name"] = "Real Target Value"
+    y_row["Feature"] = "Real Target Value"
 
-    return pd.concat([y_row, X], axis=0)
+    return pd.concat([y_row, x], axis=0)
