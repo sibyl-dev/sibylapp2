@@ -28,6 +28,7 @@ setup.setup_page()
 
 # Global options ------------------------------
 filtering.view()
+by_prediction.view_instructions()
 
 # Compute all data ----------------------------
 if "dataset_eids" not in st.session_state:

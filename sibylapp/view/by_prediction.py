@@ -1,5 +1,5 @@
 import streamlit as st
-from sibylapp.compute import context
+from sibylapp.compute.context import get_term
 from sibylapp.view.utils.helpers import (
     generate_bars,
     show_sorted_contributions,
@@ -17,8 +17,8 @@ import plotly.express as px
 def show_table(df):
     df = df.drop("Contribution Value", axis="columns").rename(
         columns={
-            "Contribution": context.get_term("Contribution"),
-            "Feature": context.get_term("Feature"),
+            "Contribution": get_term("Contribution"),
+            "Feature": get_term("Feature"),
         }
     )
     AgGrid(df, fit_columns_on_grid_load=True)
@@ -128,7 +128,7 @@ def view_summary_plot(relevant_contributions):
 
 def view_feature_plot(relevant_contributions, table):
     feature = st.selectbox(
-        "Select a %s" % context.get_term("feature"),
+        "Select a %s" % get_term("feature"),
         process_options(table)["Feature"],
         key="feature distribution feature select",
     )
@@ -137,3 +137,9 @@ def view_feature_plot(relevant_contributions, table):
         clear_figure=True,
         use_container_width=True,
     )
+
+
+def view_instructions():
+    expander = st.sidebar.expander("How to Use")
+    with expander:
+        st.markdown("This page helps you understand how ")
