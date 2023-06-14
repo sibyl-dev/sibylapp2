@@ -52,14 +52,8 @@ def view_instructions():
     expander = st.sidebar.expander("How to Use")
     with expander:
         st.markdown(
-            "*Feature Contributions* refer to the positive or negative affect a specific feature value had on the "
-            "model's prediction."
-        )
-        st.markdown(
-            "You can select a %s from the dropdown above, and see which features contributed most to "
-            "the model's prediction in the table to the right. You can also **filter** and **search** "
-            "the features shown in table or adjust the **sort order**."
-            % (get_term("Entity").lower())
+            "**%s Contributions** refer to the positive or negative affect a specific feature value had on the "
+            "model's prediction." % (get_term("Feature"))
         )
         if FLIP_COLORS:
             positive, negative = "red", "blue"
@@ -75,6 +69,15 @@ def view_instructions():
                 get_term("Entity").lower(),
                 negative,
                 get_term("Feature").lower(),
+                get_term("Feature").lower(),
+            )
+        )
+        st.markdown(
+            "You can select a %s from the dropdown above, and see the %s contributions. You can also **filter** and **search** "
+            "the %s table or adjust the **sort order**."
+            % (
+                get_term("Feature").lower(),
+                get_term("Entity").lower(),
                 get_term("Feature").lower(),
             )
         )

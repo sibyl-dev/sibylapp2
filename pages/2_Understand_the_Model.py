@@ -9,6 +9,7 @@ setup.setup_page()
 
 # Global options ------------------------------
 filtering.view()
+feature_importance.view_instructions()
 
 
 tab1, tab2 = st.tabs(

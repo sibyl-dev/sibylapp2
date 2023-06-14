@@ -9,9 +9,11 @@ st.markdown(
 )
 
 st.header("Understanding model predictions")
-st.markdown("The **Explore a Prediction** page lets you investigate a specific model prediction. On this page, "
-            "you can select a %s on the left sidebar to get an explanation of the model's prediction on that %s."
-            % (get_term("Entity"), get_term("Entity")))
+st.markdown(
+    "The **Explore a Prediction** page lets you investigate a specific model prediction. On this page, "
+    "you can select a %s on the left sidebar to get an explanation of the model's prediction on that %s."
+    % (get_term("Entity"), get_term("Entity"))
+)
 st.subheader("Explore a Prediction")
 st.markdown(
     "This page tells you how much each feature contributed to the model's prediction on that house."

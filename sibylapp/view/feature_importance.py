@@ -39,3 +39,24 @@ def view():
     to_show = helpers.process_options(to_show)
     show_table(to_show)
     return to_show["Feature"]
+
+
+def view_instructions():
+    expander = st.sidebar.expander("How to Use")
+    with expander:
+        st.markdown(
+            "**"
+            + get_term("Feature")
+            + " Importance** refers to how much the model uses a specific "
+            + get_term("Feature").lower()
+            + " overall in its predictions. A large importance bar means this "
+            + get_term("Feature").lower()
+            + " is used frequently,"
+            " while a smaller bar means it is used less."
+        )
+        st.markdown(
+            "You can also **filter** and **search** "
+            "the "
+            + get_term("Feature").lower()
+            + " table shown or adjust the **sort order**."
+        )
