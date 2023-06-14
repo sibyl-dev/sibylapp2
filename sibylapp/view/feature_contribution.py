@@ -73,8 +73,8 @@ def view_instructions():
             )
         )
         st.markdown(
-            "You can select a %s from the dropdown above, and see the %s contributions. You can also **filter** and **search** "
-            "the %s table or adjust the **sort order**."
+            "You can select a %s from the dropdown above, and see the %s contributions. "
+            "You can also **filter** and **search** the %s table or adjust the **sort order**."
             % (
                 get_term("Feature").lower(),
                 get_term("Entity").lower(),
