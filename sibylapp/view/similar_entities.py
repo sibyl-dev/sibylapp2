@@ -6,7 +6,7 @@ from st_aggrid.grid_options_builder import GridOptionsBuilder
 import streamlit as st
 import pandas as pd
 
-primary_color = st.get_option('theme.primaryColor')
+primary_color = st.get_option("theme.primaryColor")
 highlight_different_jscode = JsCode(
     """
 function(params) {
@@ -35,7 +35,7 @@ def format_similar_entities(x, y, eid):
         "Similar %s #%i" % (context.get_term("Entity"), i)
         for i in range(1, similar_entity_info.shape[1])
     ]
-    selected_col_name = "Selected"  #"%s %s" % (context.get_term("Entity"), eid)
+    selected_col_name = "Selected"
     similar_entity_info.columns = [selected_col_name] + neighbor_names
     to_show = pd.concat([feature_info, similar_entity_info], axis=1)
     to_show = process_options(to_show)
@@ -55,7 +55,9 @@ def view(eid):
     x, y = example_based.get_similar_entities(eid)
     to_show, neighbor_names, selected_col_name = format_similar_entities(x, y, eid)
     options = ["No filtering"] + neighbor_names
-    show_different = st.radio("Apply filtering by differences?", options, horizontal=True)
+    show_different = st.radio(
+        "Apply filtering by differences?", options, horizontal=True
+    )
     if show_different == "No filtering":
         pass
     else:
@@ -65,4 +67,9 @@ def view(eid):
     for neighbor_name in neighbor_names:
         gb.configure_column(neighbor_name, cellStyle=highlight_different_jscode)
 
-    AgGrid(to_show, fit_columns_on_grid_load=True, gridOptions=gb.build(), allow_unsafe_jscode=True)
+    AgGrid(
+        to_show,
+        fit_columns_on_grid_load=True,
+        gridOptions=gb.build(),
+        allow_unsafe_jscode=True,
+    )
