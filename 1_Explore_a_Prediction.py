@@ -21,6 +21,8 @@ eid = sample_options[chosen_option]
 pred = predictions[eid]
 st.sidebar.metric(get_term("Prediction"), config.pred_format_func(pred))
 
+feature_contribution.view_instructions()
+
 # Global options ------------------------------
 filtering.view()
 
