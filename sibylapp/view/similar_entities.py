@@ -1,8 +1,29 @@
 from sibylapp.compute import example_based, context
 from sibylapp.view.utils.filtering import process_options
-from st_aggrid import AgGrid
+from st_aggrid import AgGrid, ColumnsAutoSizeMode
+from st_aggrid.shared import JsCode
+from st_aggrid.grid_options_builder import GridOptionsBuilder
 import streamlit as st
 import pandas as pd
+
+primary_color = st.get_option('theme.primaryColor')
+highlight_different_jscode = JsCode(
+    """
+function(params) {
+    if (params.value != params.data.Selected) {
+        return {
+            'color': 'white',
+            'backgroundColor': 'tomato'
+        }
+    } else {
+        return {
+            'color': 'black',
+            'backgroundColor': 'white'
+        }
+    }
+};
+"""
+)
 
 
 def format_similar_entities(x, y, eid):
@@ -14,7 +35,7 @@ def format_similar_entities(x, y, eid):
         "Similar %s #%i" % (context.get_term("Entity"), i)
         for i in range(1, similar_entity_info.shape[1])
     ]
-    selected_col_name = "%s %s" % (context.get_term("Entity"), eid)
+    selected_col_name = "Selected"  #"%s %s" % (context.get_term("Entity"), eid)
     similar_entity_info.columns = [selected_col_name] + neighbor_names
     to_show = pd.concat([feature_info, similar_entity_info], axis=1)
     to_show = process_options(to_show)
@@ -39,4 +60,9 @@ def view(eid):
         pass
     else:
         to_show = filter_different_rows(to_show, show_different, selected_col_name)
-    AgGrid(to_show, fit_columns_on_grid_load=True)
+
+    gb = GridOptionsBuilder.from_dataframe(to_show)
+    for neighbor_name in neighbor_names:
+        gb.configure_column(neighbor_name, cellStyle=highlight_different_jscode)
+
+    AgGrid(to_show, fit_columns_on_grid_load=True, gridOptions=gb.build(), allow_unsafe_jscode=True)
