@@ -26,7 +26,7 @@ function(params) {
 )
 
 
-def format_similar_entities(x, y, eid):
+def format_similar_entities(x, y):
     similar_entities = pd.concat([y, x], axis=0)
 
     feature_info = similar_entities[["Category", "Feature"]]
@@ -53,7 +53,7 @@ def filter_different_rows(to_show, neighbor_names, selected_col_name):
 
 def view(eid):
     x, y = example_based.get_similar_entities(eid)
-    to_show, neighbor_names, selected_col_name = format_similar_entities(x, y, eid)
+    to_show, neighbor_names, selected_col_name = format_similar_entities(x, y)
     options = ["No filtering"] + neighbor_names
     show_different = st.radio(
         "Apply filtering by differences?", options, horizontal=True
