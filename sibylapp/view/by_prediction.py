@@ -3,8 +3,8 @@ from sibylapp.compute import context
 from sibylapp.view.utils.helpers import (
     generate_bars,
     show_sorted_contributions,
-    process_options
 )
+from sibylapp.view.utils.filtering import process_options
 from st_aggrid import AgGrid
 import pandas as pd
 from pyreal.visualize import swarm_plot
@@ -110,10 +110,12 @@ def view_table(relevant_contributions):
     sort_by = st.selectbox(
         "Sort order", ["Absolute", "Ascending", "Descending", "Side-by-side"]
     )
-    show_distributions = st.checkbox("Show feature distributions?",
-                                     help="Add a column that shows [min - Q1 - median - Q3 - max] "
-                                          "values for numeric features, or value percentages for "
-                                          "categorical features.")
+    show_distributions = st.checkbox(
+        "Show feature distributions?",
+        help="Add a column that shows [min - Q1 - median - Q3 - max] "
+        "values for numeric features, or value percentages for "
+        "categorical features.",
+    )
 
     to_show = generate_distribution_table(relevant_contributions, show_distributions)
     show_sorted_contributions(to_show, sort_by, show_table)
@@ -131,6 +133,7 @@ def view_feature_plot(relevant_contributions, table):
         key="feature distribution feature select",
     )
     st.plotly_chart(
-        generate_feature_plot(feature, relevant_contributions), clear_figure=True,
-        use_container_width=True
+        generate_feature_plot(feature, relevant_contributions),
+        clear_figure=True,
+        use_container_width=True,
     )

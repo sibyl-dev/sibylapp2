@@ -8,7 +8,7 @@ setup.setup_page()
 
 
 # Global options ------------------------------
-filtering.view()
+filtering.view_filtering()
 
 
 tab1, tab2 = st.tabs(

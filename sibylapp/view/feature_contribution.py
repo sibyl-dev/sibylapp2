@@ -1,5 +1,5 @@
 import streamlit as st
-from sibylapp.view.utils.helpers import process_options
+from sibylapp.view.utils.filtering import process_options
 from sibylapp.view.utils import helpers
 from sibylapp.compute import contributions
 from sibylapp.compute.context import get_term
