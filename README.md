@@ -9,7 +9,7 @@
 <!--[![Travis CI Shield](https://travis-ci.org/DAI-Lab/pyreal.svg?branch=stable)](https://travis-ci.org/DAI-Lab/pyreal)-->
 <!--[![Coverage Status](https://codecov.io/gh/DAI-Lab/pyreal/branch/stable/graph/badge.svg)](https://codecov.io/gh/DAI-Lab/pyreal)-->
 <!--[![Build Action Status](https://github.com/DAI-Lab/pyreal/workflows/Test%20CI/badge.svg)](https://github.com/DAI-Lab/pyreal/actions)-->
-# Sibylapp
+# Sibylapp2
 
 Library for visualizing explanations.
 
@@ -58,6 +58,6 @@ poetry run sibyl run -v
 configurations specific to your application here.
 3. From the root project folder, run:
 ```bash
-poetry run streamlit run main.py
+poetry run streamlit run 1_Explore_a_Prediction.py
 ```
 
