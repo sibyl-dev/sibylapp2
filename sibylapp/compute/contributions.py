@@ -41,3 +41,4 @@ def compute_global_contributions(contributions_in_range):
     negs = rows[rows <= 0].mean(axis=1).fillna(0)
     poss = rows[rows >= 0].mean(axis=1).fillna(0)
     return pd.concat({"negative": negs, "positive": poss}, axis=1)
+

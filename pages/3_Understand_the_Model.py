@@ -3,6 +3,7 @@ from sibylapp.view.utils import filtering, setup
 from sibylapp.view import explore_feature, feature_importance, global_contributions
 from sibylapp.compute.context import get_term
 from sibylapp.compute import model, contributions
+import extra_streamlit_components as stx
 
 
 setup.setup_page()
@@ -11,21 +12,49 @@ setup.setup_page()
 # Global options ------------------------------
 filtering.view_filtering()
 
-# Filtering by prediction
+# Compute -------------------------------------
+predictions = model.get_dataset_predictions()
 all_contributions = contributions.get_dataset_contributions()
 
-tab1, tab2, tab3 = st.tabs(
-    [
-        get_term("Feature Importance"),
-        "Global %s" % get_term("Feature Contributions"),
-        "Explore a %s" % get_term("Feature"),
-    ]
-)
-with tab1:
-    features = feature_importance.view()
+# Setup tabs ----------------------------------
+pred_filter_container = st.container()
 
-with tab2:
-    global_contributions.view(all_contributions)
+tab = stx.tab_bar(data=[
+        stx.TabBarItemData(id=1, title=get_term("Feature Importance"), description=""),
+        stx.TabBarItemData(id=2, title="Global %s" % get_term("Feature Contributions"), description=""),
+        stx.TabBarItemData(id=3, title="Summary Plot", description=""),
+        stx.TabBarItemData(id=4, title="Explore a %s" % get_term("Feature"), description=""),
+    ])
 
-with tab3:
-    explore_feature.view(features)
+st.session_state["disabled"] = (tab == "1")
+
+# Prediction filtering -------------------------
+with pred_filter_container:
+    if "disabled" not in st.session_state:
+        st.session_state["disabled"] = True
+    eids = filtering.view_prediction_selection(predictions, disabled=st.session_state["disabled"])
+    filtered_contributions = filtering.filter_eids(eids, all_contributions)
+    filtered_predictions = filtering.filter_eids(eids, predictions)
+
+placeholder = st.container()
+features = all_contributions[next(iter(all_contributions))]["Feature"]
+
+if tab == "1":
+    with placeholder:
+        features = feature_importance.view()
+
+if tab == "2":
+    with placeholder:
+        global_contributions.view(filtered_contributions)
+
+if tab == "3":
+    global_contributions.view_summary_plot(filtered_contributions)
+
+if tab == "4":
+    with placeholder:
+        feature = st.selectbox("Select a %s" % get_term("feature"), features)
+        col1, col2 = st.columns(2)
+        with col1:
+            explore_feature.view(filtered_contributions, filtered_predictions, feature)
+        with col2:
+            global_contributions.view_feature_plot(filtered_contributions, feature)
