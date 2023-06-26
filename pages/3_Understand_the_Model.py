@@ -2,6 +2,7 @@ import streamlit as st
 from sibylapp.view.utils import filtering, setup
 from sibylapp.view import explore_feature, feature_importance, global_contributions
 from sibylapp.compute.context import get_term
+from sibylapp.compute import model, contributions
 
 
 setup.setup_page()
@@ -10,11 +11,16 @@ setup.setup_page()
 # Global options ------------------------------
 filtering.view_filtering()
 
+# Filtering by prediction
+predictions = model.get_dataset_predictions()
+all_contributions = contributions.get_dataset_contributions()
+eids = filtering.view_prediction_selection(predictions)
+
 
 tab1, tab2, tab3 = st.tabs(
     [
         get_term("Feature Importance"),
-        get_term("Global Contributions"),
+        "Global %s" % get_term("Feature Contributions"),
         "Explore a %s" % get_term("Feature"),
     ]
 )

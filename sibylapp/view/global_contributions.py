@@ -15,13 +15,19 @@ def view():
     global_contributions = contributions.compute_global_contributions(
         contributions_results
     )
-    bars = generate_bars_bidirectional(global_contributions["negative"], global_contributions["positive"])
-    feature_info = contributions_results[next(iter(contributions_results))][["category", "Feature Name"]].rename(columns={"category": "Category", "Feature Name": "Feature"})
+    bars = generate_bars_bidirectional(
+        global_contributions["negative"], global_contributions["positive"]
+    )
+    feature_info = contributions_results[next(iter(contributions_results))][
+        ["category", "Feature"]
+    ].rename(columns={"category": "Category"})
     to_show = pd.concat([feature_info, bars, global_contributions], axis="columns")
 
     if sort_by == "Total":
         to_show = to_show.reindex(
-            (to_show["negative"].abs() + to_show["positive"]).sort_values(ascending=False).index
+            (to_show["negative"].abs() + to_show["positive"])
+            .sort_values(ascending=False)
+            .index
         )
     if sort_by == "Most Increasing":
         to_show = to_show.sort_values(by="positive", axis="index", ascending=False)

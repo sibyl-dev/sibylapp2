@@ -64,7 +64,6 @@ def generate_distribution_table(contributions_in_range, show_distributions):
     to_show = contributions_in_range[next(iter(contributions_in_range))].copy()
     to_show = to_show.rename(
         columns={
-            "Feature Name": "Feature",
             "category": "Category",
         }
     )[["Category", "Feature"]]
@@ -86,7 +85,7 @@ def generate_swarm_plot(contribution_dict):
 def generate_feature_plot(feature, contribution_dict):
     data = pd.DataFrame(
         [
-            contribution_dict[eid][contribution_dict[eid]["Feature Name"] == feature][
+            contribution_dict[eid][contribution_dict[eid]["Feature"] == feature][
                 "Feature Value"
             ]
             for eid in contribution_dict

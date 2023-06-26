@@ -7,7 +7,7 @@ from sibylapp.compute import api, context
 def get_similar_entities(eid):
     result = api.fetch_similar_examples([eid])
     x = result[eid]["X"]
-    x = x.rename(columns={"Feature Name": "Feature", "category": "Category"})
+    x = x.rename(columns={"category": "Category"})
     y = result[eid]["y"]
     y["Feature"] = "Real Target Value"
 

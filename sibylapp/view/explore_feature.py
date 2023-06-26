@@ -13,6 +13,10 @@ def generate_feature_plot(feature):
     contributions_results = contributions.get_contributions(
         st.session_state["dataset_eids"]
     )
+    contributions_results = {
+        eid: contributions_results[eid].rename(columns={"Feature": "Feature Name"})
+        for eid in contributions_results
+    }
     feature_scatter_plot(contributions_results, feature, predictions=predictions)
     st.pyplot(plt.gcf(), use_container_width=False, clear_figure=True)
 
