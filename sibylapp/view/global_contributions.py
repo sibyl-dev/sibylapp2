@@ -5,20 +5,18 @@ from sibylapp.view.utils.helpers import generate_bars_bidirectional, process_opt
 from st_aggrid import AgGrid
 
 
-def view():
-    contributions_results = contributions.get_dataset_contributions()
-
+def view(all_contributions):
     sort_by = st.selectbox(
         "Sort order", ["Total", "Most Increasing", "Most Decreasing"]
     )
 
     global_contributions = contributions.compute_global_contributions(
-        contributions_results
+        all_contributions
     )
     bars = generate_bars_bidirectional(
         global_contributions["negative"], global_contributions["positive"]
     )
-    feature_info = contributions_results[next(iter(contributions_results))][
+    feature_info = all_contributions[next(iter(all_contributions))][
         ["category", "Feature"]
     ].rename(columns={"category": "Category"})
     to_show = pd.concat([feature_info, bars, global_contributions], axis="columns")
@@ -36,3 +34,4 @@ def view():
 
     to_show = process_options(to_show).drop(["positive", "negative"], axis=1)
     AgGrid(to_show, fit_columns_on_grid_load=True)
+    return to_show

@@ -1,9 +1,6 @@
 import streamlit as st
 from sibylapp.compute import context
-from sibylapp.view.utils.helpers import (
-    generate_bars,
-    show_sorted_contributions,
-)
+from sibylapp.view.utils.helpers import rename_for_pyreal_vis
 from sibylapp.view.utils.filtering import process_options
 from st_aggrid import AgGrid
 import pandas as pd
@@ -47,34 +44,6 @@ def aggregate(row):
         return get_categorical_metrics(row)
 
 
-@st.cache_data(show_spinner="Getting global contributions...")
-def generate_distribution_table(contributions_in_range, show_distributions):
-    averaged = pd.concat(
-        [contributions_in_range[eid]["Contribution"] for eid in contributions_in_range],
-        axis=1,
-    ).mean(axis=1)
-    quantiles = pd.concat(
-        [
-            contributions_in_range[eid]["Feature Value"]
-            for eid in contributions_in_range
-        ],
-        axis=1,
-    ).apply(aggregate, axis=1)
-
-    to_show = contributions_in_range[next(iter(contributions_in_range))].copy()
-    to_show = to_show.rename(
-        columns={
-            "category": "Category",
-        }
-    )[["Category", "Feature"]]
-
-    to_show["Contribution Value"] = averaged
-    to_show["Average Contribution"] = generate_bars(to_show["Contribution Value"])
-    if show_distributions:
-        to_show["Distribution"] = quantiles
-    return to_show
-
-
 @st.cache_data(show_spinner="Generating plot...")
 def generate_swarm_plot(contribution_dict):
     swarm_plot(contribution_dict, type="strip")
@@ -105,24 +74,8 @@ def generate_feature_plot(feature, contribution_dict):
         return fig
 
 
-def view_table(relevant_contributions):
-    sort_by = st.selectbox(
-        "Sort order", ["Absolute", "Ascending", "Descending", "Side-by-side"]
-    )
-    show_distributions = st.checkbox(
-        "Show feature distributions?",
-        help="Add a column that shows [min - Q1 - median - Q3 - max] "
-        "values for numeric features, or value percentages for "
-        "categorical features.",
-    )
-
-    to_show = generate_distribution_table(relevant_contributions, show_distributions)
-    show_sorted_contributions(to_show, sort_by, show_table)
-    return to_show
-
-
 def view_summary_plot(relevant_contributions):
-    st.pyplot(generate_swarm_plot(relevant_contributions), clear_figure=True)
+    st.pyplot(generate_swarm_plot(rename_for_pyreal_vis(relevant_contributions)), clear_figure=True)
 
 
 def view_feature_plot(relevant_contributions, table):

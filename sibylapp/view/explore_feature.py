@@ -1,6 +1,7 @@
 import streamlit as st
 from sibylapp.compute.context import get_term
 from sibylapp.compute import contributions, model, entities
+from sibylapp.view.utils import helpers
 from pyreal.visualize import feature_scatter_plot
 import matplotlib.pyplot as plt
 
@@ -13,10 +14,7 @@ def generate_feature_plot(feature):
     contributions_results = contributions.get_contributions(
         st.session_state["dataset_eids"]
     )
-    contributions_results = {
-        eid: contributions_results[eid].rename(columns={"Feature": "Feature Name"})
-        for eid in contributions_results
-    }
+    contributions_results = helpers.rename_for_pyreal_vis(contributions_results)
     feature_scatter_plot(contributions_results, feature, predictions=predictions)
     st.pyplot(plt.gcf(), use_container_width=False, clear_figure=True)
 

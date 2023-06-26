@@ -16,7 +16,11 @@ def get_relevant_eids_range(pred_range, _all_preds):
     ]
 
 
-def view_prediction_selection(predictions):
+def filter_eids(eids, dict):
+    return {eid: dict[eid] for eid in eids}
+
+
+def view_prediction_selection(predictions, disabled=False):
     pred_values = list(predictions.values())
     if len(np.unique(pred_values)) <= 2:
         chosen_pred = st.selectbox(
@@ -39,7 +43,7 @@ def view_prediction_selection(predictions):
         min_pred = min(pred_values)
         max_pred = max(pred_values)
         pred_range = st.slider(
-            "Predictions to visualize", min_pred, max_pred, (min_pred, max_pred)
+            "Predictions to visualize", min_pred, max_pred, (min_pred, max_pred), disabled=disabled
         )
         eids = get_relevant_eids_range(pred_range, predictions)
     return eids

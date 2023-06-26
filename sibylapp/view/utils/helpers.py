@@ -105,3 +105,10 @@ def show_sorted_contributions(to_show, sort_by, show_func):
             )
         to_show = process_options(to_show)
         show_func(to_show)
+
+
+def rename_for_pyreal_vis(df):
+    return {
+        eid: df[eid].rename(columns={"Feature": "Feature Name"})
+        for eid in df
+    }

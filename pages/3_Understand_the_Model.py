@@ -12,10 +12,7 @@ setup.setup_page()
 filtering.view_filtering()
 
 # Filtering by prediction
-predictions = model.get_dataset_predictions()
 all_contributions = contributions.get_dataset_contributions()
-eids = filtering.view_prediction_selection(predictions)
-
 
 tab1, tab2, tab3 = st.tabs(
     [
@@ -28,7 +25,7 @@ with tab1:
     features = feature_importance.view()
 
 with tab2:
-    global_contributions.view()
+    global_contributions.view(all_contributions)
 
 with tab3:
     explore_feature.view(features)
