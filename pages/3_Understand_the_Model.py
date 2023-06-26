@@ -45,16 +45,22 @@ if tab == "1":
 
 if tab == "2":
     with placeholder:
-        global_contributions.view(filtered_contributions)
+        if len(eids) == 0:
+            st.warning("Select predictions above to see explanation!")
+        else:
+            global_contributions.view(filtered_contributions)
 
 if tab == "3":
     global_contributions.view_summary_plot(filtered_contributions)
 
 if tab == "4":
     with placeholder:
-        feature = st.selectbox("Select a %s" % get_term("feature"), features)
-        col1, col2 = st.columns(2)
-        with col1:
-            explore_feature.view(filtered_contributions, filtered_predictions, feature)
-        with col2:
-            global_contributions.view_feature_plot(filtered_contributions, feature)
+        if len(eids) == 0:
+            st.warning("Select predictions above to see explanation!")
+        else:
+            feature = st.selectbox("Select a %s" % get_term("feature"), features)
+            col1, col2 = st.columns(2)
+            with col1:
+                explore_feature.view(filtered_contributions, filtered_predictions, feature)
+            with col2:
+                global_contributions.view_feature_plot(filtered_contributions, feature)
