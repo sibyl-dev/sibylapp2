@@ -30,7 +30,7 @@ def format_similar_entities(x, y):
     similar_entities = pd.concat([y, x], axis=0)
 
     feature_info = similar_entities[["Category", "Feature"]]
-    similar_entity_info = similar_entities.drop(columns=["Feature", "Category"])
+    similar_entity_info = similar_entities.drop(columns=["Feature", "Category"]).iloc[:, :3]
     neighbor_names = [
         "Similar %s #%i" % (context.get_term("Entity"), i)
         for i in range(1, similar_entity_info.shape[1])
