@@ -75,7 +75,10 @@ def generate_feature_plot(feature, contribution_dict):
 
 
 def view_summary_plot(relevant_contributions):
-    st.pyplot(generate_swarm_plot(rename_for_pyreal_vis(relevant_contributions)), clear_figure=True)
+    st.pyplot(
+        generate_swarm_plot(rename_for_pyreal_vis(relevant_contributions)),
+        clear_figure=True,
+    )
 
 
 def view_feature_plot(relevant_contributions, table):

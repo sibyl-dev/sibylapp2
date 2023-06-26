@@ -10,9 +10,7 @@ def view(all_contributions):
         "Sort order", ["Total", "Most Increasing", "Most Decreasing"]
     )
 
-    global_contributions = contributions.compute_global_contributions(
-        all_contributions
-    )
+    global_contributions = contributions.compute_global_contributions(all_contributions)
     bars = generate_bars_bidirectional(
         global_contributions["negative"], global_contributions["positive"]
     )

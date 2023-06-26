@@ -43,7 +43,11 @@ def view_prediction_selection(predictions, disabled=False):
         min_pred = min(pred_values)
         max_pred = max(pred_values)
         pred_range = st.slider(
-            "Predictions to visualize", min_pred, max_pred, (min_pred, max_pred), disabled=disabled
+            "Predictions to visualize",
+            min_pred,
+            max_pred,
+            (min_pred, max_pred),
+            disabled=disabled,
         )
         eids = get_relevant_eids_range(pred_range, predictions)
     return eids
