@@ -24,7 +24,7 @@ def get_term(term, p=False, l=False, a=False):
     if p:
         new_term = lang.plural(new_term)
     if l:
-        new_term = lang.lower(new_term)
+        new_term = new_term.lower()
     if a:
         new_term = lang.a(new_term)
     return new_term

@@ -51,32 +51,30 @@ def view_instructions():
     expander = st.sidebar.expander("How to Use")
     with expander:
         st.markdown(
-            "**%s Contributions** refer to the positive or negative affect a specific feature value had on the "
-            "model's prediction." % (get_term("Feature"))
+            "**{feature_contributions}** refer to the positive or negative affect a specific feature value had on the "
+            "model's prediction.".format(
+                feature_contributions=get_term("Feature Contributions")
+            )
         )
         if FLIP_COLORS:
             positive, negative = "red", "blue"
         else:
             positive, negative = "blue", "red"
         st.markdown(
-            "A large **%s** bar means that this %s's value significantly increased the model's prediction"
-            "on this %s. A large **%s** bar means that this %s's value significantly decreased the model's prediction. "
-            "A lack of a bar suggests this %s had little effect on the model's prediction in this case."
-            % (
-                positive,
-                get_term("Feature").lower(),
-                get_term("Entity").lower(),
-                negative,
-                get_term("Feature").lower(),
-                get_term("Feature").lower(),
+            "A large **{positive}** bar means that this {feature}'s value significantly increased the model's "
+            "prediction on this {entity}. A large **{negative}** bar means that this {feature}'s value significantly "
+            "decreased the model's prediction. "
+            "A lack of a bar suggests this {feature} had little effect on the model's prediction in this case.".format(
+                positive=positive,
+                negative=negative,
+                feature=get_term("Feature").lower(),
+                entity=get_term("Entity").lower(),
             )
         )
         st.markdown(
-            "You can select a %s from the dropdown above, and see the %s contributions. "
-            "You can also **filter** and **search** the %s table or adjust the **sort order**."
-            % (
-                get_term("Feature").lower(),
-                get_term("Entity").lower(),
-                get_term("Feature").lower(),
+            "You can select {a_entity} from the dropdown above, and see the {feature} contributions. "
+            "You can also **filter** and **search** the {feature} table or adjust the **sort order**.".format(
+                a_entity=get_term("Entity", a=True, l=True),
+                feature=get_term("Feature", l=True),
             )
         )

@@ -8,7 +8,6 @@ import extra_streamlit_components as stx
 
 setup.setup_page()
 
-
 # Global options ------------------------------
 filtering.view_filtering()
 
@@ -32,6 +31,13 @@ tab = stx.tab_bar(
     ],
     default=1,
 )
+
+# Sidebar --------------------------------------
+if tab == "1":
+    feature_importance.view_instructions()
+
+if tab == "2":
+    global_contributions.view_instructions()
 
 st.session_state["disabled"] = tab == "1"
 

@@ -6,11 +6,13 @@ from sibylapp.view.utils.helpers import (
     process_options,
     rename_for_pyreal_vis,
 )
+from sibylapp.compute.context import get_term
 from st_aggrid import AgGrid
 import plotly.graph_objects as go
 import plotly.express as px
 from pyreal.visualize import swarm_plot
 import matplotlib.pyplot as plt
+from sibylapp.config import FLIP_COLORS
 
 
 @st.cache_data(show_spinner="Generating plot...")
@@ -87,3 +89,33 @@ def view(all_contributions):
     to_show = process_options(to_show).drop(["positive", "negative"], axis=1)
     AgGrid(to_show, fit_columns_on_grid_load=True)
     return to_show
+
+
+def view_instructions():
+    expander = st.sidebar.expander("How to Use")
+    with expander:
+        if FLIP_COLORS:
+            positive, negative = "red", "blue"
+        else:
+            positive, negative = "blue", "red"
+        st.markdown(
+            "**Global {feature_contributions}** show how each {feature} tends to contribute to the model "
+            "prediction overall across the training dataset. Each row shows the average positive and negative "
+            "contribution for that {feature}.".format(
+                feature_contributions=get_term("Feature Contributions"),
+                feature=get_term("Feature", l=True),
+            )
+        )
+        st.markdown(
+            "For example, a large **{pos}** bar without a **{neg}** bar means this {feature} "
+            "often greatly increases the model prediction, and never decreases it. A large **{pos}** bar and "
+            "a large **{neg}** bar means this {feature} can both increase and decrease the model prediction, "
+            "depending on its value and the context.".format(
+                feature=get_term("Feature", l=True), pos=positive, neg=negative
+            )
+        )
+        st.markdown(
+            "You can also **filter** and **search** the {feature} table or adjust the **sort order**.".format(
+                feature=get_term("Feature", l=True)
+            )
+        )

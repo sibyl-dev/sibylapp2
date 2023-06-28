@@ -46,28 +46,14 @@ def view_instructions():
     expander = st.sidebar.expander("How to Use")
     with expander:
         st.markdown(
-            "**"
-            + get_term("Feature")
-            + " Importance** refers to how much the model uses a specific "
-            + get_term("Feature").lower()
-            + " overall in its predictions. A large importance bar means this "
-            + get_term("Feature").lower()
-            + " is used frequently,"
-            " while a smaller bar means it is used less."
+            "**{feature_up} Importance** refers to how much the model uses a specific {feature}"
+            " overall in its predictions. A large importance bar means this {feature} is used frequently,"
+            " while a smaller bar means it is used less.".format(
+                feature_up=get_term("Feature"), feature=get_term("Feature", l=True)
+            )
         )
         st.markdown(
-            "You can also **filter** and **search** "
-            "the "
-            + get_term("Feature").lower()
-            + " table shown or adjust the **sort order**."
-        )
-        st.markdown(
-            "The **Explor a %s** tab let's you see how the model uses a specific %s in more detail. The "
-            "generated plot shows how much each value for the chosen %s contributes to the model's "
-            "prediction across the training set, as well as the corresponding model predictions."
-            % (
-                get_term("Feature"),
-                get_term("Feature").lower(),
-                get_term("Feature").lower(),
+            "You can also **filter** and **search** the {feature} table or adjust the **sort order**.".format(
+                feature=get_term("Feature", l=True)
             )
         )

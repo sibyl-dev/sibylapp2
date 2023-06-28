@@ -8,6 +8,7 @@ setup.setup_page()
 
 # Sidebar ------------------------------------
 filtering.view_entity_select()
+feature_contribution.view_instructions()
 
 # Global options ------------------------------
 filtering.view_filtering()

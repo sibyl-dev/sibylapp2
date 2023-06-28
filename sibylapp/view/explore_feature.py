@@ -15,3 +15,16 @@ def generate_feature_plot(contributions_to_show, predictions, feature):
 
 def view(contributions_to_show, predictions, feature):
     generate_feature_plot(contributions_to_show, predictions, feature)
+
+
+def view_instructions():
+    st.markdown(
+        "The **Explor a %s** tab let's you see how the model uses a specific %s in more detail. The "
+        "generated plot shows how much each value for the chosen %s contributes to the model's "
+        "prediction across the training set, as well as the corresponding model predictions."
+        % (
+            get_term("Feature"),
+            get_term("Feature").lower(),
+            get_term("Feature").lower(),
+        )
+    )
