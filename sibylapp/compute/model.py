@@ -17,11 +17,13 @@ def compute_predictions(eids):
 @st.cache_data(show_spinner="Getting predictions...")
 def get_predictions(eids):
     if "predictions" not in st.session_state:
-        compute_predictions(eids)
-    missing_eids = list(set(eids) - st.session_state["predictions"].keys())
+        predictions = compute_predictions(eids)
+    else:
+        predictions = st.session_state["predictions"]
+    missing_eids = list(set(eids) - predictions.keys())
     if len(missing_eids) > 0:
         compute_predictions(missing_eids)
-    return {eid: st.session_state["predictions"][eid] for eid in eids}
+    return {eid: predictions[eid] for eid in eids}
 
 
 @st.cache_data(show_spinner="Getting contributions...")

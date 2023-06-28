@@ -13,6 +13,7 @@ xgboost = "0.90"
 black = "^23.3.0"
 streamlit-aggrid = "^0.3.4.post3"
 plotly = "^5.14.1"
+extra-streamlit-components = "^0.1.56"
 
 
 [build-system]

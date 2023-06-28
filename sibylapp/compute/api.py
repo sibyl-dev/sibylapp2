@@ -51,7 +51,7 @@ def fetch_predictions(eids):
 
 def fetch_features():
     features = api_get("features/")["features"]
-    features_df = pd.DataFrame(features).rename(columns={"description": "Feature Name"})
+    features_df = pd.DataFrame(features).rename(columns={"description": "Feature"})
     features_df = features_df.set_index("name")
     return features_df
 
@@ -91,7 +91,7 @@ def fetch_similar_examples(eids):
         y = pd.read_json(result[eid]["y"], orient="index").T
         X = pd.concat(
             [
-                features_df[["Feature Name", "category"]],
+                features_df[["Feature", "category"]],
                 pd.read_json(result[eid]["X"], orient="index").T,
             ],
             axis=1,

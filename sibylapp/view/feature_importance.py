@@ -13,7 +13,6 @@ def format_importance_to_view(importance_df):
         columns={
             "importances": "Importance",
             "category": "Category",
-            "Feature Name": "Feature",
         }
     )
     importance_df = importance_df[["Category", "Feature", "Importance"]]  # reorder

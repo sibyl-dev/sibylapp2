@@ -3,7 +3,7 @@ BASE_URL = "http://localhost:3000/api/v1/"
 CERT = None
 
 # APPLICATION-SPECIFIC CONFIGURATIONS =============================================================
-FLIP_COLORS = True  # If true, positive contributions will be red
+FLIP_COLORS = False  # If true, positive contributions will be red
 
 
 def pred_format_func(
