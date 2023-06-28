@@ -125,6 +125,16 @@ def process_search(to_show):
     return to_show
 
 
+def process_search_on_features(features):
+    if st.session_state["search_term"] is not None:
+        features = [
+            feature
+            for feature in features
+            if st.session_state["search_term"].lower() in feature.lower()
+        ]
+    return features
+
+
 def process_filter(to_show):
     if len(st.session_state["filters"]) > 0:
         return to_show[to_show["Category"].isin(st.session_state["filters"])]

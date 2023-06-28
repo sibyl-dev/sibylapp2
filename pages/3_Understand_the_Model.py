@@ -50,7 +50,7 @@ features = all_contributions[next(iter(all_contributions))]["Feature"]
 
 if tab == "1":
     with placeholder:
-        features = feature_importance.view()
+        feature_importance.view()
 
 if tab == "2":
     with placeholder:
@@ -67,7 +67,10 @@ if tab == "4":
         if len(eids) == 0:
             st.warning("Select predictions above to see explanation!")
         else:
-            feature = st.selectbox("Select a %s" % get_term("feature"), features)
+            feature = st.selectbox(
+                "Select a %s" % get_term("feature"),
+                filtering.process_search_on_features(features),
+            )
             col1, col2 = st.columns(2)
             with col1:
                 explore_feature.view(
