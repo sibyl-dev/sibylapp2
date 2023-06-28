@@ -10,7 +10,8 @@ def pred_format_func(
     pred,
 ):  # Function to use to format the prediction values from model
     return format_dollar(pred)  # See pre-written options below for defaults
-    #return format_boolean_name(pred, "failure", "normal")
+    # return format_boolean_name(pred, "failure", "normal")
+
 
 # OTHER CONFIGURATIONS ============================================================================
 BAR_LENGTH = 8  # Number of squares to use for contribution/importance bars

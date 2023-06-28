@@ -22,13 +22,15 @@ def filter_eids(eids, dict):
 
 def view_prediction_selection(predictions, disabled=False):
     pred_values = list(predictions.values())
-    if (len(np.unique(pred_values)) < 8):  # TODO: ensure non-numeric fall in this category
+    if (
+        len(np.unique(pred_values)) < 8
+    ):  # TODO: ensure non-numeric fall in this category
         chosen_preds = st.multiselect(
             "Predictions to visualize",
             [pred for pred in np.unique(pred_values)],
             default=np.unique(pred_values),
             format_func=config.pred_format_func,
-            disabled=disabled
+            disabled=disabled,
         )
         eids = get_relevant_eids(chosen_preds, predictions)
     else:

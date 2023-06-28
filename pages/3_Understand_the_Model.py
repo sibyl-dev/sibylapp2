@@ -19,20 +19,29 @@ all_contributions = contributions.get_dataset_contributions()
 # Setup tabs ----------------------------------
 pred_filter_container = st.container()
 
-tab = stx.tab_bar(data=[
+tab = stx.tab_bar(
+    data=[
         stx.TabBarItemData(id=1, title=get_term("Feature Importance"), description=""),
-        stx.TabBarItemData(id=2, title="Global %s" % get_term("Feature Contributions"), description=""),
+        stx.TabBarItemData(
+            id=2, title="Global %s" % get_term("Feature Contributions"), description=""
+        ),
         stx.TabBarItemData(id=3, title="Summary Plot", description=""),
-        stx.TabBarItemData(id=4, title="Explore a %s" % get_term("Feature"), description=""),
-    ], default=1)
+        stx.TabBarItemData(
+            id=4, title="Explore a %s" % get_term("Feature"), description=""
+        ),
+    ],
+    default=1,
+)
 
-st.session_state["disabled"] = (tab == "1")
+st.session_state["disabled"] = tab == "1"
 
 # Prediction filtering -------------------------
 with pred_filter_container:
     if "disabled" not in st.session_state:
         st.session_state["disabled"] = True
-    eids = filtering.view_prediction_selection(predictions, disabled=st.session_state["disabled"])
+    eids = filtering.view_prediction_selection(
+        predictions, disabled=st.session_state["disabled"]
+    )
     filtered_contributions = filtering.filter_eids(eids, all_contributions)
     filtered_predictions = filtering.filter_eids(eids, predictions)
 
@@ -61,6 +70,8 @@ if tab == "4":
             feature = st.selectbox("Select a %s" % get_term("feature"), features)
             col1, col2 = st.columns(2)
             with col1:
-                explore_feature.view(filtered_contributions, filtered_predictions, feature)
+                explore_feature.view(
+                    filtered_contributions, filtered_predictions, feature
+                )
             with col2:
                 global_contributions.view_feature_plot(filtered_contributions, feature)

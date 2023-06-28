@@ -1,7 +1,11 @@
 import pandas as pd
 import streamlit as st
 from sibylapp.compute import contributions
-from sibylapp.view.utils.helpers import generate_bars_bidirectional, process_options, rename_for_pyreal_vis
+from sibylapp.view.utils.helpers import (
+    generate_bars_bidirectional,
+    process_options,
+    rename_for_pyreal_vis,
+)
 from st_aggrid import AgGrid
 import plotly.graph_objects as go
 import plotly.express as px
