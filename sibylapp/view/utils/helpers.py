@@ -2,6 +2,9 @@ import streamlit as st
 from sibylapp.config import BAR_LENGTH, FLIP_COLORS
 from sibylapp.compute.context import get_term
 import math
+import pandas as pd
+
+from sibylapp.view.utils.filtering import process_options
 
 if FLIP_COLORS:
     POS_EM = "🟥"
@@ -13,30 +16,7 @@ NEUT_EM = "🟪"
 BLANK_EM = "⬜"
 UP_ARROW = "⬆"
 DOWN_ARROW = "⬇"
-
-
-def process_options(to_show):
-    return process_search(process_filter(process_show_more(to_show)))
-
-
-def process_show_more(to_show):
-    if not st.session_state["show_more"]:
-        return to_show[0:10]
-    return to_show
-
-
-def process_search(to_show):
-    if st.session_state["search_term"] is not None:
-        to_show = to_show[
-            to_show["Feature"].str.contains(st.session_state["search_term"], case=False)
-        ]
-    return to_show
-
-
-def process_filter(to_show):
-    if len(st.session_state["filters"]) > 0:
-        return to_show[to_show["Category"].isin(st.session_state["filters"])]
-    return to_show
+DIVIDING_BAR = "|"
 
 
 def generate_bars(values, neutral=False):
@@ -59,6 +39,40 @@ def generate_bars(values, neutral=False):
             else (DOWN_ARROW + BLANK_EM * (BAR_LENGTH + n) + NEG_EM * -n)
             for n in num_to_show
         ]
+
+
+def generate_bars_bidirectional(neg_values, pos_values):
+    def round_away_from_zero(x):
+        if x >= 0.0:
+            return math.floor(x + 0.5)
+        else:
+            return math.ceil(x - 0.5)
+
+    half_bar_length = math.ceil(BAR_LENGTH / 2)
+
+    neg_num_to_show = (
+        (neg_values / max(neg_values.abs()) * half_bar_length)
+        .apply(round_away_from_zero)
+        .astype("int")
+    )
+    pos_num_to_show = (
+        (pos_values / max(pos_values.abs()) * half_bar_length)
+        .apply(round_away_from_zero)
+        .astype("int")
+    )
+    strings = [
+        (
+            DOWN_ARROW
+            + BLANK_EM * (half_bar_length + neg)
+            + (NEG_EM * -neg)
+            + DIVIDING_BAR
+            + (POS_EM * pos)
+            + (BLANK_EM * (half_bar_length - pos))
+            + UP_ARROW
+        )
+        for (neg, pos) in zip(neg_num_to_show, pos_num_to_show)
+    ]
+    return pd.Series(strings, index=neg_values.index, name="Average Contribution")
 
 
 def show_sorted_contributions(to_show, sort_by, show_func):
@@ -91,3 +105,7 @@ def show_sorted_contributions(to_show, sort_by, show_func):
             )
         to_show = process_options(to_show)
         show_func(to_show)
+
+
+def rename_for_pyreal_vis(df):
+    return {eid: df[eid].rename(columns={"Feature": "Feature Name"}) for eid in df}

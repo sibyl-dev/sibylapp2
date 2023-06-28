@@ -3,8 +3,8 @@ from sibylapp import config
 from sibylapp.compute import importance, contributions, model, entities
 
 
-def setup_page():
-    st.set_page_config(layout="wide")
+def setup_page(page_title=None):
+    st.set_page_config(layout="wide", page_title=page_title)
     st.title("Sibyl")
 
     # Selecting eids -----------------------------
@@ -18,9 +18,6 @@ def setup_page():
 
     # Populate cache -----------------------------
     if config.LOAD_UPFRONT:
-        all_eids = list(
-            set(st.session_state["eids"] + st.session_state["dataset_eids"])
-        )
-        model.get_predictions(all_eids)
-        contributions.get_contributions(all_eids)
+        model.get_dataset_predictions()
+        contributions.get_dataset_contributions()
         importance.compute_importance()

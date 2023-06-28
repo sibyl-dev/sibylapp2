@@ -21,7 +21,6 @@ def format_contributions_to_view(contribution_df):
     contribution_df = contribution_df.rename(
         columns={
             "category": "Category",
-            "Feature Name": "Feature",
             "Feature Value": "Value",
             "Average/Mode": "Average/Mode Value",
         }

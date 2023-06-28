@@ -1,5 +1,6 @@
 import streamlit as st
-from sibylapp.compute import api
+from sibylapp.compute import api, entities
+import pandas as pd
 
 
 @st.cache_data(show_spinner="Computing contribution scores...")
@@ -22,3 +23,21 @@ def get_contributions(eids):
     if len(missing_eids) > 0:
         compute_contributions(missing_eids)
     return {eid: st.session_state["contributions"][eid] for eid in eids}
+
+
+@st.cache_data(show_spinner="Getting contributions...")
+def get_dataset_contributions():
+    if "dataset_eids" not in st.session_state:
+        st.session_state["dataset_eids"] = entities.get_eids(1000)
+    return get_contributions(st.session_state["dataset_eids"])
+
+
+@st.cache_data(show_spinner="Getting global contributions...")
+def compute_global_contributions(contributions_in_range):
+    rows = pd.concat(
+        [contributions_in_range[eid]["Contribution"] for eid in contributions_in_range],
+        axis=1,
+    )
+    negs = rows[rows <= 0].mean(axis=1).fillna(0)
+    poss = rows[rows >= 0].mean(axis=1).fillna(0)
+    return pd.concat({"negative": negs, "positive": poss}, axis=1)

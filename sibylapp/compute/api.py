@@ -45,13 +45,13 @@ def fetch_eids():
 
 def fetch_predictions(eids):
     json = {"eids": eids, "model_id": fetch_model_id()}
-    predictions = api_post("multi_prediction", json)["predictions"]
+    predictions = api_post("multi_prediction/", json)["predictions"]
     return predictions
 
 
 def fetch_features():
     features = api_get("features/")["features"]
-    features_df = pd.DataFrame(features).rename(columns={"description": "Feature Name"})
+    features_df = pd.DataFrame(features).rename(columns={"description": "Feature"})
     features_df = features_df.set_index("name")
     return features_df
 
@@ -65,13 +65,13 @@ def fetch_entity(eid):
 def fetch_contributions(eids):
     features_df = fetch_features()
     json = {"eids": eids, "model_id": fetch_model_id()}
-    contributions = api_post("multi_contributions/", json)["contributions"]
-    results = {}
-    for eid in contributions:
-        results[eid] = pd.concat(
-            [features_df, pd.read_json(contributions[eid], orient="index")], axis=1
+    result = api_post("multi_contributions/", json)["contributions"]
+    contributions = {}
+    for eid in result:
+        contributions[eid] = pd.concat(
+            [features_df, pd.read_json(result[eid], orient="index")], axis=1
         )
-    return results
+    return contributions
 
 
 def fetch_importance():
@@ -80,6 +80,32 @@ def fetch_importance():
     importance = api_get(url)
     importance_df = pd.DataFrame(importance)
     return pd.concat([features_df, importance_df], axis=1)
+
+
+def fetch_similar_examples(eids):
+    features_df = fetch_features()
+    json = {"eids": eids, "model_id": fetch_model_id()}
+    result = api_post("similar_entities/", json)["similar_entities"]
+    similar_entities = {}
+    for eid in result:
+        y = pd.read_json(result[eid]["y"], orient="index").T
+        X = pd.concat(
+            [
+                features_df[["Feature", "category"]],
+                pd.read_json(result[eid]["X"], orient="index").T,
+            ],
+            axis=1,
+        )
+        X.columns = X.columns.astype(str)
+        y.columns = y.columns.astype(str)
+        if str(eid) not in X:
+            X = pd.concat([X, fetch_entity(eid)], axis=1)
+        y[str(eid)] = "N/A"
+        similar_entities[eid] = {
+            "X": X,
+            "y": y,
+        }
+    return similar_entities
 
 
 def fetch_categories():
