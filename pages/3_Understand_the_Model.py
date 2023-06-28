@@ -60,7 +60,10 @@ if tab == "2":
             global_contributions.view(filtered_contributions)
 
 if tab == "3":
-    global_contributions.view_summary_plot(filtered_contributions)
+    if len(eids) == 0:
+        st.warning("Select predictions above to see explanation!")
+    else:
+        global_contributions.view_summary_plot(filtered_contributions)
 
 if tab == "4":
     with placeholder:
