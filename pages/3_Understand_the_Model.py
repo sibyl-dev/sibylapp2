@@ -24,7 +24,7 @@ tab = stx.tab_bar(data=[
         stx.TabBarItemData(id=2, title="Global %s" % get_term("Feature Contributions"), description=""),
         stx.TabBarItemData(id=3, title="Summary Plot", description=""),
         stx.TabBarItemData(id=4, title="Explore a %s" % get_term("Feature"), description=""),
-    ])
+    ], default=1)
 
 st.session_state["disabled"] = (tab == "1")
 
