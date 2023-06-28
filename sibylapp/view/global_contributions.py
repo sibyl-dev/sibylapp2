@@ -115,7 +115,9 @@ def view_instructions():
             )
         )
         st.markdown(
-            "You can also **filter** and **search** the {feature} table or adjust the **sort order**.".format(
+            "You can **filter** and **search** the {feature} table or adjust the **sort order**."
+            " You can also use the selector to visualize the contributions for rows in the dataset"
+            " with only a select subset of predictions.".format(
                 feature=get_term("Feature", l=True)
             )
         )

@@ -18,13 +18,19 @@ def view(contributions_to_show, predictions, feature):
 
 
 def view_instructions():
-    st.markdown(
-        "The **Explor a %s** tab let's you see how the model uses a specific %s in more detail. The "
-        "generated plot shows how much each value for the chosen %s contributes to the model's "
-        "prediction across the training set, as well as the corresponding model predictions."
-        % (
-            get_term("Feature"),
-            get_term("Feature").lower(),
-            get_term("Feature").lower(),
+    expander = st.sidebar.expander("How to Use")
+    with expander:
+        st.markdown(
+            "The **Explore a {feature_up}** tab lets you see how the model uses a specific {feature} in more detail. "
+            "The plot on the left shows how much each value for the chosen {feature} contributes to the model's "
+            "prediction across the training set, as well as the corresponding model predictions.".format(
+                feature_up=get_term("Feature"), feature=get_term("Feature", l=True)
+            )
         )
-    )
+        st.markdown(
+            "The plot on the right shows how the values for the chosen {feature} varied across the training dataset. "
+            "For numeric features, you will see a box-and-whiskers plot with some notable distribution values "
+            "(hover for specifics). For categorical features, you will see a pie chart.".format(
+                feature=get_term("Feature", l=True)
+            )
+        )

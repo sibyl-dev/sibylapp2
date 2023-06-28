@@ -39,6 +39,9 @@ if tab == "1":
 if tab == "2":
     global_contributions.view_instructions()
 
+if tab == "4":
+    explore_feature.view_instructions()
+
 st.session_state["disabled"] = tab == "1"
 
 # Prediction filtering -------------------------
