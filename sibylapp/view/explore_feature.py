@@ -34,3 +34,6 @@ def view_instructions():
                 feature=get_term("Feature", l=True)
             )
         )
+        st.markdown(
+            "You can use the selector to visualize only rows in the training set with a subset of prediction values"
+        )
