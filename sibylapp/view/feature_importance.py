@@ -40,3 +40,20 @@ def view():
     to_show = sibylapp.view.utils.filtering.process_options(to_show)
     show_table(to_show)
     return to_show["Feature"]
+
+
+def view_instructions():
+    expander = st.sidebar.expander("How to Use")
+    with expander:
+        st.markdown(
+            "**{feature_up} Importance** refers to how much the model uses a specific {feature}"
+            " overall in its predictions. A large importance bar means this {feature} is used frequently,"
+            " while a smaller bar means it is used less.".format(
+                feature_up=get_term("Feature"), feature=get_term("Feature", l=True)
+            )
+        )
+        st.markdown(
+            "You can also **filter** and **search** the {feature} table or adjust the **sort order**.".format(
+                feature=get_term("Feature", l=True)
+            )
+        )

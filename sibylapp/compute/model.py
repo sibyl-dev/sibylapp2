@@ -22,7 +22,7 @@ def get_predictions(eids):
         predictions = st.session_state["predictions"]
     missing_eids = list(set(eids) - predictions.keys())
     if len(missing_eids) > 0:
-        compute_predictions(missing_eids)
+        predictions = {**predictions, **compute_predictions(missing_eids)}
     return {eid: predictions[eid] for eid in eids}
 
 

@@ -1,4 +1,5 @@
 from sibylapp.compute import example_based, context
+from sibylapp.compute.context import get_term
 from sibylapp.view.utils.filtering import process_options
 from st_aggrid import AgGrid, ColumnsAutoSizeMode
 from st_aggrid.shared import JsCode
@@ -34,14 +35,14 @@ def format_similar_entities(x, y):
         :, :3
     ]
     neighbor_names = [
-        "Similar %s #%i" % (context.get_term("Entity"), i)
+        "Similar %s #%i" % (get_term("Entity"), i)
         for i in range(1, similar_entity_info.shape[1])
     ]
     selected_col_name = "Selected"
     similar_entity_info.columns = [selected_col_name] + neighbor_names
     to_show = pd.concat([feature_info, similar_entity_info], axis=1)
     to_show = process_options(to_show)
-    to_show = to_show.rename(columns={"Feature": context.get_term("Feature")})
+    to_show = to_show.rename(columns={"Feature": get_term("Feature")})
 
     return to_show, neighbor_names, selected_col_name
 
@@ -75,3 +76,16 @@ def view(eid):
         gridOptions=gb.build(),
         allow_unsafe_jscode=True,
     )
+
+
+def view_instructions():
+    expander = st.sidebar.expander("How to Use")
+    with expander:
+        st.markdown(
+            "The **Similar Cases** page shows the two {entities} from the training dataset with the most similar "
+            "{feature} values. Rows where a similar {entity} has a different value are highlighted.".format(
+                entities=get_term("Entity", p=True, l=True),
+                feature=get_term("Feature", l=True),
+                entity=get_term("Entity", l=True),
+            )
+        )

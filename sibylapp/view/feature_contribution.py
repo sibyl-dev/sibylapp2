@@ -2,6 +2,7 @@ import streamlit as st
 from sibylapp.view.utils import helpers
 from sibylapp.compute import contributions
 from sibylapp.compute.context import get_term
+from sibylapp.config import FLIP_COLORS
 from st_aggrid import AgGrid
 
 
@@ -44,3 +45,36 @@ def view(eid):
         to_show = to_show.drop("Average/Mode Value", axis="columns")
 
     helpers.show_sorted_contributions(to_show, sort_by, show_table)
+
+
+def view_instructions():
+    expander = st.sidebar.expander("How to Use")
+    with expander:
+        st.markdown(
+            "**{feature_contributions}** refer to the positive or negative affect a specific feature value had on the "
+            "model's prediction.".format(
+                feature_contributions=get_term("Feature Contributions")
+            )
+        )
+        if FLIP_COLORS:
+            positive, negative = "red", "blue"
+        else:
+            positive, negative = "blue", "red"
+        st.markdown(
+            "A large **{positive}** bar means that this {feature}'s value significantly increased the model's "
+            "prediction on this {entity}. A large **{negative}** bar means that this {feature}'s value significantly "
+            "decreased the model's prediction. "
+            "A lack of a bar suggests this {feature} had little effect on the model's prediction in this case.".format(
+                positive=positive,
+                negative=negative,
+                feature=get_term("Feature").lower(),
+                entity=get_term("Entity").lower(),
+            )
+        )
+        st.markdown(
+            "You can select {a_entity} from the dropdown above, and see the {feature} contributions. "
+            "You can also **filter** and **search** the {feature} table or adjust the **sort order**.".format(
+                a_entity=get_term("Entity", a=True, l=True),
+                feature=get_term("Feature", l=True),
+            )
+        )
