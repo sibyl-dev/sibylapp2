@@ -87,7 +87,7 @@ def view(all_contributions):
         to_show = to_show.sort_values(by="negative", axis="index")
 
     to_show = process_options(to_show).drop(["positive", "negative"], axis=1)
-    AgGrid(to_show, fit_columns_on_grid_load=True)
+    AgGrid(to_show, fit_columns_on_grid_load=True, enable_enterprise_modules=False)
     return to_show
 
 

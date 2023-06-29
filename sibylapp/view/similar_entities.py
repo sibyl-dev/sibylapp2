@@ -75,6 +75,7 @@ def view(eid):
         fit_columns_on_grid_load=True,
         gridOptions=gb.build(),
         allow_unsafe_jscode=True,
+        enable_enterprise_modules=False
     )
 
 

@@ -31,7 +31,7 @@ def show_table(df):
             "Feature": get_term("Feature"),
         }
     )
-    AgGrid(df, fit_columns_on_grid_load=True)
+    AgGrid(df, fit_columns_on_grid_load=True, enable_enterprise_modules=False)
 
 
 def view():
