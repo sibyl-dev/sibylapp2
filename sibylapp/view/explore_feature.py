@@ -26,12 +26,14 @@ def generate_feature_plot(contributions_to_show, predictions, feature):
         ],
         axis=1,
     )
+    df["ID"] = df.index
     df = df.rename(columns={"Feature Value": "Value"})
     hover_data = {
         "Contribution": ":.3f",
         "Value": True,
         "Prediction ": False,
         "Prediction": True,
+        "ID": True,
     }
     fig = px.scatter(
         df,
