@@ -1,16 +1,22 @@
 import streamlit as st
 from sibylapp.compute.context import get_term
-from sibylapp.compute import contributions, model, entities
 from sibylapp.view.utils import helpers
+from sibylapp import config
 from pyreal.visualize import feature_scatter_plot
 import matplotlib.pyplot as plt
+import plotly.express as px
+import pandas as pd
 
 
 @st.cache_data(show_spinner="Generating plot...")
 def generate_feature_plot(contributions_to_show, predictions, feature):
-    contributions_renamed = helpers.rename_for_pyreal_vis(contributions_to_show)
-    feature_scatter_plot(contributions_renamed, feature, predictions=predictions)
-    st.pyplot(plt.gcf(), clear_figure=True)
+    data = {i: contributions_to_show[i][contributions_to_show[i]["Feature"] == feature][["Contribution", "Feature Value"]].squeeze() for i in contributions_to_show}
+    formatted_pred = {i: config.pred_format_func(predictions[i]) for i in predictions}
+    df = pd.concat([pd.DataFrame(data).T, pd.Series(predictions, name="Raw Prediction"),  pd.Series(formatted_pred, name="Prediction")], axis=1)
+    hover_data = {"Contribution": ":.3f", "Feature Value": True, "Raw Prediction": False, "Prediction": True}
+    fig = px.scatter(df, x="Feature Value", y="Contribution", color="Raw Prediction", color_continuous_scale="Brwnyl", hover_data=hover_data)
+    #fig.update_traces(hovertemplate=config.pred_format_func)
+    st.plotly_chart(fig)
 
 
 def view(contributions_to_show, predictions, feature):
