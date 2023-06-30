@@ -8,15 +8,26 @@ from st_aggrid.grid_options_builder import GridOptionsBuilder
 
 
 def show_table(df):
-    df = df.drop("Contribution Value", axis="columns").rename(
-        columns={
-            "Contribution": get_term("Contribution"),
-            "Feature": get_term("Feature"),
-        }
-    ).reset_index()
+    df = (
+        df.drop("Contribution Value", axis="columns")
+        .rename(
+            columns={
+                "Contribution": get_term("Contribution"),
+                "Feature": get_term("Feature"),
+            }
+        )
+        .reset_index()
+    )
     gb = GridOptionsBuilder.from_dataframe(df)
-    gb.configure_pagination(enabled=True, paginationAutoPageSize=False, paginationPageSize=10)
-    AgGrid(df, fit_columns_on_grid_load=True, gridOptions=gb.build(), columns_auto_size_mode=ColumnsAutoSizeMode.FIT_CONTENTS)
+    gb.configure_pagination(
+        enabled=True, paginationAutoPageSize=False, paginationPageSize=10
+    )
+    AgGrid(
+        df,
+        fit_columns_on_grid_load=True,
+        gridOptions=gb.build(),
+        columns_auto_size_mode=ColumnsAutoSizeMode.FIT_CONTENTS,
+    )
 
 
 @st.cache_data(show_spinner=False)

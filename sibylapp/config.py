@@ -9,7 +9,7 @@ FLIP_COLORS = True  # If true, positive contributions will be red
 def pred_format_func(
     pred,
 ):  # Function to use to format the prediction values from model
-    #return format_dollar(pred)  # See pre-written options below for defaults
+    # return format_dollar(pred)  # See pre-written options below for defaults
     return format_boolean_name(pred, "failure", "normal")
 
 
