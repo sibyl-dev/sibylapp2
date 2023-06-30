@@ -3,7 +3,8 @@ from sibylapp.view.utils import helpers
 from sibylapp.compute import contributions
 from sibylapp.compute.context import get_term
 from sibylapp.config import FLIP_COLORS
-from st_aggrid import AgGrid
+from st_aggrid import AgGrid, ColumnsAutoSizeMode
+from st_aggrid.grid_options_builder import GridOptionsBuilder
 
 
 def show_table(df):
@@ -12,8 +13,10 @@ def show_table(df):
             "Contribution": get_term("Contribution"),
             "Feature": get_term("Feature"),
         }
-    )
-    AgGrid(df, fit_columns_on_grid_load=True)
+    ).reset_index()
+    gb = GridOptionsBuilder.from_dataframe(df)
+    gb.configure_pagination(enabled=True, paginationAutoPageSize=False, paginationPageSize=10)
+    AgGrid(df, fit_columns_on_grid_load=True, gridOptions=gb.build(), columns_auto_size_mode=ColumnsAutoSizeMode.FIT_CONTENTS)
 
 
 @st.cache_data(show_spinner=False)

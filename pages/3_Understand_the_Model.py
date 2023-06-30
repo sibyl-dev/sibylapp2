@@ -83,10 +83,6 @@ if tab == "4":
                 "Select a %s" % get_term("feature"),
                 filtering.process_search_on_features(features),
             )
-            col1, col2 = st.columns(2)
-            with col1:
-                explore_feature.view(
-                    filtered_contributions, filtered_predictions, feature
-                )
-            with col2:
-                global_contributions.view_feature_plot(filtered_contributions, feature)
+            explore_feature.view(
+                filtered_contributions, filtered_predictions, feature
+            )

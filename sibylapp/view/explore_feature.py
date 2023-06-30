@@ -1,14 +1,36 @@
 import streamlit as st
 from sibylapp.compute.context import get_term
-from sibylapp.compute import contributions
-from sibylapp.view.utils import helpers
 from sibylapp.view import feature_contribution
 from sibylapp import config
-from pyreal.visualize import feature_scatter_plot
-import matplotlib.pyplot as plt
 import plotly.express as px
+import plotly.graph_objects as go
 import pandas as pd
 from streamlit_plotly_events import plotly_events
+
+
+@st.cache_data(show_spinner="Generating plot...")
+def generate_feature_distribution_plot(contribution_dict, feature):
+    data = pd.DataFrame(
+        [
+            contribution_dict[eid][contribution_dict[eid]["Feature"] == feature][
+                "Feature Value"
+            ]
+            for eid in contribution_dict
+        ]
+    ).squeeze()
+    if pd.api.types.is_numeric_dtype(pd.to_numeric(data, errors="ignore")):
+        trace1 = go.Box(x=data, boxpoints="all", name="")
+        fig = go.Figure(data=[trace1])
+        fig.update_layout(title="Distributions for '%s'" % feature)
+        return fig
+    else:
+        fig = px.pie(
+            data,
+            values=data.value_counts().values,
+            names=data.value_counts().index,
+            title="Distributions for '%s'" % feature,
+        )
+        return fig
 
 
 @st.cache_data(show_spinner="Generating plot...")
@@ -50,12 +72,19 @@ def generate_feature_plot(contributions_to_show, predictions, feature):
 
 
 def view(contributions_to_show, predictions, feature):
-    fig = generate_feature_plot(contributions_to_show, predictions, feature)
-    selected_index = plotly_events(fig)
-    if len(selected_index) > 0:
-        eid = list(contributions_to_show.keys())[selected_index[0]["pointIndex"]]
-        #st.write(contributions.get_contributions(eid))
-        feature_contribution.view(eid)
+    col1, col2 = st.columns(2)
+    with col1:
+        fig1 = generate_feature_plot(contributions_to_show, predictions, feature)
+        selected_index = plotly_events(fig1)
+        fig2 = generate_feature_distribution_plot(contributions_to_show, feature)
+        st.plotly_chart(fig2)
+    with col2:
+        if len(selected_index) > 0:
+            eid = list(contributions_to_show.keys())[selected_index[0]["pointIndex"]]
+            st.subheader("Contributions for {entity} {eid}".format(entity=get_term("Entity"), eid=eid))
+            feature_contribution.view(eid)
+        else:
+            st.warning("Select a point in the plot to see all contributions!")
 
 
 def view_instructions():

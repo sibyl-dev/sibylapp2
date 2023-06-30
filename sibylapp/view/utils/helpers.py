@@ -75,7 +75,7 @@ def generate_bars_bidirectional(neg_values, pos_values):
     return pd.Series(strings, index=neg_values.index, name="Average Contribution")
 
 
-def show_sorted_contributions(to_show, sort_by, show_func):
+def show_sorted_contributions(to_show, sort_by, show_func, selected=None):
     if sort_by == "Side-by-side":
         col1, col2 = st.columns(2)
         with col1:
