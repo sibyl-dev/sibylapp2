@@ -36,7 +36,7 @@ def format_contributions_to_view(contribution_df):
 
 
 def view(eid):
-    to_show = format_contributions_to_view(contributions.get_contributions(eid)[eid])
+    to_show = format_contributions_to_view(contributions.get_contributions([eid])[eid])
     sort_by = st.selectbox(
         "Sort order", ["Absolute", "Ascending", "Descending", "Side-by-side"]
     )

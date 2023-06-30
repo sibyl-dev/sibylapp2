@@ -1,11 +1,14 @@
 import streamlit as st
 from sibylapp.compute.context import get_term
+from sibylapp.compute import contributions
 from sibylapp.view.utils import helpers
+from sibylapp.view import feature_contribution
 from sibylapp import config
 from pyreal.visualize import feature_scatter_plot
 import matplotlib.pyplot as plt
 import plotly.express as px
 import pandas as pd
+from streamlit_plotly_events import plotly_events
 
 
 @st.cache_data(show_spinner="Generating plot...")
@@ -43,11 +46,16 @@ def generate_feature_plot(contributions_to_show, predictions, feature):
         color_continuous_scale="Brwnyl",
         hover_data=hover_data,
     )
-    st.plotly_chart(fig)
+    return fig
 
 
 def view(contributions_to_show, predictions, feature):
-    generate_feature_plot(contributions_to_show, predictions, feature)
+    fig = generate_feature_plot(contributions_to_show, predictions, feature)
+    selected_index = plotly_events(fig)
+    if len(selected_index) > 0:
+        eid = list(contributions_to_show.keys())[selected_index[0]["pointIndex"]]
+        #st.write(contributions.get_contributions(eid))
+        feature_contribution.view(eid)
 
 
 def view_instructions():
