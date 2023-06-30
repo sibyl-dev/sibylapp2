@@ -10,12 +10,37 @@ import pandas as pd
 
 @st.cache_data(show_spinner="Generating plot...")
 def generate_feature_plot(contributions_to_show, predictions, feature):
-    data = {i: contributions_to_show[i][contributions_to_show[i]["Feature"] == feature][["Contribution", "Feature Value"]].squeeze() for i in contributions_to_show}
+    data = {
+        i: contributions_to_show[i][contributions_to_show[i]["Feature"] == feature][
+            ["Contribution", "Feature Value"]
+        ].squeeze()
+        for i in contributions_to_show
+    }
     formatted_pred = {i: config.pred_format_func(predictions[i]) for i in predictions}
-    df = pd.concat([pd.DataFrame(data).T, pd.Series(predictions, name="Raw Prediction"),  pd.Series(formatted_pred, name="Prediction")], axis=1)
-    hover_data = {"Contribution": ":.3f", "Feature Value": True, "Raw Prediction": False, "Prediction": True}
-    fig = px.scatter(df, x="Feature Value", y="Contribution", color="Raw Prediction", color_continuous_scale="Brwnyl", hover_data=hover_data)
-    #fig.update_traces(hovertemplate=config.pred_format_func)
+    # Adding the space after prediction as a hack to allow two columns with the same displayed name
+    df = pd.concat(
+        [
+            pd.DataFrame(data).T,
+            pd.Series(predictions, name="Prediction "),
+            pd.Series(formatted_pred, name="Prediction"),
+        ],
+        axis=1,
+    )
+    df = df.rename(columns={"Feature Value": "Value"})
+    hover_data = {
+        "Contribution": ":.3f",
+        "Value": True,
+        "Prediction ": False,
+        "Prediction": True,
+    }
+    fig = px.scatter(
+        df,
+        x="Value",
+        y="Contribution",
+        color="Prediction ",
+        color_continuous_scale="Brwnyl",
+        hover_data=hover_data,
+    )
     st.plotly_chart(fig)
 
 
