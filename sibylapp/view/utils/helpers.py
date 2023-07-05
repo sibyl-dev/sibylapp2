@@ -1,12 +1,11 @@
-import streamlit as st
-from sibylapp.config import BAR_LENGTH, FLIP_COLORS
-from sibylapp.compute.context import get_term
 import math
+
 import pandas as pd
 from st_aggrid import AgGrid, ColumnsAutoSizeMode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 
-from sibylapp.view.utils.filtering import process_options
+from sibylapp.compute.context import get_term
+from sibylapp.config import BAR_LENGTH, FLIP_COLORS
 
 if FLIP_COLORS:
     POS_EM = "🟥"
@@ -21,6 +20,13 @@ DOWN_ARROW = "⬇"
 DIVIDING_BAR = "|"
 
 
+def get_pos_neg_names():
+    if FLIP_COLORS:
+        return "red", "blue"
+    else:
+        return "blue", "red"
+
+
 def show_table(df, gb=None, allow_unsafe=False):
     renames = {}
     for column in df:
@@ -29,9 +35,7 @@ def show_table(df, gb=None, allow_unsafe=False):
     if gb is None:
         gb = GridOptionsBuilder.from_dataframe(df)
     if df.shape[0] > 10:
-        gb.configure_pagination(
-            enabled=True, paginationAutoPageSize=False, paginationPageSize=10
-        )
+        gb.configure_pagination(enabled=True, paginationAutoPageSize=False, paginationPageSize=10)
     AgGrid(
         df,
         fit_columns_on_grid_load=True,
@@ -51,14 +55,14 @@ def generate_bars(values, neutral=False):
     num_to_show = values / max(values.abs()) * BAR_LENGTH
     num_to_show = num_to_show.apply(round_away_from_zero).astype("int")
     if neutral:
-        return [
-            (NEUT_EM * n + BLANK_EM * (BAR_LENGTH - n) + UP_ARROW) for n in num_to_show
-        ]
+        return [(NEUT_EM * n + BLANK_EM * (BAR_LENGTH - n) + UP_ARROW) for n in num_to_show]
     else:
         return [
-            (POS_EM * n + BLANK_EM * (BAR_LENGTH - n) + UP_ARROW)
-            if n > 0
-            else (DOWN_ARROW + BLANK_EM * (BAR_LENGTH + n) + NEG_EM * -n)
+            (
+                (POS_EM * n + BLANK_EM * (BAR_LENGTH - n) + UP_ARROW)
+                if n > 0
+                else (DOWN_ARROW + BLANK_EM * (BAR_LENGTH + n) + NEG_EM * -n)
+            )
             for n in num_to_show
         ]
 

@@ -1,6 +1,6 @@
 import streamlit as st
-import pandas as pd
-from sibylapp.compute import api, context
+
+from sibylapp.compute import api
 
 
 @st.cache_data

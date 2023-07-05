@@ -1,5 +1,6 @@
-from sibylapp.compute import api
 import streamlit as st
+
+from sibylapp.compute import api
 
 
 @st.cache_data(show_spinner="Fetching data...")

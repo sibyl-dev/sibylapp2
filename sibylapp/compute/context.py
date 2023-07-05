@@ -1,6 +1,7 @@
-from sibylapp.compute import api
-import streamlit as st
 import inflect
+import streamlit as st
+
+from sibylapp.compute import api
 
 lang = inflect.engine()
 

@@ -1,6 +1,7 @@
 import streamlit as st
+
 from sibylapp import config
-from sibylapp.compute import importance, contributions, model, entities
+from sibylapp.compute import contributions, entities, importance, model
 
 
 def setup_page(page_title=None):
@@ -12,9 +13,7 @@ def setup_page(page_title=None):
         st.session_state["eids"] = entities.get_eids(max_entities=config.MAX_ENTITIES)
 
     if "dataset_eids" not in st.session_state:
-        st.session_state["dataset_eids"] = entities.get_eids(
-            max_entities=config.DATASET_SIZE
-        )
+        st.session_state["dataset_eids"] = entities.get_eids(max_entities=config.DATASET_SIZE)
 
     # Populate cache -----------------------------
     if config.LOAD_UPFRONT:
