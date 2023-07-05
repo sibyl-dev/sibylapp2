@@ -19,11 +19,13 @@ def compute_contributions(eids):
 @st.cache_data(show_spinner="Getting contributions...")
 def get_contributions(eids):
     if "contributions" not in st.session_state:
-        compute_contributions(eids)
-    missing_eids = list(set(eids) - st.session_state["contributions"].keys())
+        contributions = compute_contributions(eids)
+    else:
+        contributions = st.session_state["contributions"]
+    missing_eids = list(set(eids) - contributions.keys())
     if len(missing_eids) > 0:
-        compute_contributions(missing_eids)
-    return {eid: st.session_state["contributions"][eid] for eid in eids}
+        contributions = {**contributions, **compute_contributions(missing_eids)}
+    return {eid: contributions[eid] for eid in eids}
 
 
 @st.cache_data(show_spinner="Getting contributions...")
