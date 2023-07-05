@@ -37,7 +37,7 @@ def show_table(df, gb=None, allow_unsafe=False):
         fit_columns_on_grid_load=True,
         gridOptions=gb.build(),
         columns_auto_size_mode=ColumnsAutoSizeMode.FIT_CONTENTS,
-        allow_unsafe_jscode=allow_unsafe
+        allow_unsafe_jscode=allow_unsafe,
     )
 
 
