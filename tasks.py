@@ -10,6 +10,7 @@ def fix_lint(context):
 
     subprocess.run(["black", "sibylapp"])
     subprocess.run(["isort", "--atomic", "sibylapp"])
+    subprocess.run(["pylint", "sibylapp"], check=True)
 
 
 @task
