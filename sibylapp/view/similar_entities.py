@@ -1,6 +1,7 @@
 from sibylapp.compute import example_based, context
 from sibylapp.compute.context import get_term
 from sibylapp.view.utils.filtering import process_options
+from sibylapp.view.utils import helpers
 from st_aggrid import AgGrid, ColumnsAutoSizeMode
 from st_aggrid.shared import JsCode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
@@ -70,12 +71,7 @@ def view(eid):
     for neighbor_name in neighbor_names:
         gb.configure_column(neighbor_name, cellStyle=highlight_different_jscode)
 
-    AgGrid(
-        to_show,
-        fit_columns_on_grid_load=True,
-        gridOptions=gb.build(),
-        allow_unsafe_jscode=True,
-    )
+    helpers.show_table(to_show, gb, allow_unsafe=True)
 
 
 def view_instructions():

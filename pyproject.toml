@@ -15,6 +15,7 @@ streamlit-aggrid = "^0.3.4.post3"
 plotly = "^5.14.1"
 extra-streamlit-components = "^0.1.56"
 inflect = "^6.0.4"
+streamlit-plotly-events = "^0.0.6"
 
 
 [build-system]

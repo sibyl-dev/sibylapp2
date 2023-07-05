@@ -4,6 +4,7 @@ from sibylapp.view import explore_feature, feature_importance, global_contributi
 from sibylapp.compute.context import get_term
 from sibylapp.compute import model, contributions
 import extra_streamlit_components as stx
+import numpy as np
 
 
 setup.setup_page()
@@ -13,6 +14,10 @@ filtering.view_filtering()
 
 # Compute -------------------------------------
 predictions = model.get_dataset_predictions()
+discrete = (
+    len(np.unique(list(predictions.values()))) <= 6
+)  # todo: ensure non-numeric is discrete
+
 all_contributions = contributions.get_dataset_contributions()
 
 # Setup tabs ----------------------------------
@@ -83,10 +88,6 @@ if tab == "4":
                 "Select a %s" % get_term("feature"),
                 filtering.process_search_on_features(features),
             )
-            col1, col2 = st.columns(2)
-            with col1:
-                explore_feature.view(
-                    filtered_contributions, filtered_predictions, feature
-                )
-            with col2:
-                global_contributions.view_feature_plot(filtered_contributions, feature)
+            explore_feature.view(
+                filtered_contributions, filtered_predictions, feature, discrete
+            )

@@ -1,20 +1,104 @@
 import streamlit as st
 from sibylapp.compute.context import get_term
-from sibylapp.compute import contributions, model, entities
-from sibylapp.view.utils import helpers
-from pyreal.visualize import feature_scatter_plot
-import matplotlib.pyplot as plt
+from sibylapp.view import feature_contribution
+from sibylapp import config
+import plotly.express as px
+import plotly.graph_objects as go
+import pandas as pd
+from streamlit_plotly_events import plotly_events
+import numpy as np
 
 
 @st.cache_data(show_spinner="Generating plot...")
-def generate_feature_plot(contributions_to_show, predictions, feature):
-    contributions_renamed = helpers.rename_for_pyreal_vis(contributions_to_show)
-    feature_scatter_plot(contributions_renamed, feature, predictions=predictions)
-    st.pyplot(plt.gcf(), clear_figure=True)
+def generate_feature_distribution_plot(contribution_dict, feature):
+    data = pd.DataFrame(
+        [
+            contribution_dict[eid][contribution_dict[eid]["Feature"] == feature][
+                "Feature Value"
+            ]
+            for eid in contribution_dict
+        ]
+    ).squeeze()
+    if pd.api.types.is_numeric_dtype(pd.to_numeric(data, errors="ignore")):
+        trace1 = go.Box(
+            x=data, boxpoints="all", name="", marker_color="rgb(84, 31, 63)"
+        )
+        fig = go.Figure(data=[trace1])
+        fig.update_layout(title="Distributions for '%s'" % feature)
+        return fig
+    else:
+        fig = px.pie(
+            data,
+            values=data.value_counts().values,
+            names=data.value_counts().index,
+            title="Distributions for '%s'" % feature,
+        )
+        return fig
 
 
-def view(contributions_to_show, predictions, feature):
-    generate_feature_plot(contributions_to_show, predictions, feature)
+@st.cache_data(show_spinner="Generating plot...")
+def generate_feature_plot(contributions_to_show, predictions, feature, discrete=False):
+    data = {
+        i: contributions_to_show[i][contributions_to_show[i]["Feature"] == feature][
+            ["Contribution", "Feature Value"]
+        ].squeeze()
+        for i in contributions_to_show
+    }
+    formatted_pred = {i: config.pred_format_func(predictions[i]) for i in predictions}
+    # Adding the space after prediction as a hack to allow two columns with the same displayed name
+    df = pd.concat(
+        [
+            pd.DataFrame(data).T,
+            pd.Series(predictions, name="Prediction "),
+            pd.Series(formatted_pred, name="Prediction"),
+        ],
+        axis=1,
+    )
+    df["ID"] = df.index
+    df = df.rename(columns={"Feature Value": "Value"})
+    hover_data = {
+        "Contribution": ":.3f",
+        "Value": True,
+        "Prediction ": False,
+        "Prediction": True,
+        "ID": True,
+    }
+    color = "Prediction" if discrete else "Prediction "
+    fig = px.scatter(
+        df,
+        x="Value",
+        y="Contribution",
+        color=color,
+        color_continuous_scale="Brwnyl",
+        color_discrete_sequence=px.colors.qualitative.Bold,
+        hover_data=hover_data,
+    )
+    fig.update_traces(
+        opacity=0.7, marker=dict(size=10, line=dict(width=0.5, color="black"))
+    )
+    return fig
+
+
+def view(contributions_to_show, predictions, feature, discrete=False):
+    col1, col2 = st.columns(2)
+    with col1:
+        fig1 = generate_feature_plot(
+            contributions_to_show, predictions, feature, discrete
+        )
+        selected_index = plotly_events(fig1)
+        fig2 = generate_feature_distribution_plot(contributions_to_show, feature)
+        st.plotly_chart(fig2)
+    with col2:
+        if len(selected_index) > 0:
+            eid = list(contributions_to_show.keys())[selected_index[0]["pointIndex"]]
+            st.subheader(
+                "Contributions for {entity} {eid}".format(
+                    entity=get_term("Entity"), eid=eid
+                )
+            )
+            feature_contribution.view(eid)
+        else:
+            st.warning("Select a point in the plot to see all contributions!")
 
 
 def view_instructions():
