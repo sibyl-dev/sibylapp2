@@ -1,7 +1,8 @@
-from sibylapp.config import BASE_URL, CERT
-import requests
 import pandas as pd
+import requests
 import streamlit as st
+
+from sibylapp.config import BASE_URL, CERT
 
 session = requests.Session()
 session.headers.update({"Access-Control-Allow-Origin": "*"})
@@ -13,10 +14,7 @@ def api_get(url):
     fetch_url = BASE_URL + url
     response = session.get(fetch_url)
     if response.status_code != 200:
-        st.error(
-            "Error with GET(%s). %s: %s"
-            % (fetch_url, response.status_code, response.reason)
-        )
+        st.error("Error with GET(%s). %s: %s" % (fetch_url, response.status_code, response.reason))
         st.stop()
     return response.json()
 
@@ -26,8 +24,7 @@ def api_post(url, json):
     response = session.post(fetch_url, json=json)
     if response.status_code != 200:
         st.error(
-            "Error with POST(%s). %s: %s"
-            % (fetch_url, response.status_code, response.reason)
+            "Error with POST(%s). %s: %s" % (fetch_url, response.status_code, response.reason)
         )
         st.stop()
     return response.json()

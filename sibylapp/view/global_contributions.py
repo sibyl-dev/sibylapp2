@@ -1,11 +1,12 @@
+import matplotlib.pyplot as plt
 import pandas as pd
 import streamlit as st
-from sibylapp.compute import contributions
-from sibylapp.view.utils import helpers
-from sibylapp.compute.context import get_term
 from pyreal.visualize import swarm_plot
-import matplotlib.pyplot as plt
+
+from sibylapp.compute import contributions
+from sibylapp.compute.context import get_term
 from sibylapp.config import FLIP_COLORS
+from sibylapp.view.utils import helpers
 
 
 @st.cache_data(show_spinner="Generating plot...")
@@ -22,9 +23,7 @@ def view_summary_plot(contributions):
 
 
 def view(all_contributions):
-    sort_by = st.selectbox(
-        "Sort order", ["Total", "Most Increasing", "Most Decreasing"]
-    )
+    sort_by = st.selectbox("Sort order", ["Total", "Most Increasing", "Most Decreasing"])
 
     global_contributions = contributions.compute_global_contributions(all_contributions)
     bars = helpers.generate_bars_bidirectional(
@@ -37,9 +36,7 @@ def view(all_contributions):
 
     if sort_by == "Total":
         to_show = to_show.reindex(
-            (to_show["negative"].abs() + to_show["positive"])
-            .sort_values(ascending=False)
-            .index
+            (to_show["negative"].abs() + to_show["positive"]).sort_values(ascending=False).index
         )
     if sort_by == "Most Increasing":
         to_show = to_show.sort_values(by="positive", axis="index", ascending=False)
@@ -59,18 +56,18 @@ def view_instructions():
         else:
             positive, negative = "blue", "red"
         st.markdown(
-            "**Global {feature_contributions}** show how each {feature} tends to contribute to the model "
-            "prediction overall across the training dataset. Each row shows the average positive and negative "
-            "contribution for that {feature}.".format(
+            "**Global {feature_contributions}** show how each {feature} tends to contribute to the"
+            " model prediction overall across the training dataset. Each row shows the average"
+            " positive and negative contribution for that {feature}.".format(
                 feature_contributions=get_term("Feature Contributions"),
                 feature=get_term("Feature", l=True),
             )
         )
         st.markdown(
-            "For example, a large **{pos}** bar without a **{neg}** bar means this {feature} "
-            "often greatly increases the model prediction, and never decreases it. A large **{pos}** bar and "
-            "a large **{neg}** bar means this {feature} can both increase and decrease the model prediction, "
-            "depending on its value and the context.".format(
+            "For example, a large **{pos}** bar without a **{neg}** bar means this {feature} often"
+            " greatly increases the model prediction, and never decreases it. A large **{pos}**"
+            " bar and a large **{neg}** bar means this {feature} can both increase and decrease"
+            " the model prediction, depending on its value and the context.".format(
                 feature=get_term("Feature", l=True), pos=positive, neg=negative
             )
         )

@@ -1,6 +1,7 @@
-import streamlit as st
-from sibylapp.compute import api, entities
 import pandas as pd
+import streamlit as st
+
+from sibylapp.compute import api, entities
 
 
 @st.cache_data(show_spinner="Computing contribution scores...")

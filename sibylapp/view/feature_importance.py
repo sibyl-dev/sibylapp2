@@ -2,8 +2,8 @@ import streamlit as st
 
 import sibylapp.view.utils.filtering
 from sibylapp.compute import importance
-from sibylapp.view.utils import helpers
 from sibylapp.compute.context import get_term
+from sibylapp.view.utils import helpers
 
 
 @st.cache_data
@@ -16,9 +16,7 @@ def format_importance_to_view(importance_df):
     )
     importance_df = importance_df[["Category", "Feature", "Importance"]]  # reorder
     importance_df["Importance Value"] = importance_df["Importance"].copy()
-    importance_df["Importance"] = helpers.generate_bars(
-        importance_df["Importance"], neutral=True
-    )
+    importance_df["Importance"] = helpers.generate_bars(importance_df["Importance"], neutral=True)
 
     return importance_df
 
@@ -36,13 +34,12 @@ def view_instructions():
     with expander:
         st.markdown(
             "**{feature_up} Importance** refers to how much the model uses a specific {feature}"
-            " overall in its predictions. A large importance bar means this {feature} is used frequently,"
-            " while a smaller bar means it is used less.".format(
+            " overall in its predictions. A large importance bar means this {feature} is used"
+            " frequently, while a smaller bar means it is used less.".format(
                 feature_up=get_term("Feature"), feature=get_term("Feature", l=True)
             )
         )
         st.markdown(
-            "You can also **filter** and **search** the {feature} table or adjust the **sort order**.".format(
-                feature=get_term("Feature", l=True)
-            )
+            "You can also **filter** and **search** the {feature} table or adjust the **sort"
+            " order**.".format(feature=get_term("Feature", l=True))
         )
