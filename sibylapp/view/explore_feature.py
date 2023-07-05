@@ -73,7 +73,7 @@ def generate_feature_plot(contributions_to_show, predictions, feature, discrete=
         color_discrete_sequence=px.colors.qualitative.Bold,
         hover_data=hover_data,
     )
-    fig.update_traces(opacity=0.7, marker=dict(size=10))
+    fig.update_traces(opacity=0.7, marker=dict(size=10, line=dict(width=.5, color="black")))
     return fig
 
 

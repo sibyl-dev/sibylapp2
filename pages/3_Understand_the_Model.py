@@ -15,7 +15,7 @@ filtering.view_filtering()
 # Compute -------------------------------------
 predictions = model.get_dataset_predictions()
 discrete = (
-    len(np.unique(len(predictions.keys()))) <= 6
+    len(np.unique(list(predictions.values()))) <= 6
 )  # todo: ensure non-numeric is discrete
 
 all_contributions = contributions.get_dataset_contributions()
