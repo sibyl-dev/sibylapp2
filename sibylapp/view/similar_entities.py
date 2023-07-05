@@ -1,10 +1,9 @@
 import pandas as pd
 import streamlit as st
-from st_aggrid import AgGrid, ColumnsAutoSizeMode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 from st_aggrid.shared import JsCode
 
-from sibylapp.compute import context, example_based
+from sibylapp.compute import example_based
 from sibylapp.compute.context import get_term
 from sibylapp.view.utils import helpers
 from sibylapp.view.utils.filtering import process_options

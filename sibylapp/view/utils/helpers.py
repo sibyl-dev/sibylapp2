@@ -1,13 +1,11 @@
 import math
 
 import pandas as pd
-import streamlit as st
 from st_aggrid import AgGrid, ColumnsAutoSizeMode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 
 from sibylapp.compute.context import get_term
 from sibylapp.config import BAR_LENGTH, FLIP_COLORS
-from sibylapp.view.utils.filtering import process_options
 
 if FLIP_COLORS:
     POS_EM = "🟥"

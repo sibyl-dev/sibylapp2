@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -90,6 +89,7 @@ def view(contributions_to_show, predictions, feature, discrete=False):
             feature_contribution.view(eid)
         else:
             st.warning("Select a point in the plot to see all contributions!")
+
 
 
 def view_instructions():
