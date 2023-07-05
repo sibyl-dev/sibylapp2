@@ -20,6 +20,13 @@ DOWN_ARROW = "⬇"
 DIVIDING_BAR = "|"
 
 
+def get_pos_neg_names():
+    if FLIP_COLORS:
+        return "red", "blue"
+    else:
+        return "blue", "red"
+
+
 def show_table(df, gb=None, allow_unsafe=False):
     renames = {}
     for column in df:

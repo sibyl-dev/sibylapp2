@@ -91,7 +91,6 @@ def view(contributions_to_show, predictions, feature, discrete=False):
             st.warning("Select a point in the plot to see all contributions!")
 
 
-
 def view_instructions():
     expander = st.sidebar.expander("How to Use")
     with expander:

@@ -5,8 +5,7 @@ from pyreal.visualize import swarm_plot
 
 from sibylapp.compute import contributions
 from sibylapp.compute.context import get_term
-from sibylapp.config import FLIP_COLORS
-from sibylapp.view.utils import helpers
+from sibylapp.view.utils import filtering, helpers
 
 
 @st.cache_data(show_spinner="Generating plot...")
@@ -15,9 +14,9 @@ def generate_swarm_plot(contribution_dict):
     return plt.gcf()
 
 
-def view_summary_plot(contributions):
+def view_summary_plot(contribution_dict):
     st.pyplot(
-        generate_swarm_plot(helpers.rename_for_pyreal_vis(contributions)),
+        generate_swarm_plot(helpers.rename_for_pyreal_vis(contribution_dict)),
         clear_figure=True,
     )
 
@@ -43,7 +42,7 @@ def view(all_contributions):
     if sort_by == "Most Decreasing":
         to_show = to_show.sort_values(by="negative", axis="index")
 
-    to_show = helpers.process_options(to_show).drop(["positive", "negative"], axis=1)
+    to_show = filtering.process_options(to_show).drop(["positive", "negative"], axis=1)
     helpers.show_table(to_show)
     return to_show
 
@@ -51,10 +50,7 @@ def view(all_contributions):
 def view_instructions():
     expander = st.sidebar.expander("How to Use")
     with expander:
-        if FLIP_COLORS:
-            positive, negative = "red", "blue"
-        else:
-            positive, negative = "blue", "red"
+        positive, negative = helpers.get_pos_neg_names()
         st.markdown(
             "**Global {feature_contributions}** show how each {feature} tends to contribute to the"
             " model prediction overall across the training dataset. Each row shows the average"

@@ -2,8 +2,7 @@ import streamlit as st
 
 from sibylapp.compute import contributions
 from sibylapp.compute.context import get_term
-from sibylapp.config import FLIP_COLORS
-from sibylapp.view.utils import helpers
+from sibylapp.view.utils import filtering, helpers
 
 
 def show_sorted_contributions(to_show, sort_by):
@@ -14,14 +13,14 @@ def show_sorted_contributions(to_show, sort_by):
             to_show_neg = to_show[to_show["Contribution Value"] < 0].sort_values(
                 by="Contribution", axis="index", ascending=False
             )
-            to_show_neg = helpers.process_options(to_show_neg)
+            to_show_neg = filtering.process_options(to_show_neg)
             helpers.show_table(to_show_neg.drop("Contribution Value", axis="columns"))
         with col2:
             st.subheader(get_term("Positive"))
             to_show_pos = to_show[to_show["Contribution Value"] >= 0].sort_values(
                 by="Contribution", axis="index", ascending=False
             )
-            to_show_pos = helpers.process_options(to_show_pos)
+            to_show_pos = filtering.process_options(to_show_pos)
             helpers.show_table(to_show_pos.drop("Contribution Value", axis="columns"))
     else:
         if sort_by == "Absolute":
@@ -32,7 +31,7 @@ def show_sorted_contributions(to_show, sort_by):
             to_show = to_show.sort_values(by="Contribution Value", axis="index")
         if sort_by == "Descending":
             to_show = to_show.sort_values(by="Contribution Value", axis="index", ascending=False)
-        to_show = helpers.process_options(to_show)
+        to_show = filtering.process_options(to_show)
         helpers.show_table(to_show.drop("Contribution Value", axis="columns"))
 
 
@@ -72,10 +71,7 @@ def view_instructions():
                 feature_contributions=get_term("Feature Contributions")
             )
         )
-        if FLIP_COLORS:
-            positive, negative = "red", "blue"
-        else:
-            positive, negative = "blue", "red"
+        positive, negative = helpers.get_pos_neg_names()
         st.markdown(
             "A large **{positive}** bar means that this {feature}'s value significantly increased"
             " the model's prediction on this {entity}. A large **{negative}** bar means that this"
