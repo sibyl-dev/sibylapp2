@@ -3,31 +3,38 @@ from sibylapp.view.utils import helpers
 from sibylapp.compute import contributions
 from sibylapp.compute.context import get_term
 from sibylapp.config import FLIP_COLORS
-from st_aggrid import AgGrid, ColumnsAutoSizeMode
-from st_aggrid.grid_options_builder import GridOptionsBuilder
 
 
-def show_table(df):
-    df = (
-        df.drop("Contribution Value", axis="columns")
-        .rename(
-            columns={
-                "Contribution": get_term("Contribution"),
-                "Feature": get_term("Feature"),
-            }
-        )
-        .reset_index()
-    )
-    gb = GridOptionsBuilder.from_dataframe(df)
-    gb.configure_pagination(
-        enabled=True, paginationAutoPageSize=False, paginationPageSize=10
-    )
-    AgGrid(
-        df,
-        fit_columns_on_grid_load=True,
-        gridOptions=gb.build(),
-        columns_auto_size_mode=ColumnsAutoSizeMode.FIT_CONTENTS,
-    )
+def show_sorted_contributions(to_show, sort_by):
+    if sort_by == "Side-by-side":
+        col1, col2 = st.columns(2)
+        with col1:
+            st.subheader(get_term("Negative"))
+            to_show_neg = to_show[to_show["Contribution Value"] < 0].sort_values(
+                by="Contribution", axis="index", ascending=False
+            )
+            to_show_neg = helpers.process_options(to_show_neg)
+            helpers.show_table(to_show_neg.drop("Contribution Value", axis="columns"))
+        with col2:
+            st.subheader(get_term("Positive"))
+            to_show_pos = to_show[to_show["Contribution Value"] >= 0].sort_values(
+                by="Contribution", axis="index", ascending=False
+            )
+            to_show_pos = helpers.process_options(to_show_pos)
+            helpers.show_table(to_show_pos.drop("Contribution Value", axis="columns"))
+    else:
+        if sort_by == "Absolute":
+            to_show = to_show.reindex(
+                to_show["Contribution Value"].abs().sort_values(ascending=False).index
+            )
+        if sort_by == "Ascending":
+            to_show = to_show.sort_values(by="Contribution Value", axis="index")
+        if sort_by == "Descending":
+            to_show = to_show.sort_values(
+                by="Contribution Value", axis="index", ascending=False
+            )
+        to_show = helpers.process_options(to_show)
+        helpers.show_table(to_show.drop("Contribution Value", axis="columns"))
 
 
 @st.cache_data(show_spinner=False)
@@ -58,7 +65,7 @@ def view(eid):
     if not show_average:
         to_show = to_show.drop("Average/Mode Value", axis="columns")
 
-    helpers.show_sorted_contributions(to_show, sort_by, show_table)
+    show_sorted_contributions(to_show, sort_by)
 
 
 def view_instructions():
