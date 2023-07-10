@@ -1,10 +1,9 @@
 import streamlit as st
-
+from st_aggrid import AgGrid
 from sibylapp.compute import contributions
 from sibylapp.compute.context import get_term
+from sibylapp.config import PredType, PREDICTION_TYPE
 from sibylapp.view.utils import filtering, helpers
-from st_aggrid import AgGrid
-from sibylapp.config import BAR_LENGTH, FLIP_COLORS, PredType, PREDICTION_TYPE
 from sibylapp.view.utils.helpers import POS_EM, NEG_EM
 
 
@@ -40,13 +39,13 @@ def show_sorted_contributions(to_show, sort_by):
 
 
 def show_table(df):
-    st.write("LEGEND:") 
+    st.write("LEGEND:")
     modelPred = get_term("Prediction")
     posChange = ""
     negChange = ""
     # TODO: do i need the legend for categorical?
     # TODO: try the context-specific prediction name thing
-    # TODO: 
+    # TODO:
     if PREDICTION_TYPE == PredType.NUMERIC:
         posChange = " Increase in"
         negChange = " Decrease in"
