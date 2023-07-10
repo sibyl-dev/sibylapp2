@@ -3,6 +3,9 @@ import streamlit as st
 from sibylapp.compute import contributions
 from sibylapp.compute.context import get_term
 from sibylapp.view.utils import filtering, helpers
+from st_aggrid import AgGrid
+from sibylapp.config import BAR_LENGTH, FLIP_COLORS, PredType, PREDICTION_TYPE
+from sibylapp.view.utils.helpers import POS_EM, NEG_EM
 
 
 def show_sorted_contributions(to_show, sort_by):
@@ -34,6 +37,36 @@ def show_sorted_contributions(to_show, sort_by):
         to_show = filtering.process_options(to_show)
         helpers.show_table(to_show.drop("Contribution Value", axis="columns"))
 
+
+
+def show_table(df):
+    st.write("LEGEND:") 
+    modelPred = get_term("Prediction")
+    posChange = ""
+    negChange = ""
+    # TODO: do i need the legend for categorical?
+    # TODO: try the context-specific prediction name thing
+    # TODO: 
+    if PREDICTION_TYPE == PredType.NUMERIC:
+        posChange = " Increase in"
+        negChange = " Decrease in"
+    elif PREDICTION_TYPE == PredType.BOOLEAN:
+        posChange = " True"
+        negChange = " False"
+    else:
+        # closer / farther from this category
+        posChange = " this"
+        negChange = " another"
+    st.write(POS_EM + posChange + " " + modelPred)
+    st.write(NEG_EM + negChange + " " + modelPred)
+
+    df = df.drop("Contribution Value", axis="columns").rename(
+        columns={
+            "Contribution": get_term("Contribution"),
+            "Feature": get_term("Feature"),
+        }
+    )
+    AgGrid(df, fit_columns_on_grid_load=True)
 
 @st.cache_data(show_spinner=False)
 def format_contributions_to_view(contribution_df):

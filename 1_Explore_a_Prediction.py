@@ -24,3 +24,5 @@ tab = stx.tab_bar(
 
 if tab == "1":
     feature_contribution.view(st.session_state["eid"])
+
+
