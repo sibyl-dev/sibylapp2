@@ -8,7 +8,7 @@ def setup_page(page_title=None):
     st.set_page_config(layout="wide", page_title=page_title)
     st.title("Sibyl")
 
-    #st.write("legend? owo?")
+    # st.write("legend? owo?")
 
     # Selecting eids -----------------------------
     if "eids" not in st.session_state:
@@ -21,6 +21,6 @@ def setup_page(page_title=None):
     if config.LOAD_UPFRONT:
         model.get_dataset_predictions()
         #
-        #st.write("after model")
+        # st.write("after model")
         contributions.get_dataset_contributions()
         importance.compute_importance()

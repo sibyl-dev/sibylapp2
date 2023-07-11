@@ -6,11 +6,15 @@ CERT = None
 
 # APPLICATION-SPECIFIC CONFIGURATIONS =============================================================
 FLIP_COLORS = False  # If true, positive contributions will be red
-#FLIP_COLORS = True  # If true, positive contributions will be red
+
+
+# FLIP_COLORS = True  # If true, positive contributions will be red
 class PredType(Enum):
     BOOLEAN = 1
     CATEGORICAL = 2
     NUMERIC = 3
+
+
 PREDICTION_TYPE = PredType.NUMERIC
 
 

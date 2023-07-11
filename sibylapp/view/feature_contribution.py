@@ -1,10 +1,11 @@
 import streamlit as st
 from st_aggrid import AgGrid
+
 from sibylapp.compute import contributions
 from sibylapp.compute.context import get_term
-from sibylapp.config import PredType, PREDICTION_TYPE
+from sibylapp.config import PREDICTION_TYPE, PredType
 from sibylapp.view.utils import filtering, helpers
-from sibylapp.view.utils.helpers import POS_EM, NEG_EM
+from sibylapp.view.utils.helpers import NEG_EM, POS_EM
 
 
 def show_sorted_contributions(to_show, sort_by):
@@ -57,7 +58,6 @@ def show_sorted_contributions(to_show, sort_by):
         helpers.show_table(to_show.drop("Contribution Value", axis="columns"))
 
 
-
 def show_table(df):
     st.write("LEGEND:")
     modelPred = get_term("Prediction")
@@ -86,6 +86,7 @@ def show_table(df):
         }
     )
     AgGrid(df, fit_columns_on_grid_load=True)
+
 
 @st.cache_data(show_spinner=False)
 def format_contributions_to_view(contribution_df):
