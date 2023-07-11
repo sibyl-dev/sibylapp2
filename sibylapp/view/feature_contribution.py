@@ -8,6 +8,26 @@ from sibylapp.view.utils.helpers import POS_EM, NEG_EM
 
 
 def show_sorted_contributions(to_show, sort_by):
+    st.write("LEGEND:")
+    modelPred = get_term("Prediction")
+    posChange = ""
+    negChange = ""
+    # TODO: do i need the legend for categorical?
+    # TODO: try the context-specific prediction name thing
+    # TODO:
+    if PREDICTION_TYPE == PredType.NUMERIC:
+        posChange = " Increase in"
+        negChange = " Decrease in"
+    elif PREDICTION_TYPE == PredType.BOOLEAN:
+        posChange = " True"
+        negChange = " False"
+    else:
+        # closer / farther from this category
+        posChange = " this"
+        negChange = " another"
+    st.write(POS_EM + posChange + " " + modelPred)
+    st.write(NEG_EM + negChange + " " + modelPred)
+
     if sort_by == "Side-by-side":
         col1, col2 = st.columns(2)
         with col1:
