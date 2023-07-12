@@ -7,28 +7,24 @@ from sibylapp.config import PREDICTION_TYPE, PredType
 from sibylapp.view.utils import filtering, helpers
 from sibylapp.view.utils.helpers import NEG_EM, POS_EM
 
-
-def show_sorted_contributions(to_show, sort_by):
-    st.write("LEGEND:")
+def legend():
     modelPred = get_term("Prediction")
     posChange = ""
     negChange = ""
-    # TODO: do i need the legend for categorical?
-    # TODO: try the context-specific prediction name thing
-    # TODO:
+    separator = "           "
+    # TODO: add detail for categorical predictions after we figure this out
     if PREDICTION_TYPE == PredType.NUMERIC:
         posChange = " Increase in"
         negChange = " Decrease in"
     elif PREDICTION_TYPE == PredType.BOOLEAN:
-        posChange = " True"
-        negChange = " False"
-    else:
-        # closer / farther from this category
-        posChange = " this"
-        negChange = " another"
-    st.write(POS_EM + posChange + " " + modelPred)
-    st.write(NEG_EM + negChange + " " + modelPred)
+        posChange = " towards True"
+        negChange = " towards False"
+    st.write((POS_EM + posChange + " " + modelPred) + separator + (NEG_EM + negChange + " " + modelPred))
 
+
+def show_sorted_contributions(to_show, sort_by):
+    legend()
+    
     if sort_by == "Side-by-side":
         col1, col2 = st.columns(2)
         with col1:
@@ -57,27 +53,10 @@ def show_sorted_contributions(to_show, sort_by):
         to_show = filtering.process_options(to_show)
         helpers.show_table(to_show.drop("Contribution Value", axis="columns"))
 
-
+"""
 def show_table(df):
-    st.write("LEGEND:")
-    modelPred = get_term("Prediction")
-    posChange = ""
-    negChange = ""
-    # TODO: do i need the legend for categorical?
-    # TODO: try the context-specific prediction name thing
-    # TODO:
-    if PREDICTION_TYPE == PredType.NUMERIC:
-        posChange = " Increase in"
-        negChange = " Decrease in"
-    elif PREDICTION_TYPE == PredType.BOOLEAN:
-        posChange = " True"
-        negChange = " False"
-    else:
-        # closer / farther from this category
-        posChange = " this"
-        negChange = " another"
-    st.write(POS_EM + posChange + " " + modelPred)
-    st.write(NEG_EM + negChange + " " + modelPred)
+    legend()
+    st.write("HELLO WORLD HEE HEE")
 
     df = df.drop("Contribution Value", axis="columns").rename(
         columns={
@@ -86,6 +65,7 @@ def show_table(df):
         }
     )
     AgGrid(df, fit_columns_on_grid_load=True)
+"""
 
 
 @st.cache_data(show_spinner=False)

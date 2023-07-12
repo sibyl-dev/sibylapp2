@@ -7,7 +7,8 @@ CERT = None
 # APPLICATION-SPECIFIC CONFIGURATIONS =============================================================
 FLIP_COLORS = False  # If true, positive contributions will be red
 
-
+# TODO: add names for "positive" and "negative" values after we have a more concrete idea
+# TODO: (optional) provide threshold for true/false
 # FLIP_COLORS = True  # If true, positive contributions will be red
 class PredType(Enum):
     BOOLEAN = 1
