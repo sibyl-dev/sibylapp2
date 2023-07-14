@@ -15,6 +15,7 @@ class PredType(Enum):
     CATEGORICAL = 2
     NUMERIC = 3
 
+
 # add names for "positive" and "negative" values after we have a more concrete idea
 PREDICTION_TYPE = PredType.BOOLEAN
 positiveTerm = "Failure"

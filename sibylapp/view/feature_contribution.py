@@ -2,7 +2,7 @@ import streamlit as st
 
 from sibylapp.compute import contributions
 from sibylapp.compute.context import get_term
-from sibylapp.config import PREDICTION_TYPE, PredType, positiveTerm, negativeTerm
+from sibylapp.config import PREDICTION_TYPE, PredType, negativeTerm, positiveTerm
 from sibylapp.view.utils import filtering, helpers
 from sibylapp.view.utils.helpers import NEG_EM, POS_EM
 
@@ -17,8 +17,8 @@ def legend():
         posChange = " Increase in"
         negChange = " Decrease in"
     elif PREDICTION_TYPE == PredType.BOOLEAN:
-        posChange = (" towards " + positiveTerm + " as")
-        negChange = (" towards " + negativeTerm + " as")
+        posChange = " towards " + positiveTerm + " as"
+        negChange = " towards " + negativeTerm + " as"
     st.write(
         (POS_EM + posChange + " " + modelPred) + separator + (NEG_EM + negChange + " " + modelPred)
     )
