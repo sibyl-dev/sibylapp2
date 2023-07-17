@@ -5,10 +5,9 @@ BASE_URL = "http://localhost:3000/api/v1/"
 CERT = None
 
 # APPLICATION-SPECIFIC CONFIGURATIONS =============================================================
-FLIP_COLORS = True  # If true, positive contributions will be red
+FLIP_COLORS = False  # If true, positive contributions will be red
 
 
-# TODO: (optional) provide threshold for true/false
 # FLIP_COLORS = True  # If true, positive contributions will be red
 class PredType(Enum):
     BOOLEAN = 1
@@ -17,9 +16,9 @@ class PredType(Enum):
 
 
 # add names for "positive" and "negative" values after we have a more concrete idea
-PREDICTION_TYPE = PredType.BOOLEAN
-positiveTerm = "Failure"
-negativeTerm = "Working"
+PREDICTION_TYPE = PredType.NUMERIC
+POSITIVE_TERM = ""
+NEGATIVE_TERM = ""
 
 
 def pred_format_func(
