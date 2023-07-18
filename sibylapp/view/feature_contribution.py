@@ -20,7 +20,7 @@ def show_legend():
         posChange = f" towards **{POSITIVE_TERM}** as"
         negChange = f" towards **{NEGATIVE_TERM}** as"
     st.write(
-        (POS_EM + posChange + " " + modelPred) + separator + (NEG_EM + negChange + " " + modelPred)
+        (NEG_EM + negChange + " " + modelPred) + separator + (POS_EM + posChange + " " + modelPred)
     )
 
 
