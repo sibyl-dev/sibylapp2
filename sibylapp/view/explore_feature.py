@@ -66,6 +66,7 @@ def generate_feature_plot(contributions_to_show, predictions, feature, discrete=
         y="Contribution",
         color=color,
         color_continuous_scale="Brwnyl",
+        category_orders={color: sorted(set(df["Prediction"]))},
         color_discrete_sequence=px.colors.qualitative.Bold,
         hover_data=hover_data,
     )
