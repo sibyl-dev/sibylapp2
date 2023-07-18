@@ -7,7 +7,10 @@ CERT = None
 # APPLICATION-SPECIFIC CONFIGURATIONS =============================================================
 FLIP_COLORS = False  # If true, positive contributions will be red
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> c181b08 (remove commented out code)
 class PredType(Enum):
     BOOLEAN = 1
     CATEGORICAL = 2
