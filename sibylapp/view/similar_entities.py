@@ -1,7 +1,5 @@
 import pandas as pd
 import streamlit as st
-from st_aggrid.grid_options_builder import GridOptionsBuilder
-from st_aggrid.shared import JsCode
 
 from sibylapp.compute import example_based
 from sibylapp.compute.context import get_term
@@ -37,14 +35,18 @@ def view(eid):
     y.index = ["y"]  # Used to prevent bug in data_editor where index is assumed to be numeric
     to_show, neighbor_names, selected_col_name = format_similar_entities(x, y)
     options = ["No filtering"] + neighbor_names
-    show_different = st.radio("Apply filtering by differences?", options, horizontal=True, 
-                              help="Show only rows where value differs from selected")
+    show_different = st.radio(
+        "Apply filtering by differences?",
+        options,
+        horizontal=True,
+        help="Show only rows where value differs from selected",
+    )
     if show_different == "No filtering":
         pass
     else:
         to_show = filter_different_rows(to_show, show_different, selected_col_name)
 
-    helpers.show_table(to_show), #gb, allow_unsafe=True)
+    helpers.show_table(to_show)
 
 
 def view_instructions():

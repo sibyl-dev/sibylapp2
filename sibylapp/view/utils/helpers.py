@@ -1,12 +1,10 @@
 import math
 
 import pandas as pd
-from st_aggrid import AgGrid, ColumnsAutoSizeMode
-from st_aggrid.grid_options_builder import GridOptionsBuilder
+import streamlit as st
 
 from sibylapp.compute.context import get_term
 from sibylapp.config import BAR_LENGTH, FLIP_COLORS
-import streamlit as st
 
 if FLIP_COLORS:
     POS_EM = "🟥"
@@ -42,22 +40,38 @@ def show_table(df, page_size=10, key=None):
     with col1:
         if key is not None:
             key = "%s%s" % (key, "_page")
-        page = st.number_input("Page", value=1, step=1, min_value=1, max_value=int(df.shape[0]/page_size)+1, key=key)
+        page = st.number_input(
+            "Page",
+            value=1,
+            step=1,
+            min_value=1,
+            max_value=int(df.shape[0] / page_size) + 1,
+            key=key,
+        )
     renames = {}
     for column in df:
         renames[column] = get_term(column)
     df = df.rename(columns=renames)
 
-    table.data_editor(df[(page-1)*page_size: (page-1)*page_size+page_size], 
-                   hide_index=True, use_container_width=True, num_rows="fixed", disabled=True)
+    table.data_editor(
+        df[(page - 1) * page_size : (page - 1) * page_size + page_size],
+        hide_index=True,
+        use_container_width=True,
+        num_rows="fixed",
+        disabled=True,
+    )
 
 
 def generate_bars(values, neutral=False, show_number=False):
     def format_func(n, v=None):
         if neutral:
-            formatted = (NEUT_EM * n + BLANK_EM * (BAR_LENGTH - n) + UP_ARROW)
+            formatted = NEUT_EM * n + BLANK_EM * (BAR_LENGTH - n) + UP_ARROW
         else:
-            formatted = (POS_EM * n + BLANK_EM * (BAR_LENGTH - n) + UP_ARROW) if n > 0 else (DOWN_ARROW + BLANK_EM * (BAR_LENGTH + n) + NEG_EM * -n)
+            formatted = (
+                (POS_EM * n + BLANK_EM * (BAR_LENGTH - n) + UP_ARROW)
+                if n > 0
+                else (DOWN_ARROW + BLANK_EM * (BAR_LENGTH + n) + NEG_EM * -n)
+            )
         if show_number:
             formatted = "%s    %.3f" % (formatted, v)
         return formatted

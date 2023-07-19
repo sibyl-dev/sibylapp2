@@ -68,7 +68,9 @@ def format_contributions_to_view(contribution_df, show_number=False):
         ["Category", "Feature", "Value", "Average/Mode Value", "Contribution"]
     ]  # reorder
     contribution_df["Contribution Value"] = contribution_df["Contribution"].copy()
-    contribution_df["Contribution"] = helpers.generate_bars(contribution_df["Contribution"], show_number=show_number)
+    contribution_df["Contribution"] = helpers.generate_bars(
+        contribution_df["Contribution"], show_number=show_number
+    )
     return contribution_df
 
 
@@ -78,15 +80,28 @@ def view(eid, save_space=False):
     if not save_space:
         cols = st.columns(2)
         with cols[0]:
-            sort_by = helpers.show_sort_options(["Absolute", "Ascending", "Descending", "Side-by-side"])
+            sort_by = helpers.show_sort_options(
+                ["Absolute", "Ascending", "Descending", "Side-by-side"]
+            )
         with cols[1]:
-            show_average = st.checkbox("Show average values?", help="Contributions are based on the difference from the average value in the training set")
-            show_number = st.checkbox("Show numeric contributions?", help="Show the exact amount this feature contributes to the model prediction")
+            show_average = st.checkbox(
+                "Show average values?",
+                help=(
+                    "Contributions are based on the difference from the average value in the"
+                    " training set"
+                ),
+            )
+            show_number = st.checkbox(
+                "Show numeric contributions?",
+                help="Show the exact amount this feature contributes to the model prediction",
+            )
     else:
         cols = st.columns(1)
         with cols[0]:
             sort_by = helpers.show_sort_options(["Absolute", "Ascending", "Descending"])
-    to_show = format_contributions_to_view(contributions.get_contributions([eid])[eid], show_number=show_number)
+    to_show = format_contributions_to_view(
+        contributions.get_contributions([eid])[eid], show_number=show_number
+    )
     if not show_average:
         to_show = to_show.drop("Average/Mode Value", axis="columns")
 
