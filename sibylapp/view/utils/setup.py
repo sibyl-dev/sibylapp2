@@ -18,5 +18,6 @@ def setup_page(page_title=None):
     # Populate cache -----------------------------
     if config.LOAD_UPFRONT:
         model.get_dataset_predictions()
+
         contributions.get_dataset_contributions()
         importance.compute_importance()

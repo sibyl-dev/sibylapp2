@@ -1,9 +1,23 @@
+from enum import Enum
+
 # API CONFIGURATIONS ==============================================================================
 BASE_URL = "http://localhost:3000/api/v1/"
 CERT = None
 
 # APPLICATION-SPECIFIC CONFIGURATIONS =============================================================
 FLIP_COLORS = False  # If true, positive contributions will be red
+
+
+class PredType(Enum):
+    BOOLEAN = 1
+    CATEGORICAL = 2
+    NUMERIC = 3
+
+
+# add names for "positive" and "negative" values after we have a more concrete idea
+PREDICTION_TYPE = PredType.NUMERIC
+POSITIVE_TERM = None
+NEGATIVE_TERM = None
 
 
 def pred_format_func(
@@ -34,8 +48,8 @@ def format_class_name(pred, class_names):
     return class_names[int(pred)]
 
 
-def format_boolean_name(pred, pos_name, neg_name):
-    return pos_name if pred else neg_name
+def format_boolean_name(pred):
+    return POSITIVE_TERM if pred else NEGATIVE_TERM
 
 
 def format_number(pred, decimals=2):
