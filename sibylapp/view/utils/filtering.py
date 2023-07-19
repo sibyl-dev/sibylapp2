@@ -89,13 +89,15 @@ def view_filtering(include_show_more=True):
     exp = st.expander("Search and filter", expanded=expanded)
 
     with exp:
-        st.session_state["search_term"] = st.text_input(
+        st.text_input(
             "Search by %s" % context.get_term("Feature").lower(),
+            key="search_term",
             value=st.session_state["search_term"],
         )
-        st.session_state["filters"] = st.multiselect(
+        st.multiselect(
             "Filter by category",
             context.get_category_list(),
+            key="filters",
             default=st.session_state["filters"],
         )
 
