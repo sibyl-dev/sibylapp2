@@ -54,7 +54,7 @@ def show_table(df, page_size=10, key=None):
     df = df.rename(columns=renames)
 
     table.data_editor(
-        df[(page - 1) * page_size : (page - 1) * page_size + page_size],
+        df[(page - 1) * page_size : page * page_size],
         hide_index=True,
         use_container_width=True,
         num_rows="fixed",
