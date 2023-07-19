@@ -2,10 +2,31 @@ import streamlit as st
 
 from sibylapp.compute import contributions
 from sibylapp.compute.context import get_term
+from sibylapp.config import NEGATIVE_TERM, POSITIVE_TERM, PREDICTION_TYPE, PredType
 from sibylapp.view.utils import filtering, helpers
+from sibylapp.view.utils.helpers import NEG_EM, POS_EM
+
+
+def show_legend():
+    modelPred = get_term("Prediction", l=True)
+    posChange = ""
+    negChange = ""
+    separator = "&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;"
+    # *will add detail for categorical predictions after we figure this out
+    if PREDICTION_TYPE == PredType.NUMERIC:
+        posChange = " Increase in"
+        negChange = " Decrease in"
+    elif PREDICTION_TYPE == PredType.BOOLEAN:
+        posChange = f" towards **{POSITIVE_TERM}** as"
+        negChange = f" towards **{NEGATIVE_TERM}** as"
+    st.write(
+        (NEG_EM + negChange + " " + modelPred) + separator + (POS_EM + posChange + " " + modelPred)
+    )
 
 
 def show_sorted_contributions(to_show, sort_by):
+    show_legend()
+
     if sort_by == "Side-by-side":
         col1, col2 = st.columns(2)
         with col1:

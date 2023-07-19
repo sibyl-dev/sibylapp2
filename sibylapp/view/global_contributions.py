@@ -5,6 +5,7 @@ from pyreal.visualize import swarm_plot
 
 from sibylapp.compute import contributions
 from sibylapp.compute.context import get_term
+from sibylapp.view.feature_contribution import show_legend
 from sibylapp.view.utils import filtering, helpers
 
 
@@ -23,6 +24,8 @@ def view_summary_plot(contribution_dict):
 
 def view(all_contributions):
     sort_by = st.selectbox("Sort order", ["Total", "Most Increasing", "Most Decreasing"])
+
+    show_legend()
 
     global_contributions = contributions.compute_global_contributions(all_contributions)
     bars = helpers.generate_bars_bidirectional(
