@@ -92,13 +92,13 @@ def view_filtering(include_show_more=False):
         st.text_input(
             "Search by %s" % context.get_term("Feature").lower(),
             key="search_term",
-            value=st.session_state["search_term"]
+            value=st.session_state["search_term"],
         )
         st.multiselect(
             "Filter by category",
             context.get_category_list(),
-            key="filters", 
-            default=st.session_state["filters"]
+            key="filters",
+            default=st.session_state["filters"],
         )
 
 
