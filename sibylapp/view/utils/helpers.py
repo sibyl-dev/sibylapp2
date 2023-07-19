@@ -6,6 +6,7 @@ from st_aggrid.grid_options_builder import GridOptionsBuilder
 
 from sibylapp.compute.context import get_term
 from sibylapp.config import BAR_LENGTH, FLIP_COLORS
+import streamlit as st
 
 if FLIP_COLORS:
     POS_EM = "🟥"
@@ -20,6 +21,10 @@ DOWN_ARROW = "⬇"
 DIVIDING_BAR = "|"
 
 
+def show_sort_options(options):
+    return st.radio("Sort by", options, horizontal=True)
+
+
 def get_pos_neg_names():
     if FLIP_COLORS:
         return "red", "blue"
@@ -27,25 +32,32 @@ def get_pos_neg_names():
         return "blue", "red"
 
 
-def show_table(df, gb=None, allow_unsafe=False):
+def show_table(df, page_size=10):
+    table = st.container()
+    _, col1, col2 = st.columns((4, 1, 1))
+    with col2:
+        page_size = st.selectbox("Rows per page", [10, 25, 50])
+    with col1:
+        page = st.number_input("Page", value=1, step=1, min_value=1, max_value=int(df.shape[0]/page_size)+1)
     renames = {}
     for column in df:
         renames[column] = get_term(column)
     df = df.rename(columns=renames)
-    if gb is None:
-        gb = GridOptionsBuilder.from_dataframe(df)
-    if df.shape[0] > 10:
-        gb.configure_pagination(enabled=True, paginationAutoPageSize=False, paginationPageSize=10)
-    AgGrid(
-        df,
-        fit_columns_on_grid_load=True,
-        gridOptions=gb.build(),
-        columns_auto_size_mode=ColumnsAutoSizeMode.FIT_CONTENTS,
-        allow_unsafe_jscode=allow_unsafe,
-    )
+
+    table.data_editor(df[(page-1)*page_size: (page-1)*page_size+page_size], 
+                   hide_index=True, use_container_width=True, num_rows="fixed", disabled=True)
 
 
-def generate_bars(values, neutral=False):
+def generate_bars(values, neutral=False, show_number=False):
+    def format_func(n, v=None):
+        if neutral:
+            formatted = (NEUT_EM * n + BLANK_EM * (BAR_LENGTH - n) + UP_ARROW)
+        else:
+            formatted = (POS_EM * n + BLANK_EM * (BAR_LENGTH - n) + UP_ARROW) if n > 0 else (DOWN_ARROW + BLANK_EM * (BAR_LENGTH + n) + NEG_EM * -n)
+        if show_number:
+            formatted = "%s    %.3f" % (formatted, v)
+        return formatted
+
     def round_away_from_zero(x):
         if x >= 0.0:
             return math.floor(x + 0.5)
@@ -54,17 +66,8 @@ def generate_bars(values, neutral=False):
 
     num_to_show = values / max(values.abs()) * BAR_LENGTH
     num_to_show = num_to_show.apply(round_away_from_zero).astype("int")
-    if neutral:
-        return [(NEUT_EM * n + BLANK_EM * (BAR_LENGTH - n) + UP_ARROW) for n in num_to_show]
-    else:
-        return [
-            (
-                (POS_EM * n + BLANK_EM * (BAR_LENGTH - n) + UP_ARROW)
-                if n > 0
-                else (DOWN_ARROW + BLANK_EM * (BAR_LENGTH + n) + NEG_EM * -n)
-            )
-            for n in num_to_show
-        ]
+
+    return [format_func(n, v) for n, v in zip(num_to_show, values)]
 
 
 def generate_bars_bidirectional(neg_values, pos_values):

@@ -22,7 +22,7 @@ def view_summary_plot(contribution_dict):
 
 
 def view(all_contributions):
-    sort_by = st.selectbox("Sort order", ["Total", "Most Increasing", "Most Decreasing"])
+    sort_by = helpers.show_sort_options(["Total", "Most Increasing", "Most Decreasing"])
 
     global_contributions = contributions.compute_global_contributions(all_contributions)
     bars = helpers.generate_bars_bidirectional(
