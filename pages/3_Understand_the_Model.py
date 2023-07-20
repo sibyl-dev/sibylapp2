@@ -89,5 +89,5 @@ if tab == "4":
                 filtering.process_search_on_features(features),
             )
             explore_feature.view(
-                filtered_contributions, predictions, feature, discrete
+                eids, predictions, feature, discrete
             )

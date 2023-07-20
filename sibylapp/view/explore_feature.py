@@ -7,10 +7,12 @@ from streamlit_plotly_events import plotly_events
 from sibylapp import config
 from sibylapp.compute.context import get_term
 from sibylapp.view import feature_contribution
+from sibylapp.compute import contributions
 
 
 @st.cache_data(show_spinner="Generating plot...")
-def generate_feature_distribution_plot(contribution_dict, feature):
+def generate_feature_distribution_plot(eids, feature):
+    contribution_dict = contributions.compute_contributions(eids)
     data = pd.DataFrame(
         [
             contribution_dict[eid][contribution_dict[eid]["Feature"] == feature]["Feature Value"]
@@ -33,7 +35,8 @@ def generate_feature_distribution_plot(contribution_dict, feature):
 
 
 @st.cache_data(show_spinner="Generating plot...")
-def generate_feature_plot(contributions_to_show, predictions, feature, discrete=False):
+def generate_feature_plot(eids, predictions, feature, discrete=False):
+    contributions_to_show = contributions.compute_contributions(eids)
     data = {
         i: contributions_to_show[i][contributions_to_show[i]["Feature"] == feature][
             ["Contribution", "Feature Value"]
@@ -74,16 +77,16 @@ def generate_feature_plot(contributions_to_show, predictions, feature, discrete=
     return fig
 
 
-def view(contributions_to_show, predictions, feature, discrete=False):
+def view(eids, predictions, feature, discrete=False):
     col1, col2 = st.columns(2)
     with col1:
-        fig1 = generate_feature_plot(contributions_to_show, predictions, feature, discrete)
+        fig1 = generate_feature_plot(eids, predictions, feature, discrete)
         selected_index = plotly_events(fig1)
-        fig2 = generate_feature_distribution_plot(contributions_to_show, feature)
+        fig2 = generate_feature_distribution_plot(eids, feature)
         st.plotly_chart(fig2)
     with col2:
         if len(selected_index) > 0:
-            eid = list(contributions_to_show.keys())[selected_index[0]["pointIndex"]]
+            eid = eids[selected_index[0]["pointIndex"]]
             st.subheader(
                 "Contributions for {entity} {eid}".format(entity=get_term("Entity"), eid=eid)
             )
