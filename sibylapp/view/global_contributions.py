@@ -9,16 +9,16 @@ from sibylapp.view.feature_contribution import show_legend
 from sibylapp.view.utils import filtering, helpers
 
 
-@st.cache_data(show_spinner="Generating plot...")
-def generate_swarm_plot(contribution_dict):
+@st.cache_data(show_spinner="Generating summary plot...")
+def generate_swarm_plot(eids):
+    contribution_dict = helpers.rename_for_pyreal_vis(contributions.get_contributions(eids))
     swarm_plot(contribution_dict, type="strip")
     return plt.gcf()
 
 
 def view_summary_plot(eids):
-    selected_contributions = contributions.get_contributions(eids)
     st.pyplot(
-        generate_swarm_plot(helpers.rename_for_pyreal_vis(selected_contributions)),
+        generate_swarm_plot(eids),
         clear_figure=True,
     )
 
