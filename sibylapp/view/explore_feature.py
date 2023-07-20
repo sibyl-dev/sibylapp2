@@ -12,7 +12,7 @@ from sibylapp.compute import contributions
 
 @st.cache_data(show_spinner="Generating plot...")
 def generate_feature_distribution_plot(eids, feature):
-    contribution_dict = contributions.compute_contributions(eids)
+    contribution_dict = contributions.get_contributions(eids)
     data = pd.DataFrame(
         [
             contribution_dict[eid][contribution_dict[eid]["Feature"] == feature]["Feature Value"]
@@ -36,7 +36,7 @@ def generate_feature_distribution_plot(eids, feature):
 
 @st.cache_data(show_spinner="Generating plot...")
 def generate_feature_plot(eids, predictions, feature, discrete=False):
-    contributions_to_show = contributions.compute_contributions(eids)
+    contributions_to_show = contributions.get_contributions(eids)
     data = {
         i: contributions_to_show[i][contributions_to_show[i]["Feature"] == feature][
             ["Contribution", "Feature Value"]
