@@ -23,7 +23,7 @@ def view_summary_plot(contribution_dict):
 
 
 def view(all_contributions):
-    sort_by = st.selectbox("Sort order", ["Total", "Most Increasing", "Most Decreasing"])
+    sort_by = helpers.show_sort_options(["Total", "Most Increasing", "Most Decreasing"])
 
     show_legend()
 

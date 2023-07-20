@@ -1,29 +1,10 @@
 import pandas as pd
 import streamlit as st
-from st_aggrid.grid_options_builder import GridOptionsBuilder
-from st_aggrid.shared import JsCode
 
 from sibylapp.compute import example_based
 from sibylapp.compute.context import get_term
 from sibylapp.view.utils import helpers
 from sibylapp.view.utils.filtering import process_options
-
-primary_color = st.get_option("theme.primaryColor")
-highlight_different_jscode = JsCode("""
-function(params) {
-    if (params.value != params.data.Selected) {
-        return {
-            'color': 'white',
-            'backgroundColor': 'tomato'
-        }
-    } else {
-        return {
-            'color': 'black',
-            'backgroundColor': 'white'
-        }
-    }
-};
-""")
 
 
 def format_similar_entities(x, y):
@@ -38,7 +19,6 @@ def format_similar_entities(x, y):
     similar_entity_info.columns = [selected_col_name] + neighbor_names
     to_show = pd.concat([feature_info, similar_entity_info], axis=1)
     to_show = process_options(to_show)
-    to_show = to_show.rename(columns={"Feature": get_term("Feature")})
 
     return to_show, neighbor_names, selected_col_name
 
@@ -52,19 +32,21 @@ def filter_different_rows(to_show, neighbor_names, selected_col_name):
 
 def view(eid):
     x, y = example_based.get_similar_entities(eid)
+    y.index = ["y"]  # Used to prevent bug in data_editor where index is assumed to be numeric
     to_show, neighbor_names, selected_col_name = format_similar_entities(x, y)
     options = ["No filtering"] + neighbor_names
-    show_different = st.radio("Apply filtering by differences?", options, horizontal=True)
+    show_different = st.radio(
+        "Apply filtering by differences?",
+        options,
+        horizontal=True,
+        help="Show only rows where value differs from selected",
+    )
     if show_different == "No filtering":
         pass
     else:
         to_show = filter_different_rows(to_show, show_different, selected_col_name)
 
-    gb = GridOptionsBuilder.from_dataframe(to_show)
-    for neighbor_name in neighbor_names:
-        gb.configure_column(neighbor_name, cellStyle=highlight_different_jscode)
-
-    helpers.show_table(to_show, gb, allow_unsafe=True)
+    helpers.show_table(to_show)
 
 
 def view_instructions():
