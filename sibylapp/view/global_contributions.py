@@ -25,8 +25,6 @@ def view_summary_plot(eids):
 
 def view(eids):
     sort_by = st.selectbox("Sort order", ["Total", "Most Increasing", "Most Decreasing"])
-    all_contributions = contributions.get_dataset_contributions()
-
     show_legend()
 
     global_contributions = contributions.compute_global_contributions(eids)
@@ -34,6 +32,7 @@ def view(eids):
         global_contributions["negative"], global_contributions["positive"]
     )
 
+    all_contributions = contributions.get_dataset_contributions()
     feature_info = all_contributions[next(iter(all_contributions))][
         ["category", "Feature"]
     ].rename(columns={"category": "Category"})

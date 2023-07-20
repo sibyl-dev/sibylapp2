@@ -35,14 +35,14 @@ def show_sorted_contributions(to_show, sort_by):
                 by="Contribution", axis="index", ascending=False
             )
             to_show_neg = filtering.process_options(to_show_neg)
-            helpers.show_table(to_show_neg.drop("Contribution Value", axis="columns"))
+            helpers.show_table(to_show_neg.drop("Contribution Value", axis="columns"), key="neg")
         with col2:
             st.subheader(get_term("Positive"))
             to_show_pos = to_show[to_show["Contribution Value"] >= 0].sort_values(
                 by="Contribution", axis="index", ascending=False
             )
             to_show_pos = filtering.process_options(to_show_pos)
-            helpers.show_table(to_show_pos.drop("Contribution Value", axis="columns"))
+            helpers.show_table(to_show_pos.drop("Contribution Value", axis="columns"), key="pos")
     else:
         if sort_by == "Absolute":
             to_show = to_show.reindex(
@@ -56,8 +56,7 @@ def show_sorted_contributions(to_show, sort_by):
         helpers.show_table(to_show.drop("Contribution Value", axis="columns"))
 
 
-@st.cache_data(show_spinner=False)
-def format_contributions_to_view(contribution_df):
+def format_contributions_to_view(contribution_df, show_number=False):
     contribution_df = contribution_df.rename(
         columns={
             "category": "Category",
@@ -69,14 +68,40 @@ def format_contributions_to_view(contribution_df):
         ["Category", "Feature", "Value", "Average/Mode Value", "Contribution"]
     ]  # reorder
     contribution_df["Contribution Value"] = contribution_df["Contribution"].copy()
-    contribution_df["Contribution"] = helpers.generate_bars(contribution_df["Contribution"])
+    contribution_df["Contribution"] = helpers.generate_bars(
+        contribution_df["Contribution"], show_number=show_number
+    )
     return contribution_df
 
 
-def view(eid):
-    to_show = format_contributions_to_view(contributions.get_contributions([eid])[eid])
-    sort_by = st.selectbox("Sort order", ["Absolute", "Ascending", "Descending", "Side-by-side"])
-    show_average = st.checkbox("Show average values?")
+def view(eid, save_space=False):
+    show_number = False
+    show_average = False
+    if not save_space:
+        cols = st.columns(2)
+        with cols[0]:
+            sort_by = helpers.show_sort_options(
+                ["Absolute", "Ascending", "Descending", "Side-by-side"]
+            )
+        with cols[1]:
+            show_average = st.checkbox(
+                "Show average values?",
+                help=(
+                    "Contributions are based on the difference from the average value in the"
+                    " training set"
+                ),
+            )
+            show_number = st.checkbox(
+                "Show numeric contributions?",
+                help="Show the exact amount this feature contributes to the model prediction",
+            )
+    else:
+        cols = st.columns(1)
+        with cols[0]:
+            sort_by = helpers.show_sort_options(["Absolute", "Ascending", "Descending"])
+    to_show = format_contributions_to_view(
+        contributions.get_contributions([eid])[eid], show_number=show_number
+    )
     if not show_average:
         to_show = to_show.drop("Average/Mode Value", axis="columns")
 
