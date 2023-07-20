@@ -15,22 +15,25 @@ def generate_swarm_plot(contribution_dict):
     return plt.gcf()
 
 
-def view_summary_plot(contribution_dict):
+def view_summary_plot(eids):
+    selected_contributions = contributions.get_contributions(eids)
     st.pyplot(
-        generate_swarm_plot(helpers.rename_for_pyreal_vis(contribution_dict)),
+        generate_swarm_plot(helpers.rename_for_pyreal_vis(selected_contributions)),
         clear_figure=True,
     )
 
 
-def view(all_contributions):
+def view(eids):
     sort_by = st.selectbox("Sort order", ["Total", "Most Increasing", "Most Decreasing"])
+    all_contributions = contributions.get_dataset_contributions()
 
     show_legend()
 
-    global_contributions = contributions.compute_global_contributions(all_contributions)
+    global_contributions = contributions.compute_global_contributions(eids)
     bars = helpers.generate_bars_bidirectional(
         global_contributions["negative"], global_contributions["positive"]
     )
+
     feature_info = all_contributions[next(iter(all_contributions))][
         ["category", "Feature"]
     ].rename(columns={"category": "Category"})

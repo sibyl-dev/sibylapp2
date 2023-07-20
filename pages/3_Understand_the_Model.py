@@ -71,13 +71,13 @@ if tab == "2":
         if len(eids) == 0:
             st.warning("Select predictions above to see explanation!")
         else:
-            global_contributions.view(filtered_contributions)
+            global_contributions.view(eids)
 
 if tab == "3":
     if len(eids) == 0:
         st.warning("Select predictions above to see explanation!")
     else:
-        global_contributions.view_summary_plot(filtered_contributions)
+        global_contributions.view_summary_plot(eids)
 
 if tab == "4":
     with placeholder:
