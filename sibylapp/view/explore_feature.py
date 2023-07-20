@@ -5,12 +5,12 @@ import streamlit as st
 from streamlit_plotly_events import plotly_events
 
 from sibylapp import config
+from sibylapp.compute import contributions
 from sibylapp.compute.context import get_term
 from sibylapp.view import feature_contribution
-from sibylapp.compute import contributions
 
 
-@st.cache_data(show_spinner="Generating plot...")
+@st.cache_data(show_spinner="Generating distribution plot...")
 def generate_feature_distribution_plot(eids, feature):
     contribution_dict = contributions.get_contributions(eids)
     data = pd.DataFrame(
@@ -34,7 +34,7 @@ def generate_feature_distribution_plot(eids, feature):
         return fig
 
 
-@st.cache_data(show_spinner="Generating plot...")
+@st.cache_data(show_spinner="Generating feature plot...")
 def generate_feature_plot(eids, predictions, feature, discrete=False):
     contributions_to_show = contributions.get_contributions(eids)
     data = {
