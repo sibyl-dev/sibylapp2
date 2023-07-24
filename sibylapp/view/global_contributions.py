@@ -24,7 +24,7 @@ def view_summary_plot(eids):
 
 
 def view(eids):
-    sort_by = st.selectbox("Sort order", ["Total", "Most Increasing", "Most Decreasing"])
+    sort_by = helpers.show_sort_options(["Total", "Most Increasing", "Most Decreasing"])
     show_legend()
 
     global_contributions = contributions.compute_global_contributions(eids)
