@@ -56,6 +56,8 @@ def generate_feature_plot_data(contributions_to_show, predictions, feature):
 
 
 def generate_feature_plot(contributions_to_show, predictions, feature, discrete=False):
+    # The data computation part of this function is separated out to address a bug with
+    #   plotly_events when generating the fig with a cached function
     df = generate_feature_plot_data(contributions_to_show, predictions, feature)
     hover_data = {
         "Contribution": ":.3f",
