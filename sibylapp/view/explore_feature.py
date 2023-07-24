@@ -33,7 +33,7 @@ def generate_feature_distribution_plot(contribution_dict, feature):
 
 
 @st.cache_data(show_spinner="Generating plot...")
-def generate_feature_plot(contributions_to_show, predictions, feature, discrete=False):
+def generate_feature_plot_data(contributions_to_show, predictions, feature):
     data = {
         i: contributions_to_show[i][contributions_to_show[i]["Feature"] == feature][
             ["Contribution", "Feature Value"]
@@ -52,6 +52,11 @@ def generate_feature_plot(contributions_to_show, predictions, feature, discrete=
     )
     df["ID"] = df.index
     df = df.rename(columns={"Feature Value": "Value"})
+    return df
+
+
+def generate_feature_plot(contributions_to_show, predictions, feature, discrete=False):
+    df = generate_feature_plot_data(contributions_to_show, predictions, feature)
     hover_data = {
         "Contribution": ":.3f",
         "Value": True,
