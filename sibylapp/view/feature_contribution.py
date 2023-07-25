@@ -24,7 +24,7 @@ def show_legend():
     )
 
 
-def show_sorted_contributions(to_show, sort_by):
+def show_sorted_contributions(to_show, sort_by, key=None):
     show_legend()
 
     if sort_by == "Side-by-side":
@@ -35,14 +35,18 @@ def show_sorted_contributions(to_show, sort_by):
                 by="Contribution", axis="index", ascending=False
             )
             to_show_neg = filtering.process_options(to_show_neg)
-            helpers.show_table(to_show_neg.drop("Contribution Value", axis="columns"), key="neg")
+            helpers.show_table(
+                to_show_neg.drop("Contribution Value", axis="columns"), key="%s%s" % (key, "_neg")
+            )
         with col2:
             st.subheader(get_term("Positive"))
             to_show_pos = to_show[to_show["Contribution Value"] >= 0].sort_values(
                 by="Contribution", axis="index", ascending=False
             )
             to_show_pos = filtering.process_options(to_show_pos)
-            helpers.show_table(to_show_pos.drop("Contribution Value", axis="columns"), key="pos")
+            helpers.show_table(
+                to_show_pos.drop("Contribution Value", axis="columns"), key="%s%s" % (key, "_pos")
+            )
     else:
         if sort_by == "Absolute":
             to_show = to_show.reindex(
@@ -53,7 +57,7 @@ def show_sorted_contributions(to_show, sort_by):
         if sort_by == "Descending":
             to_show = to_show.sort_values(by="Contribution Value", axis="index", ascending=False)
         to_show = filtering.process_options(to_show)
-        helpers.show_table(to_show.drop("Contribution Value", axis="columns"))
+        helpers.show_table(to_show.drop("Contribution Value", axis="columns"), key=key)
 
 
 def format_contributions_to_view(contribution_df, show_number=False):
@@ -74,7 +78,7 @@ def format_contributions_to_view(contribution_df, show_number=False):
     return contribution_df
 
 
-def view(eid, save_space=False):
+def view(eid, save_space=False, key=None):
     show_number = False
     show_average = False
     if not save_space:
@@ -105,7 +109,7 @@ def view(eid, save_space=False):
     if not show_average:
         to_show = to_show.drop("Average/Mode Value", axis="columns")
 
-    show_sorted_contributions(to_show, sort_by)
+    show_sorted_contributions(to_show, sort_by, key=key)
 
 
 def view_instructions():

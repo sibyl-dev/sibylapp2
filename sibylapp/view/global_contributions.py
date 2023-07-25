@@ -48,7 +48,7 @@ def view(eids):
         to_show = to_show.sort_values(by="negative", axis="index")
 
     to_show = filtering.process_options(to_show).drop(["positive", "negative"], axis=1)
-    helpers.show_table(to_show)
+    helpers.show_table(to_show, key="global")
     return to_show
 
 

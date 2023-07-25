@@ -97,7 +97,7 @@ def view(eids, predictions, feature, discrete=False):
             st.subheader(
                 "Contributions for {entity} {eid}".format(entity=get_term("Entity"), eid=eid)
             )
-            feature_contribution.view(eid, save_space=True)
+            feature_contribution.view(eid, save_space=True, key="explore_feature")
         else:
             st.warning("Select a point in the plot to see all contributions!")
 

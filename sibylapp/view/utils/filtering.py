@@ -59,11 +59,12 @@ def view_entity_select():
     else:
         st.session_state["select_eid_index"] = 0
 
-    st.session_state["eid"] = st.sidebar.selectbox(
+    st.sidebar.selectbox(
         "Select %s" % context.get_term("Entity"),
         st.session_state["eids"],
         format_func=format_func,
         index=st.session_state["select_eid_index"],
+        key="eid",
     )
     pred = predictions[st.session_state["eid"]]
     st.sidebar.metric(context.get_term("Prediction"), config.pred_format_func(pred))
