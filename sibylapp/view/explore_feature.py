@@ -35,7 +35,7 @@ def generate_feature_distribution_plot(eids, feature):
 
 
 @st.cache_data(show_spinner="Generating feature plot...")
-def generate_feature_plot(eids, predictions, feature, discrete=False):
+def generate_feature_plot_data(eids, predictions, feature):
     contributions_to_show = contributions.get_contributions(eids)
     data = {
         i: contributions_to_show[i][contributions_to_show[i]["Feature"] == feature][
@@ -55,6 +55,13 @@ def generate_feature_plot(eids, predictions, feature, discrete=False):
     )
     df["ID"] = df.index
     df = df.rename(columns={"Feature Value": "Value"})
+    return df
+
+
+def generate_feature_plot(eids, predictions, feature, discrete=False):
+    # The data computation part of this function is separated out to address a bug with
+    #   plotly_events when generating the fig with a cached function
+    df = generate_feature_plot_data(eids, predictions, feature)
     hover_data = {
         "Contribution": ":.3f",
         "Value": True,
