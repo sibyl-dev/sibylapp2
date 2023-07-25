@@ -56,8 +56,6 @@ with pred_filter_container:
     eids = filtering.view_prediction_selection(
         predictions, disabled=st.session_state["disabled"]
     )
-    filtered_contributions = filtering.filter_eids(eids, all_contributions)
-    filtered_predictions = filtering.filter_eids(eids, predictions)
 
 placeholder = st.container()
 features = all_contributions[next(iter(all_contributions))]["Feature"]
@@ -71,13 +69,13 @@ if tab == "2":
         if len(eids) == 0:
             st.warning("Select predictions above to see explanation!")
         else:
-            global_contributions.view(filtered_contributions)
+            global_contributions.view(eids)
 
 if tab == "3":
     if len(eids) == 0:
         st.warning("Select predictions above to see explanation!")
     else:
-        global_contributions.view_summary_plot(filtered_contributions)
+        global_contributions.view_summary_plot(eids)
 
 if tab == "4":
     with placeholder:
@@ -89,5 +87,5 @@ if tab == "4":
                 filtering.process_search_on_features(features),
             )
             explore_feature.view(
-                filtered_contributions, predictions, feature, discrete
+                eids, predictions, feature, discrete
             )
