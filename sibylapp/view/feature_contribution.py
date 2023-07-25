@@ -35,14 +35,18 @@ def show_sorted_contributions(to_show, sort_by, key=None):
                 by="Contribution", axis="index", ascending=False
             )
             to_show_neg = filtering.process_options(to_show_neg)
-            helpers.show_table(to_show_neg.drop("Contribution Value", axis="columns"), key="%s%s" % (key, "_neg"))
+            helpers.show_table(
+                to_show_neg.drop("Contribution Value", axis="columns"), key="%s%s" % (key, "_neg")
+            )
         with col2:
             st.subheader(get_term("Positive"))
             to_show_pos = to_show[to_show["Contribution Value"] >= 0].sort_values(
                 by="Contribution", axis="index", ascending=False
             )
             to_show_pos = filtering.process_options(to_show_pos)
-            helpers.show_table(to_show_pos.drop("Contribution Value", axis="columns"), key="%s%s" % (key, "_pos"))
+            helpers.show_table(
+                to_show_pos.drop("Contribution Value", axis="columns"), key="%s%s" % (key, "_pos")
+            )
     else:
         if sort_by == "Absolute":
             to_show = to_show.reindex(
