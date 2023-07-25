@@ -12,6 +12,7 @@ entity_difference.view_instructions()
 
 # Global options ------------------------------
 filtering.view_filtering()
+entity_difference.view_prediction_difference()
 
 tab = stx.tab_bar(
     data=[

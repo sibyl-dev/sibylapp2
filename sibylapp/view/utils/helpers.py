@@ -62,7 +62,12 @@ def show_table(df, page_size=10, key=None):
     )
 
 
-def generate_bars(values, neutral=False, show_number=False):
+def generate_bars(values, neutral=False, show_number=False, epsilon=1e-4):
+    """
+    Generate colorbars for numeric values.
+    epsilon is used to avoid zero division error when all values are zero.
+    """
+
     def format_func(n, v=None):
         if neutral:
             formatted = NEUT_EM * n + BLANK_EM * (BAR_LENGTH - n) + UP_ARROW
@@ -82,7 +87,7 @@ def generate_bars(values, neutral=False, show_number=False):
         else:
             return math.ceil(x - 0.5)
 
-    num_to_show = values / max(values.abs()) * BAR_LENGTH
+    num_to_show = values / (max(values.abs()) + epsilon) * BAR_LENGTH
     num_to_show = num_to_show.apply(round_away_from_zero).astype("int")
 
     return [format_func(n, v) for n, v in zip(num_to_show, values)]

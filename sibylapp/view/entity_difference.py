@@ -25,7 +25,7 @@ def view_compare_entities_select():
             st.session_state["eid_comp"]
         )
     else:
-        st.session_state["select_eid_comp_index"] = 0
+        st.session_state["select_eid_comp_index"] = 1
 
     st.session_state["eid"] = st.sidebar.selectbox(
         "Select %s #1" % get_term("Entity"),
@@ -33,20 +33,30 @@ def view_compare_entities_select():
         format_func=format_func,
         index=st.session_state["select_eid_index"],
     )
-    pred = predictions[st.session_state["eid"]]
-    st.sidebar.metric(
-        "%s for %s #1" % (get_term("Prediction"), get_term("Entity")), pred_format_func(pred)
-    )
-
     st.session_state["eid_comp"] = st.sidebar.selectbox(
         "Select %s #2" % get_term("Entity"),
         st.session_state["eids"],
         format_func=format_func,
         index=st.session_state["select_eid_comp_index"],
     )
-    pred = predictions[st.session_state["eid_comp"]]
+    pred_orig = predictions[st.session_state["eid"]]
     st.sidebar.metric(
-        "%s for %s #2" % (get_term("Prediction"), get_term("Entity")), pred_format_func(pred)
+        "%s for %s #1" % (get_term("Prediction"), get_term("Entity")), pred_format_func(pred_orig)
+    )
+    pred_new = predictions[st.session_state["eid_comp"]]
+    st.sidebar.metric(
+        "%s for %s #2" % (get_term("Prediction"), get_term("Entity")), pred_format_func(pred_new)
+    )
+
+
+def view_prediction_difference():
+    predictions = model.get_predictions(st.session_state["eids"])
+    difference = predictions[st.session_state["eid_comp"]] - predictions[st.session_state["eid"]]
+    st.metric(
+        "{prediction} Difference between {entity} #2 and {entity} #1:".format(
+            prediction=get_term("Prediction"), entity=get_term("Entity")
+        ),
+        pred_format_func(difference),
     )
 
 
@@ -56,17 +66,18 @@ def show_sorted_contributions(to_show, sort_by):
         to_show = to_show.reindex(
             to_show["Contribution Change Value"].abs().sort_values(ascending=False).index
         )
-    if sort_by == "Ascending":
-        to_show = to_show.sort_values(by="Contribution Change Value", axis="index")
-    if sort_by == "Descending":
+    if sort_by == "Positive Difference":
         to_show = to_show.sort_values(
             by="Contribution Change Value", axis="index", ascending=False
         )
+    if sort_by == "Negative Difference":
+        to_show = to_show.sort_values(by="Contribution Change Value", axis="index")
+
     to_show = filtering.process_options(to_show)
     helpers.show_table(to_show.drop("Contribution Change Value", axis="columns"))
 
 
-def format_two_contributions_to_view(df1, df2, show_number=False, show_contribution=True):
+def format_two_contributions_to_view(df1, df2, show_number=False, show_contribution=False):
     original_df = df1.rename(
         columns={
             "category": "Category",
@@ -92,8 +103,16 @@ def format_two_contributions_to_view(df1, df2, show_number=False, show_contribut
 
     compare_df = original_df.join(
         other_df[["Value", "Contribution", "Contribution Value"]],
-        lsuffix=" of %s #1" % get_term("Entity"),
-        rsuffix=" of %s #2" % get_term("Entity"),
+        lsuffix=" for %s #1" % get_term("Entity"),
+        rsuffix=" for %s #2" % get_term("Entity"),
+    )
+    compare_df = compare_df.rename(
+        columns={
+            "Value for %s #1"
+            % get_term("Entity"): "%s Value for %s #1" % (get_term("Feature"), get_term("Entity")),
+            "Value for %s #2"
+            % get_term("Entity"): "%s Value for %s #2" % (get_term("Feature"), get_term("Entity")),
+        }
     )
     compare_df["Contribution Change"] = (
         other_df["Contribution Value"] - original_df["Contribution Value"]
@@ -104,21 +123,22 @@ def format_two_contributions_to_view(df1, df2, show_number=False, show_contribut
     )
 
     if not show_contribution:
-        compare_df.drop(
+        compare_df = compare_df.drop(
             [
-                "Contribution of %s #1" % get_term("Entity"),
-                "Contribution of %s #2" % get_term("Entity"),
-                "Contribution Value of %s #1" % get_term("Entity"),
-                "Contribution Value of %s #2" % get_term("Entity"),
-            ]
+                "Contribution for %s #1" % get_term("Entity"),
+                "Contribution for %s #2" % get_term("Entity"),
+                "Contribution Value for %s #1" % get_term("Entity"),
+                "Contribution Value for %s #2" % get_term("Entity"),
+            ],
+            axis="columns",
         )
     return compare_df
 
 
 def filter_different_rows(to_show):
-    neighbor_col = to_show["Value of %s #1" % get_term("Entity")]
-    selected_col = to_show["Value of %s #2" % get_term("Entity")]
-    to_show_filtered = to_show[neighbor_col != selected_col]
+    neighbor_col = to_show["%s Value for %s #1" % (get_term("Feature"), get_term("Entity"))]
+    selected_col = to_show["%s Value for %s #2" % (get_term("Feature"), get_term("Entity"))]
+    to_show_filtered = to_show[neighbor_col == selected_col]
     return to_show_filtered
 
 
@@ -128,34 +148,48 @@ def view(eid, eid_comp, save_space=False):
     if not save_space:
         cols = st.columns(2)
         with cols[0]:
-            sort_by = helpers.show_sort_options(["Absolute Difference", "Ascending", "Descending"])
+            sort_by = helpers.show_sort_options(
+                ["Absolute Difference", "Positive Difference", "Negative Difference"]
+            )
         with cols[1]:
             show_number = st.checkbox(
                 "Show numeric contributions?",
                 help="Show the exact amount this feature contributes to the model prediction",
             )
+            show_contriubtion = st.checkbox(
+                "Show original contributions?",
+                help="Show the original %s contributions for both %s"
+                % (get_term("Feature"), get_term("Entity", p=True)),
+            )
     else:
         cols = st.columns(1)
         with cols[0]:
-            sort_by = helpers.show_sort_options(["Absolute Difference", "Ascending", "Descending"])
+            sort_by = helpers.show_sort_options(
+                ["Absolute Difference", "Positive Difference", "Negative Difference"]
+            )
+
     contributions_dict = contributions.get_contributions([eid, eid_comp])
     contribution_original = contributions_dict[eid]
     contribution_compare = contributions_dict[eid_comp]
     to_show = format_two_contributions_to_view(
-        contribution_original, contribution_compare, show_number=show_number
+        contribution_original,
+        contribution_compare,
+        show_number=show_number,
+        show_contribution=show_contriubtion,
     )
-    show_sorted_contributions(to_show, sort_by)
+
     options = ["No filtering", "With filtering"]
     show_different = st.radio(
-        "Apply filtering by differences?",
+        "Apply filtering by identical %s values?" % get_term("Feature", l=True),
         options,
         horizontal=True,
-        help="Show only rows where value differs from selected",
+        help="Show only rows where %s values of two %s are identical"
+        % (get_term("Feature", l=True), get_term("Entity", l=True, p=True)),
     )
     if show_different == "With filtering":
         to_show = filter_different_rows(to_show)
 
-    helpers.show_table(to_show)
+    show_sorted_contributions(to_show, sort_by)
 
 
 def view_instructions():
