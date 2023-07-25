@@ -35,7 +35,7 @@ def generate_feature_distribution_plot(eids, feature):
 
 
 @st.cache_data(show_spinner="Generating feature plot...")
-def generate_feature_plot_data(eids, predictions, feature, discrete=False):
+def generate_feature_plot_data(eids, predictions, feature):
     contributions_to_show = contributions.get_contributions(eids)
     data = {
         i: contributions_to_show[i][contributions_to_show[i]["Feature"] == feature][
