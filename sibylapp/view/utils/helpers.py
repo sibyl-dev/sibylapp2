@@ -18,6 +18,7 @@ UP_ARROW = "⬆"
 DOWN_ARROW = "⬇"
 DIVIDING_BAR = "|"
 
+
 def show_sort_options(options):
     return st.radio("Sort by", options, horizontal=True)
 
@@ -34,22 +35,18 @@ def show_table(df, page_size=10, key=None):
     _, col1, col2 = st.columns((4, 1, 1))
     with col2:
         if key is not None:
-            page_size_key = "%s%s" % ("per_page_", key)
-        else:
-            page_size_key = "per_page"
-        page_size = st.selectbox("Rows per page", [10, 25, 50], key=page_size_key)
+            key = "%s%s" % (key, "_per_page")
+        page_size = st.selectbox("Rows per page", [10, 25, 50], key=key)
     with col1:
         if key is not None:
-            page_key = "%s%s" % ("page_", key)
-        else:
-            page_key = "page"
+            key = "%s%s" % (key, "_page")
         page = st.number_input(
             "Page",
-            step=1,
             value=1,
+            step=1,
             min_value=1,
             max_value=int(df.shape[0] / page_size) + 1,
-            key=page_key,
+            key=key,
         )
     renames = {}
     for column in df:
