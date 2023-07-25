@@ -7,7 +7,8 @@ import extra_streamlit_components as stx
 setup.setup_page()
 
 # Sidebar ------------------------------------
-entity_difference.view_compare_entities_select()
+filtering.view_entity_select()
+entity_difference.view_other_entity_select()
 entity_difference.view_instructions()
 
 # Global options ------------------------------

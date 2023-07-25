@@ -1,24 +1,17 @@
 import streamlit as st
 
-from sibylapp.config import pred_format_func
 from sibylapp.compute import contributions, model
 from sibylapp.compute.context import get_term
+from sibylapp.config import pred_format_func
 from sibylapp.view.feature_contribution import show_legend
 from sibylapp.view.utils import filtering, helpers
 
 
-def view_compare_entities_select():
+def view_other_entity_select():
     def format_func(s):
         return f"{get_term('Entity')} {s} (" + pred_format_func(predictions[s]) + ")"
 
     predictions = model.get_predictions(st.session_state["eids"])
-
-    if "eid" in st.session_state:
-        st.session_state["select_eid_index"] = st.session_state["eids"].index(
-            st.session_state["eid"]
-        )
-    else:
-        st.session_state["select_eid_index"] = 0
 
     if "eid_comp" in st.session_state:
         st.session_state["select_eid_comp_index"] = st.session_state["eids"].index(
@@ -27,22 +20,13 @@ def view_compare_entities_select():
     else:
         st.session_state["select_eid_comp_index"] = 1
 
-    st.session_state["eid"] = st.sidebar.selectbox(
-        "Select %s #1" % get_term("Entity"),
-        st.session_state["eids"],
-        format_func=format_func,
-        index=st.session_state["select_eid_index"],
-    )
     st.session_state["eid_comp"] = st.sidebar.selectbox(
         "Select %s #2" % get_term("Entity"),
         st.session_state["eids"],
         format_func=format_func,
         index=st.session_state["select_eid_comp_index"],
     )
-    pred_orig = predictions[st.session_state["eid"]]
-    st.sidebar.metric(
-        "%s for %s #1" % (get_term("Prediction"), get_term("Entity")), pred_format_func(pred_orig)
-    )
+
     pred_new = predictions[st.session_state["eid_comp"]]
     st.sidebar.metric(
         "%s for %s #2" % (get_term("Prediction"), get_term("Entity")), pred_format_func(pred_new)
@@ -197,28 +181,33 @@ def view_instructions():
     with expander:
         st.markdown(
             "This page compares the **{feature} values** and **{feature} contributions**"
-            " of two distinct {entities}.".format(
-                entities=get_term("Entity", l=True, p=True), feature=get_term("Feature", l=True)
+            " of two distinct {entities}."
+            "You can select two {entities} you want to compare from the dropdown above.".format(
+                entities=get_term("Entity", p=True, l=True),
+                feature=get_term("Feature", l=True),
             )
         )
         positive, negative = helpers.get_pos_neg_names()
         st.markdown(
-            "A large **{positive}** bar means that this {feature}'s value significantly increased"
-            " the model's prediction on this {entity}. A large **{negative}** bar means that this"
-            " {feature}'s value significantly decreased the model's prediction. A lack of a bar"
-            " suggests this {feature} had little effect on the model's prediction in this case."
-            .format(
+            "The **Contribution Change** column refers to the difference between the {feature}"
+            " contribution of the two {entities}.A large **{positive}** bar means that this"
+            " {feature}'s value has a much more positive contribution to the model's prediction on"
+            " {entity} #2 than on {entity} #1. A large **{negative}** bar means that this"
+            " {feature}'s value has a much more negative contribution to the model's prediction on"
+            " {entity} #2 than on {entity} #1. A lack of a bar suggests this {feature} had little"
+            " effect on the model's prediction in this case.".format(
                 positive=positive,
                 negative=negative,
-                feature=get_term("Feature").lower(),
-                entity=get_term("Entity").lower(),
+                feature=get_term("Feature", l=True),
+                entity=get_term("Entity", l=True),
+                entities=get_term("Entity", l=True, p=True),
             )
         )
         st.markdown(
-            "You can select {a_entity} from the dropdown above, and see the {feature}"
-            " contributions. You can also **filter** and **search** the {feature} table or adjust"
-            " the **sort order**.".format(
-                a_entity=get_term("Entity", a=True, l=True),
+            "You can **filter** and **search** the {feature} table or adjust"
+            " the **sort order**. You can also look at {features} with identical"
+            " {feature} values.".format(
                 feature=get_term("Feature", l=True),
+                features=get_term("Feature", p=True, l=True),
             )
         )
