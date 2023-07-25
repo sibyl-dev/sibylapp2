@@ -61,3 +61,19 @@ configurations specific to your application here.
 poetry run streamlit run 1_Explore_a_Prediction.py
 ```
 
+# Contributing Guide
+We appreciate contributions of all kinds! To contribute code to the repo please follow these steps:
+1. Clone and install the library following the instructions above.
+2. Make a new branch off of `dev` with a descriptive name describing your change.
+3. Make changes to that branch, committing and pushing code as you go. Run the following commands to ensure your code meets style requirements:
+```bash
+# Fix most linting errors
+poetry run invoke fix-lint
+# Ensure no linting errors remain
+poetry run invoke lint
+```
+4. Run the app using the instructions above to confirm that all changes work as expeted.
+5. Once you are done making and testing changes, and linting passes, push all code and make a pull request. One all checks pass and the PR has been approved, merge your code and delete the branch.
+
+
+

@@ -1,7 +1,8 @@
-import streamlit as st
-from sibylapp.compute import context, model
-from sibylapp import config
 import numpy as np
+import streamlit as st
+
+from sibylapp import config
+from sibylapp.compute import context, model
 
 
 @st.cache_data
@@ -11,23 +12,19 @@ def get_relevant_eids(preds, _all_preds):
 
 @st.cache_data
 def get_relevant_eids_range(pred_range, _all_preds):
-    return [
-        eid for eid in _all_preds if pred_range[0] <= _all_preds[eid] <= pred_range[1]
-    ]
+    return [eid for eid in _all_preds if pred_range[0] <= _all_preds[eid] <= pred_range[1]]
 
 
-def filter_eids(eids, dict):
-    return {eid: dict[eid] for eid in eids}
+def filter_eids(eids, eid_dict):
+    return {eid: eid_dict[eid] for eid in eids}
 
 
 def view_prediction_selection(predictions, disabled=False):
     pred_values = list(predictions.values())
-    if (
-        len(np.unique(pred_values)) < 8
-    ):  # TODO: ensure non-numeric fall in this category
+    if len(np.unique(pred_values)) < 8:  # TODO: ensure non-numeric fall in this category
         chosen_preds = st.multiselect(
             "Predictions to visualize",
-            [pred for pred in np.unique(pred_values)],
+            list(np.unique(pred_values)),
             default=np.unique(pred_values),
             format_func=config.pred_format_func,
             disabled=disabled,
@@ -50,9 +47,7 @@ def view_prediction_selection(predictions, disabled=False):
 def view_entity_select():
     def format_func(s):
         return (
-            f"{context.get_term('Entity')} {s} ("
-            + config.pred_format_func(predictions[s])
-            + ")"
+            f"{context.get_term('Entity')} {s} (" + config.pred_format_func(predictions[s]) + ")"
         )
 
     predictions = model.get_predictions(st.session_state["eids"])
@@ -64,17 +59,18 @@ def view_entity_select():
     else:
         st.session_state["select_eid_index"] = 0
 
-    st.session_state["eid"] = st.sidebar.selectbox(
+    st.sidebar.selectbox(
         "Select %s" % context.get_term("Entity"),
         st.session_state["eids"],
         format_func=format_func,
         index=st.session_state["select_eid_index"],
+        key="eid",
     )
     pred = predictions[st.session_state["eid"]]
     st.sidebar.metric(context.get_term("Prediction"), config.pred_format_func(pred))
 
 
-def view_filtering(include_show_more=True):
+def view_filtering(include_show_more=False):
     if "show_more" not in st.session_state:
         st.session_state["show_more"] = False
     if "search_term" not in st.session_state:
@@ -87,22 +83,22 @@ def view_filtering(include_show_more=True):
     else:
         st.session_state["show_more"] = True
 
-    if (
-        "search_term" in st.session_state and len(st.session_state["search_term"]) > 0
-    ) or ("filters" in st.session_state and len(st.session_state["filters"]) > 0):
-        expanded = True
-    else:
-        expanded = False
+    expanded = bool(
+        ("search_term" in st.session_state and len(st.session_state["search_term"]) > 0)
+        or ("filters" in st.session_state and len(st.session_state["filters"]) > 0)
+    )
     exp = st.expander("Search and filter", expanded=expanded)
 
     with exp:
-        st.session_state["search_term"] = st.text_input(
+        st.text_input(
             "Search by %s" % context.get_term("Feature").lower(),
+            key="search_term",
             value=st.session_state["search_term"],
         )
-        st.session_state["filters"] = st.multiselect(
+        st.multiselect(
             "Filter by category",
             context.get_category_list(),
+            key="filters",
             default=st.session_state["filters"],
         )
 

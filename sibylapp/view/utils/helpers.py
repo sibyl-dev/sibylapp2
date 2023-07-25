@@ -1,10 +1,10 @@
-import streamlit as st
-from sibylapp.config import BAR_LENGTH, FLIP_COLORS
-from sibylapp.compute.context import get_term
 import math
-import pandas as pd
 
-from sibylapp.view.utils.filtering import process_options
+import pandas as pd
+import streamlit as st
+
+from sibylapp.compute.context import get_term
+from sibylapp.config import BAR_LENGTH, FLIP_COLORS
 
 if FLIP_COLORS:
     POS_EM = "🟥"
@@ -19,7 +19,65 @@ DOWN_ARROW = "⬇"
 DIVIDING_BAR = "|"
 
 
-def generate_bars(values, neutral=False):
+def show_sort_options(options):
+    return st.radio("Sort by", options, horizontal=True)
+
+
+def get_pos_neg_names():
+    if FLIP_COLORS:
+        return "red", "blue"
+    else:
+        return "blue", "red"
+
+
+def show_table(df, page_size=10, key=None):
+    table = st.container()
+    _, col1, col2 = st.columns((4, 1, 1))
+    with col2:
+        page_size_key = "per_page_key"
+        if key is not None:
+            page_size_key = "%s%s" % (key, "_per_page")
+        page_size = st.selectbox("Rows per page", [10, 25, 50], key=page_size_key)
+    with col1:
+        page_key = "page_key"
+        if key is not None:
+            page_key = "%s%s" % (key, "_page")
+        page = st.number_input(
+            "Page",
+            value=1,
+            step=1,
+            min_value=1,
+            max_value=int(df.shape[0] / page_size) + 1,
+            key=page_key,
+        )
+    renames = {}
+    for column in df:
+        renames[column] = get_term(column)
+    df = df.rename(columns=renames)
+
+    table.data_editor(
+        df[(page - 1) * page_size : page * page_size],
+        hide_index=True,
+        use_container_width=True,
+        num_rows="fixed",
+        disabled=True,
+    )
+
+
+def generate_bars(values, neutral=False, show_number=False):
+    def format_func(n, v=None):
+        if neutral:
+            formatted = NEUT_EM * n + BLANK_EM * (BAR_LENGTH - n) + UP_ARROW
+        else:
+            formatted = (
+                (POS_EM * n + BLANK_EM * (BAR_LENGTH - n) + UP_ARROW)
+                if n > 0
+                else (DOWN_ARROW + BLANK_EM * (BAR_LENGTH + n) + NEG_EM * -n)
+            )
+        if show_number:
+            formatted = "%s    %.3f" % (formatted, v)
+        return formatted
+
     def round_away_from_zero(x):
         if x >= 0.0:
             return math.floor(x + 0.5)
@@ -28,17 +86,8 @@ def generate_bars(values, neutral=False):
 
     num_to_show = values / max(values.abs()) * BAR_LENGTH
     num_to_show = num_to_show.apply(round_away_from_zero).astype("int")
-    if neutral:
-        return [
-            (NEUT_EM * n + BLANK_EM * (BAR_LENGTH - n) + UP_ARROW) for n in num_to_show
-        ]
-    else:
-        return [
-            (POS_EM * n + BLANK_EM * (BAR_LENGTH - n) + UP_ARROW)
-            if n > 0
-            else (DOWN_ARROW + BLANK_EM * (BAR_LENGTH + n) + NEG_EM * -n)
-            for n in num_to_show
-        ]
+
+    return [format_func(n, v) for n, v in zip(num_to_show, values)]
 
 
 def generate_bars_bidirectional(neg_values, pos_values):
@@ -73,38 +122,6 @@ def generate_bars_bidirectional(neg_values, pos_values):
         for (neg, pos) in zip(neg_num_to_show, pos_num_to_show)
     ]
     return pd.Series(strings, index=neg_values.index, name="Average Contribution")
-
-
-def show_sorted_contributions(to_show, sort_by, show_func):
-    if sort_by == "Side-by-side":
-        col1, col2 = st.columns(2)
-        with col1:
-            st.subheader(get_term("Negative"))
-            to_show_neg = to_show[to_show["Contribution Value"] < 0].sort_values(
-                by="Contribution", axis="index", ascending=False
-            )
-            to_show_neg = process_options(to_show_neg)
-            show_func(to_show_neg)
-        with col2:
-            st.subheader(get_term("Positive"))
-            to_show_pos = to_show[to_show["Contribution Value"] >= 0].sort_values(
-                by="Contribution", axis="index", ascending=False
-            )
-            to_show_pos = process_options(to_show_pos)
-            show_func(to_show_pos)
-    else:
-        if sort_by == "Absolute":
-            to_show = to_show.reindex(
-                to_show["Contribution Value"].abs().sort_values(ascending=False).index
-            )
-        if sort_by == "Ascending":
-            to_show = to_show.sort_values(by="Contribution Value", axis="index")
-        if sort_by == "Descending":
-            to_show = to_show.sort_values(
-                by="Contribution Value", axis="index", ascending=False
-            )
-        to_show = process_options(to_show)
-        show_func(to_show)
 
 
 def rename_for_pyreal_vis(df):

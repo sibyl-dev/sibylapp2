@@ -4,6 +4,7 @@ from sibylapp.view import explore_feature, feature_importance, global_contributi
 from sibylapp.compute.context import get_term
 from sibylapp.compute import model, contributions
 import extra_streamlit_components as stx
+import numpy as np
 
 
 setup.setup_page()
@@ -13,6 +14,10 @@ filtering.view_filtering()
 
 # Compute -------------------------------------
 predictions = model.get_dataset_predictions()
+discrete = (
+    len(np.unique(list(predictions.values()))) <= 6
+)  # todo: ensure non-numeric is discrete
+
 all_contributions = contributions.get_dataset_contributions()
 
 # Setup tabs ----------------------------------
@@ -51,8 +56,6 @@ with pred_filter_container:
     eids = filtering.view_prediction_selection(
         predictions, disabled=st.session_state["disabled"]
     )
-    filtered_contributions = filtering.filter_eids(eids, all_contributions)
-    filtered_predictions = filtering.filter_eids(eids, predictions)
 
 placeholder = st.container()
 features = all_contributions[next(iter(all_contributions))]["Feature"]
@@ -66,13 +69,13 @@ if tab == "2":
         if len(eids) == 0:
             st.warning("Select predictions above to see explanation!")
         else:
-            global_contributions.view(filtered_contributions)
+            global_contributions.view(eids)
 
 if tab == "3":
     if len(eids) == 0:
         st.warning("Select predictions above to see explanation!")
     else:
-        global_contributions.view_summary_plot(filtered_contributions)
+        global_contributions.view_summary_plot(eids)
 
 if tab == "4":
     with placeholder:
@@ -83,10 +86,6 @@ if tab == "4":
                 "Select a %s" % get_term("feature"),
                 filtering.process_search_on_features(features),
             )
-            col1, col2 = st.columns(2)
-            with col1:
-                explore_feature.view(
-                    filtered_contributions, filtered_predictions, feature
-                )
-            with col2:
-                global_contributions.view_feature_plot(filtered_contributions, feature)
+            explore_feature.view(
+                eids, predictions, feature, discrete
+            )

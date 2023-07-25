@@ -1,4 +1,5 @@
 import streamlit as st
+
 from sibylapp.compute import api, entities
 
 
@@ -8,9 +9,7 @@ def compute_predictions(eids):
     if "predictions" not in st.session_state:
         st.session_state["predictions"] = predictions
     else:
-        st.session_state["predictions"] = dict(
-            st.session_state["predictions"], **predictions
-        )
+        st.session_state["predictions"] = dict(st.session_state["predictions"], **predictions)
     return predictions
 
 

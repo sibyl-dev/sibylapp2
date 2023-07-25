@@ -1,9 +1,23 @@
+from enum import Enum
+
 # API CONFIGURATIONS ==============================================================================
 BASE_URL = "http://ec2-18-191-40-90.us-east-2.compute.amazonaws.com:3000/api/v1/"
 CERT = None
 
 # APPLICATION-SPECIFIC CONFIGURATIONS =============================================================
 FLIP_COLORS = False  # If true, positive contributions will be red
+
+
+class PredType(Enum):
+    BOOLEAN = 1
+    CATEGORICAL = 2
+    NUMERIC = 3
+
+
+# add names for "positive" and "negative" values after we have a more concrete idea
+PREDICTION_TYPE = PredType.NUMERIC
+POSITIVE_TERM = None
+NEGATIVE_TERM = None
 
 
 def pred_format_func(
@@ -14,11 +28,9 @@ def pred_format_func(
 
 # OTHER CONFIGURATIONS ============================================================================
 BAR_LENGTH = 8  # Number of squares to use for contribution/importance bars
-MAX_ENTITIES = (
-    10  # Maximum number of entities to select from. Set this to None to use all
-)
+MAX_ENTITIES = 11  # Maximum number of entities to select from. Set this to None to use all
 DATASET_SIZE = 1000  # Max number of entities to use for dataset-wide visualizations
-LOAD_UPFRONT = False  # If true, run heavy computations on initial load, else greedily run as needed
+LOAD_UPFRONT = True  # If true, run heavy computations on initial load, else greedily run as needed
 
 
 # PRE-WRITTEN FORMAT FUNCTION OPTIONS =============================================================
@@ -34,8 +46,8 @@ def format_class_name(pred, class_names):
     return class_names[int(pred)]
 
 
-def format_boolean_name(pred, pos_name, neg_name):
-    return pos_name if pred else neg_name
+def format_boolean_name(pred):
+    return POSITIVE_TERM if pred else NEGATIVE_TERM
 
 
 def format_number(pred, decimals=2):
