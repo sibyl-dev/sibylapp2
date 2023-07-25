@@ -34,19 +34,21 @@ def show_table(df, page_size=10, key=None):
     table = st.container()
     _, col1, col2 = st.columns((4, 1, 1))
     with col2:
+        page_size_key = "per_page_key"
         if key is not None:
-            key = "%s%s" % (key, "_per_page")
-        page_size = st.selectbox("Rows per page", [10, 25, 50], key=key)
+            page_size_key = "%s%s" % (key, "_per_page")
+        page_size = st.selectbox("Rows per page", [10, 25, 50], key=page_size_key)
     with col1:
+        page_key = "page_key"
         if key is not None:
-            key = "%s%s" % (key, "_page")
+            page_key = "%s%s" % (key, "_page")
         page = st.number_input(
             "Page",
             value=1,
             step=1,
             min_value=1,
             max_value=int(df.shape[0] / page_size) + 1,
-            key=key,
+            key=page_key,
         )
     renames = {}
     for column in df:
