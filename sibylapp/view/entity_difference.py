@@ -2,45 +2,46 @@ import streamlit as st
 
 from sibylapp.compute import contributions, model
 from sibylapp.compute.context import get_term
-from sibylapp.config import pred_format_func
-from sibylapp.view.feature_contribution import show_legend
+from sibylapp.config import PREDICTION_TYPE, PredType, pred_format_func
 from sibylapp.view.utils import filtering, helpers
-
-
-def view_other_entity_select():
-    def format_func(s):
-        return f"{get_term('Entity')} {s} (" + pred_format_func(predictions[s]) + ")"
-
-    predictions = model.get_predictions(st.session_state["eids"])
-
-    if "eid_comp" in st.session_state:
-        st.session_state["select_eid_comp_index"] = st.session_state["eids"].index(
-            st.session_state["eid_comp"]
-        )
-    else:
-        st.session_state["select_eid_comp_index"] = 1
-
-    st.session_state["eid_comp"] = st.sidebar.selectbox(
-        "Select %s #2" % get_term("Entity"),
-        st.session_state["eids"],
-        format_func=format_func,
-        index=st.session_state["select_eid_comp_index"],
-    )
-
-    pred_new = predictions[st.session_state["eid_comp"]]
-    st.sidebar.metric(
-        "%s for %s #2" % (get_term("Prediction"), get_term("Entity")), pred_format_func(pred_new)
-    )
+from sibylapp.view.utils.helpers import NEG_EM, POS_EM
 
 
 def view_prediction_difference():
     predictions = model.get_predictions(st.session_state["eids"])
-    difference = predictions[st.session_state["eid_comp"]] - predictions[st.session_state["eid"]]
+    old_prediction = predictions[st.session_state["eid"]]
+    new_prediction = predictions[st.session_state["eid_comp"]]
+    if PREDICTION_TYPE == PredType.NUMERIC:
+        difference = new_prediction - old_prediction
+        output_text = pred_format_func(difference)
+
+    else:
+        if pred_format_func(new_prediction) == pred_format_func(old_prediction):
+            output_text = "No Change"
+        else:
+            output_text = (
+                f"From {pred_format_func(old_prediction)} to {pred_format_func(new_prediction)}"
+            )
+
     st.metric(
-        "{prediction} Difference between {entity} #2 and {entity} #1:".format(
-            prediction=get_term("Prediction"), entity=get_term("Entity")
+        "{prediction} Change from {entity} {eid} to {entity} {eid_comp}:".format(
+            prediction=get_term("Prediction"),
+            entity=get_term("Entity"),
+            eid=st.session_state["eid"],
+            eid_comp=st.session_state["eid_comp"],
         ),
-        pred_format_func(difference),
+        output_text,
+    )
+
+
+def show_legend():
+    modelPred = get_term("Prediction", l=True)
+    separator = "&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;"
+    posChange = " Increase in %s's contribution to" % get_term("Feature", l=True)
+    negChange = " Decrease in %s's contribution to" % get_term("Feature", l=True)
+
+    st.write(
+        (NEG_EM + negChange + " " + modelPred) + separator + (POS_EM + posChange + " " + modelPred)
     )
 
 
@@ -61,42 +62,32 @@ def show_sorted_contributions(to_show, sort_by):
     helpers.show_table(to_show.drop("Contribution Change Value", axis="columns"))
 
 
-def format_two_contributions_to_view(df1, df2, show_number=False, show_contribution=False):
-    original_df = df1.rename(
+def format_single_contributions_df(df, show_number=False):
+    formatted_df = df.rename(
         columns={
             "category": "Category",
-            "Feature Value": "Value",
+            "Feature Value": "%s Value" % get_term("Feature"),
         }
     )
-    original_df = original_df[["Category", "Feature", "Value", "Contribution"]]
-    original_df["Contribution Value"] = original_df["Contribution"].copy()
-    original_df["Contribution"] = helpers.generate_bars(
-        original_df["Contribution"], show_number=show_number
+    formatted_df = formatted_df[
+        ["Category", "Feature", "%s Value" % get_term("Feature"), "Contribution"]
+    ]
+    formatted_df["Contribution Value"] = formatted_df["Contribution"].copy()
+    formatted_df["Contribution"] = helpers.generate_bars(
+        formatted_df["Contribution"], show_number=show_number
     )
+    return formatted_df
 
-    other_df = df2.rename(
-        columns={
-            "Feature Value": "Value",
-        }
-    )
-    other_df = other_df[["Value", "Contribution"]]
-    other_df["Contribution Value"] = other_df["Contribution"].copy()
-    other_df["Contribution"] = helpers.generate_bars(
-        other_df["Contribution"], show_number=show_number
-    )
 
+def format_two_contributions_to_view(df1, df2, show_number=False, show_contribution=False):
+    original_df = format_single_contributions_df(df1)
+    other_df = format_single_contributions_df(df2)
+
+    other_df = other_df.drop(["Category", "Feature"], axis="columns")
     compare_df = original_df.join(
-        other_df[["Value", "Contribution", "Contribution Value"]],
-        lsuffix=" for %s #1" % get_term("Entity"),
-        rsuffix=" for %s #2" % get_term("Entity"),
-    )
-    compare_df = compare_df.rename(
-        columns={
-            "Value for %s #1"
-            % get_term("Entity"): "%s Value for %s #1" % (get_term("Feature"), get_term("Entity")),
-            "Value for %s #2"
-            % get_term("Entity"): "%s Value for %s #2" % (get_term("Feature"), get_term("Entity")),
-        }
+        other_df,
+        lsuffix=" for %s %s" % (get_term("Entity"), st.session_state["eid"]),
+        rsuffix=" for %s %s" % (get_term("Entity"), st.session_state["eid_comp"]),
     )
     compare_df["Contribution Change"] = (
         other_df["Contribution Value"] - original_df["Contribution Value"]
@@ -109,10 +100,11 @@ def format_two_contributions_to_view(df1, df2, show_number=False, show_contribut
     if not show_contribution:
         compare_df = compare_df.drop(
             [
-                "Contribution for %s #1" % get_term("Entity"),
-                "Contribution for %s #2" % get_term("Entity"),
-                "Contribution Value for %s #1" % get_term("Entity"),
-                "Contribution Value for %s #2" % get_term("Entity"),
+                "Contribution for %s %s" % (get_term("Entity"), st.session_state["eid"]),
+                "Contribution for %s %s" % (get_term("Entity"), st.session_state["eid_comp"]),
+                "Contribution Value for %s %s" % (get_term("Entity"), st.session_state["eid"]),
+                "Contribution Value for %s %s"
+                % (get_term("Entity"), st.session_state["eid_comp"]),
             ],
             axis="columns",
         )
@@ -120,8 +112,13 @@ def format_two_contributions_to_view(df1, df2, show_number=False, show_contribut
 
 
 def filter_different_rows(to_show):
-    neighbor_col = to_show["%s Value for %s #1" % (get_term("Feature"), get_term("Entity"))]
-    selected_col = to_show["%s Value for %s #2" % (get_term("Feature"), get_term("Entity"))]
+    neighbor_col = to_show[
+        "%s Value for %s %s" % (get_term("Feature"), get_term("Entity"), st.session_state["eid"])
+    ]
+    selected_col = to_show[
+        "%s Value for %s %s"
+        % (get_term("Feature"), get_term("Entity"), st.session_state["eid_comp"])
+    ]
     to_show_filtered = to_show[neighbor_col == selected_col]
     return to_show_filtered
 
@@ -182,7 +179,7 @@ def view_instructions():
         st.markdown(
             "This page compares the **{feature} values** and **{feature} contributions**"
             " of two distinct {entities}."
-            "You can select two {entities} you want to compare from the dropdown above.".format(
+            " You can select two {entities} you want to compare from the dropdown above.".format(
                 entities=get_term("Entity", p=True, l=True),
                 feature=get_term("Feature", l=True),
             )
@@ -190,12 +187,13 @@ def view_instructions():
         positive, negative = helpers.get_pos_neg_names()
         st.markdown(
             "The **Contribution Change** column refers to the difference between the {feature}"
-            " contribution of the two {entities}.A large **{positive}** bar means that this"
+            " contribution of the two {entities}. A large **{positive}** bar means that this"
             " {feature}'s value has a much more positive contribution to the model's prediction on"
-            " {entity} #2 than on {entity} #1. A large **{negative}** bar means that this"
-            " {feature}'s value has a much more negative contribution to the model's prediction on"
-            " {entity} #2 than on {entity} #1. A lack of a bar suggests this {feature} had little"
-            " effect on the model's prediction in this case.".format(
+            " the second {entity} than on the first {entity}. A large **{negative}** bar means"
+            " that this {feature}'s value has a much more negative contribution to the model's"
+            " prediction on the second {entity} than on the first {entity}. A lack of a bar"
+            " suggests this {feature} has a similar effect on the model's prediction for both"
+            " cases.".format(
                 positive=positive,
                 negative=negative,
                 feature=get_term("Feature", l=True),
