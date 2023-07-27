@@ -1,7 +1,7 @@
-from enum import Enum
-from sibylapp.compute import context
+from sibylapp.compute.context import get_gui_config
 import os.path as path
 import yaml
+from enum import Enum
 
 
 with open(path.join(path.dirname(path.abspath(__file__)), "config.yml")) as f:
@@ -15,15 +15,12 @@ LOAD_UPFRONT = cfg.get("LOAD_UPFRONT", True)
 
 
 # APPLICATION-SPECIFIC CONFIGURATIONS =============================================================
-def flip_colors():
-    return (
-        cfg.get("FLIP_COLORS")
-        if cfg.get("FLIP_COLORS") is not None
-        else context.get_flip_colors_from_api()
-    )
-
-
-FLIP_COLORS = flip_colors()
+def get_config(name, api_name, default):
+    if cfg.get(name) is not None:
+        return cfg.get(name)
+    if get_gui_config(api_name) is not None:
+        return get_gui_config(api_name)
+    return default
 
 
 class PredType(Enum):
@@ -32,46 +29,33 @@ class PredType(Enum):
     NUMERIC = 3
 
 
-# add names for "positive" and "negative" values after we have a more concrete idea
-PREDICTION_TYPE = PredType.NUMERIC
-POSITIVE_TERM = None
-NEGATIVE_TERM = None
+def to_pred_type(str_pred_type):
+    if str_pred_type == "numeric":
+        return PredType.NUMERIC
+    if str_pred_type == "categorical":
+        return PredType.CATEGORICAL
+    if str_pred_type == "boolean":
+        return PredType.BOOLEAN
+    raise ValueError("Received invalid pred type %s" % str_pred_type)
+
+
+FLIP_COLORS = get_config("FLIP_COLORS", "model_pred_bad_outcome", False)
+PREDICTION_TYPE = to_pred_type(get_config("PREDICTION_TYPE", "pred_type", "numeric"))
+POSITIVE_TERM = get_config("POSITIVE_TERM", "pos_pred_name", True)
+NEGATIVE_TERM = get_config("NEGATIVE_TERM", "neg_pred_name", False)
+PRED_FORMAT_STRING = get_config("PRED_FORMAT_STRING", "pred_format_string", "{}")
 
 
 def pred_format_func(pred):
-    if get_gui_config("pred_type") == "numeric":
-        if get_gui_config("pred_format_string") is not None:
-            return get_gui_config("pred_format_string").format(pred)
-    if get_gui_config("pred_type") == "boolean":
-        return (
-            get_gui_config("pos_pred_name", pred)
-            if pred
-            else get_gui_config("neg_pred_name", pred)
-        )
+    if cfg.get("OVERRIDE_PRED_FORMAT"):
+        return manual_pred_format_func(pred)
+    if PREDICTION_TYPE == PredType.NUMERIC:
+        return PRED_FORMAT_STRING.format(pred)
+    if PREDICTION_TYPE == PredType.BOOLEAN:
+        return POSITIVE_TERM if pred else NEGATIVE_TERM
+    return str(pred)
 
 
-# def pred_format_func(pred):
-# Function to format prediction from model
-# See pre-written options below for defaults or return None to use API defaults
-#    return None
-
-
-# PRE-WRITTEN FORMAT FUNCTION OPTIONS =============================================================
-def format_none(pred):
-    return pred
-
-
-def format_dollar(pred):
-    return "${:,.2f}".format(pred)
-
-
-def format_class_name(pred, class_names):
-    return class_names[int(pred)]
-
-
-def format_boolean_name(pred):
-    return POSITIVE_TERM if pred else NEGATIVE_TERM
-
-
-def format_number(pred, decimals=2):
-    return "{:,.{prec}f}".format(pred, prec=decimals)
+def manual_pred_format_func(pred):
+    # Not used unless config.OVERRIDE_PRED_FORMAT == True
+    return None

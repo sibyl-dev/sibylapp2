@@ -2,7 +2,7 @@ import streamlit as st
 
 from sibylapp.compute import contributions, model
 from sibylapp.compute.context import get_term
-from sibylapp.config import PREDICTION_TYPE, PredType, pred_format_func
+from sibylapp.config import PREDICTION_TYPE, pred_format_func, PredType
 from sibylapp.view.utils import filtering, helpers
 from sibylapp.view.utils.helpers import NEG_EM, POS_EM
 
@@ -35,13 +35,15 @@ def view_prediction_difference():
 
 
 def show_legend():
-    modelPred = get_term("Prediction", l=True)
+    model_pred = get_term("Prediction", l=True)
     separator = "&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;"
-    posChange = " Increase in %s's contribution to" % get_term("Feature", l=True)
-    negChange = " Decrease in %s's contribution to" % get_term("Feature", l=True)
+    pos_change = " Increase in %s's contribution to" % get_term("Feature", l=True)
+    neg_change = " Decrease in %s's contribution to" % get_term("Feature", l=True)
 
     st.write(
-        (NEG_EM + negChange + " " + modelPred) + separator + (POS_EM + posChange + " " + modelPred)
+        (NEG_EM + neg_change + " " + model_pred)
+        + separator
+        + (POS_EM + pos_change + " " + model_pred)
     )
 
 

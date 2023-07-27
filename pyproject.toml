@@ -37,7 +37,6 @@ skip = ["__init__.py"]
 
 [tool.pylint.MAIN]
 disable = ["missing-docstring",
-          "invalid-name",
           "consider-using-f-string",
           "no-member",
           "fixme",

@@ -32,21 +32,5 @@ def get_term(term, p=False, l=False, a=False):
     return new_term
 
 
-def get_gui_config(key, default=None):
-    return get_context()["gui_config"].get(key, default)
-
-
-def get_flip_colors_from_api():
-    return True if get_gui_config("model_pred_bad_outcome") else False
-
-
-def get_pred_format_func_from_api():
-    if get_gui_config("pred_type") == "numeric":
-        if get_gui_config("pred_format_string") is not None:
-            return get_gui_config("pred_format_string").format(pred)
-    if get_gui_config("pred_type") == "boolean":
-        return (
-            get_gui_config("pos_pred_name", pred)
-            if pred
-            else get_gui_config("neg_pred_name", pred)
-        )
+def get_gui_config(key):
+    return get_context()["gui_config"].get(key)
