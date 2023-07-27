@@ -5,8 +5,8 @@ from pyreal.visualize import swarm_plot
 
 from sibylapp.compute import contributions
 from sibylapp.compute.context import get_term
-from sibylapp.view.feature_contribution import show_legend
 from sibylapp.view.utils import filtering, helpers
+from sibylapp.view.utils.helpers import show_legend
 
 
 @st.cache_data(show_spinner="Generating summary plot...")

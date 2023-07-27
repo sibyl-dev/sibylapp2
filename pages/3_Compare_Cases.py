@@ -1,8 +1,9 @@
-import streamlit as st
-from sibylapp.view.utils import filtering, setup
-from sibylapp.view import entity_difference
-from sibylapp.compute.context import get_term
 import extra_streamlit_components as stx
+import streamlit as st
+
+from sibylapp.compute.context import get_term
+from sibylapp.view import entity_difference
+from sibylapp.view.utils import filtering, setup
 
 setup.setup_page()
 

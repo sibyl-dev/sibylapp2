@@ -1,11 +1,11 @@
-import os.path as path
+from os import path
 
 import pandas as pd
 import requests
 import streamlit as st
 import yaml
 
-with open(path.join(path.dirname(path.dirname(path.abspath(__file__))), "config.yml")) as f:
+with open(path.join(path.dirname(path.dirname(path.abspath(__file__))), "config.yml"), "r") as f:
     cfg = yaml.safe_load(f)
 
 session = requests.Session()

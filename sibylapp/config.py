@@ -1,14 +1,14 @@
-import os.path as path
 from enum import Enum
+from os import path
 
 import yaml
 
 from sibylapp.compute.context import get_gui_config
 
-with open(path.join(path.dirname(path.abspath(__file__)), "config.yml")) as f:
+with open(path.join(path.dirname(path.abspath(__file__)), "config.yml"), "r") as f:
     cfg = yaml.safe_load(f)
 
-# GENERAL CONFIGURATIONS ============================================================================
+# GENERAL CONFIGURATIONS ==========================================================================
 BAR_LENGTH = cfg.get("BAR_LENGTH", 8)
 MAX_ENTITIES = cfg.get("MAX_ENTITIES", 11)
 DATASET_SIZE = cfg.get("DATASET_SIZE", 1000)
@@ -59,4 +59,4 @@ def pred_format_func(pred):
 
 def manual_pred_format_func(pred):
     # Not used unless config.OVERRIDE_PRED_FORMAT == True
-    return None
+    return str(pred)

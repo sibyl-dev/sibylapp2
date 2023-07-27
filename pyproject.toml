@@ -40,5 +40,7 @@ disable = ["missing-docstring",
           "consider-using-f-string",
           "no-member",
           "fixme",
+          "invalid-name",
           "use-dict-literal",
-          "no-else-return"]
+          "no-else-return",
+          "unspecified-encoding"]

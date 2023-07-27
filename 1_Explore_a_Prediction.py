@@ -15,14 +15,10 @@ filtering.view_filtering()
 
 tab = stx.tab_bar(
     data=[
-        stx.TabBarItemData(
-            id=1, title=get_term("Feature Contributions"), description=""
-        ),
+        stx.TabBarItemData(id=1, title=get_term("Feature Contributions"), description=""),
     ],
     default=1,
 )
 
 if tab == "1":
     feature_contribution.view(st.session_state["eid"])
-
-
