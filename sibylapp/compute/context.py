@@ -33,4 +33,6 @@ def get_term(term, p=False, l=False, a=False):
 
 
 def get_gui_config(key):
+    if "gui_config" not in get_context():
+        return None
     return get_context()["gui_config"].get(key)
