@@ -9,28 +9,30 @@ from sibylapp.view.feature_contribution import show_legend
 from sibylapp.view.utils import filtering, helpers
 
 
-@st.cache_data(show_spinner="Generating plot...")
-def generate_swarm_plot(contribution_dict):
+@st.cache_data(show_spinner="Generating summary plot...")
+def generate_swarm_plot(eids):
+    contribution_dict = helpers.rename_for_pyreal_vis(contributions.get_contributions(eids))
     swarm_plot(contribution_dict, type="strip")
     return plt.gcf()
 
 
-def view_summary_plot(contribution_dict):
+def view_summary_plot(eids):
     st.pyplot(
-        generate_swarm_plot(helpers.rename_for_pyreal_vis(contribution_dict)),
+        generate_swarm_plot(eids),
         clear_figure=True,
     )
 
 
-def view(all_contributions):
+def view(eids):
     sort_by = helpers.show_sort_options(["Total", "Most Increasing", "Most Decreasing"])
-
     show_legend()
 
-    global_contributions = contributions.compute_global_contributions(all_contributions)
+    global_contributions = contributions.compute_global_contributions(eids)
     bars = helpers.generate_bars_bidirectional(
         global_contributions["negative"], global_contributions["positive"]
     )
+
+    all_contributions = contributions.get_dataset_contributions()
     feature_info = all_contributions[next(iter(all_contributions))][
         ["category", "Feature"]
     ].rename(columns={"category": "Category"})
@@ -46,7 +48,7 @@ def view(all_contributions):
         to_show = to_show.sort_values(by="negative", axis="index")
 
     to_show = filtering.process_options(to_show).drop(["positive", "negative"], axis=1)
-    helpers.show_table(to_show)
+    helpers.show_table(to_show, key="global")
     return to_show
 
 

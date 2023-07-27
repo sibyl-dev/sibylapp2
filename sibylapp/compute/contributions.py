@@ -36,7 +36,8 @@ def get_dataset_contributions():
 
 
 @st.cache_data(show_spinner="Getting global contributions...")
-def compute_global_contributions(contributions_in_range):
+def compute_global_contributions(eids):
+    contributions_in_range = get_contributions(eids)
     rows = pd.concat(
         [contributions_in_range[eid]["Contribution"] for eid in contributions_in_range],
         axis=1,
