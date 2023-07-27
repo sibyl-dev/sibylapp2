@@ -1,8 +1,9 @@
+import os.path as path
+
 import pandas as pd
 import requests
 import streamlit as st
 import yaml
-import os.path as path
 
 with open(path.join(path.dirname(path.dirname(path.abspath(__file__))), "config.yml")) as f:
     cfg = yaml.safe_load(f)

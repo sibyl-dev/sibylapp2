@@ -2,7 +2,7 @@ import streamlit as st
 
 from sibylapp.compute import contributions, model
 from sibylapp.compute.context import get_term
-from sibylapp.config import PREDICTION_TYPE, pred_format_func, PredType
+from sibylapp.config import PREDICTION_TYPE, PredType, pred_format_func
 from sibylapp.view.utils import filtering, helpers
 from sibylapp.view.utils.helpers import NEG_EM, POS_EM
 

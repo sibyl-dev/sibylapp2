@@ -1,8 +1,9 @@
-from sibylapp.compute.context import get_gui_config
 import os.path as path
-import yaml
 from enum import Enum
 
+import yaml
+
+from sibylapp.compute.context import get_gui_config
 
 with open(path.join(path.dirname(path.abspath(__file__)), "config.yml")) as f:
     cfg = yaml.safe_load(f)
