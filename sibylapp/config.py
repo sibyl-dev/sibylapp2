@@ -1,11 +1,29 @@
 from enum import Enum
+from sibylapp.compute import context
+import os.path as path
+import yaml
 
-# API CONFIGURATIONS ==============================================================================
-BASE_URL = "http://localhost:3000/api/v1/"
-CERT = None
+
+with open(path.join(path.dirname(path.abspath(__file__)), "config.yml")) as f:
+    cfg = yaml.safe_load(f)
+
+# GENERAL CONFIGURATIONS ============================================================================
+BAR_LENGTH = cfg.get("BAR_LENGTH", 8)
+MAX_ENTITIES = cfg.get("MAX_ENTITIES", 11)
+DATASET_SIZE = cfg.get("DATASET_SIZE", 1000)
+LOAD_UPFRONT = cfg.get("LOAD_UPFRONT", True)
+
 
 # APPLICATION-SPECIFIC CONFIGURATIONS =============================================================
-FLIP_COLORS = False  # If true, positive contributions will be red
+def flip_colors():
+    return (
+        cfg.get("FLIP_COLORS")
+        if cfg.get("FLIP_COLORS") is not None
+        else context.get_flip_colors_from_api()
+    )
+
+
+FLIP_COLORS = flip_colors()
 
 
 class PredType(Enum):
@@ -20,17 +38,22 @@ POSITIVE_TERM = None
 NEGATIVE_TERM = None
 
 
-def pred_format_func(
-    pred,
-):  # Function to use to format the prediction values from model
-    return format_dollar(pred)  # See pre-written options below for defaults
+def pred_format_func(pred):
+    if get_gui_config("pred_type") == "numeric":
+        if get_gui_config("pred_format_string") is not None:
+            return get_gui_config("pred_format_string").format(pred)
+    if get_gui_config("pred_type") == "boolean":
+        return (
+            get_gui_config("pos_pred_name", pred)
+            if pred
+            else get_gui_config("neg_pred_name", pred)
+        )
 
 
-# OTHER CONFIGURATIONS ============================================================================
-BAR_LENGTH = 8  # Number of squares to use for contribution/importance bars
-MAX_ENTITIES = 11  # Maximum number of entities to select from. Set this to None to use all
-DATASET_SIZE = 1000  # Max number of entities to use for dataset-wide visualizations
-LOAD_UPFRONT = True  # If true, run heavy computations on initial load, else greedily run as needed
+# def pred_format_func(pred):
+# Function to format prediction from model
+# See pre-written options below for defaults or return None to use API defaults
+#    return None
 
 
 # PRE-WRITTEN FORMAT FUNCTION OPTIONS =============================================================
