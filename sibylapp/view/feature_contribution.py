@@ -130,8 +130,8 @@ def view_instructions():
             .format(
                 positive=positive,
                 negative=negative,
-                feature=get_term("Feature").lower(),
-                entity=get_term("Entity").lower(),
+                feature=get_term("Feature", l=True),
+                entity=get_term("Entity", l=True),
             )
         )
         st.markdown(
