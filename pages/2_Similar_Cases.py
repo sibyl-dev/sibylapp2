@@ -1,8 +1,7 @@
 import streamlit as st
 
-from sibylapp.view.utils import setup, filtering
 from sibylapp.view import similar_entities
-
+from sibylapp.view.utils import filtering, setup
 
 setup.setup_page()
 

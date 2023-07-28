@@ -4,7 +4,6 @@ from sibylapp.compute import contributions, model
 from sibylapp.compute.context import get_term
 from sibylapp.config import PREDICTION_TYPE, PredType, pred_format_func
 from sibylapp.view.utils import filtering, helpers
-from sibylapp.view.utils.helpers import NEG_EM, POS_EM
 
 
 def view_prediction_difference():
@@ -34,19 +33,8 @@ def view_prediction_difference():
     )
 
 
-def show_legend():
-    modelPred = get_term("Prediction", l=True)
-    separator = "&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;"
-    posChange = " Increase in %s's contribution to" % get_term("Feature", l=True)
-    negChange = " Decrease in %s's contribution to" % get_term("Feature", l=True)
-
-    st.write(
-        (NEG_EM + negChange + " " + modelPred) + separator + (POS_EM + posChange + " " + modelPred)
-    )
-
-
 def show_sorted_contributions(to_show, sort_by):
-    show_legend()
+    helpers.show_legend(similar_entities=True)
     if sort_by == "Absolute Difference":
         to_show = to_show.reindex(
             to_show["Contribution Change Value"].abs().sort_values(ascending=False).index
@@ -137,7 +125,7 @@ def view(eid, eid_comp, save_space=False):
                 "Show numeric contributions?",
                 help="Show the exact amount this feature contributes to the model prediction",
             )
-            show_contriubtion = st.checkbox(
+            show_contribution = st.checkbox(
                 "Show original contributions?",
                 help="Show the original %s contributions for both %s"
                 % (get_term("Feature"), get_term("Entity", p=True)),
@@ -156,7 +144,7 @@ def view(eid, eid_comp, save_space=False):
         contribution_original,
         contribution_compare,
         show_number=show_number,
-        show_contribution=show_contriubtion,
+        show_contribution=show_contribution,
     )
 
     options = ["No filtering", "With filtering"]

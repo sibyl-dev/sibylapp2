@@ -1,11 +1,27 @@
 from enum import Enum
+from os import path
 
-# API CONFIGURATIONS ==============================================================================
-BASE_URL = "http://localhost:3000/api/v1/"
-CERT = None
+import yaml
+
+from sibylapp.compute.context import get_gui_config
+
+with open(path.join(path.dirname(path.abspath(__file__)), "config.yml"), "r") as f:
+    cfg = yaml.safe_load(f)
+
+# GENERAL CONFIGURATIONS ==========================================================================
+BAR_LENGTH = cfg.get("BAR_LENGTH", 8)
+MAX_ENTITIES = cfg.get("MAX_ENTITIES", 11)
+DATASET_SIZE = cfg.get("DATASET_SIZE", 1000)
+LOAD_UPFRONT = cfg.get("LOAD_UPFRONT", True)
+
 
 # APPLICATION-SPECIFIC CONFIGURATIONS =============================================================
-FLIP_COLORS = False  # If true, positive contributions will be red
+def get_config(name, api_name, default):
+    if cfg.get(name) is not None:
+        return cfg.get(name)
+    if get_gui_config(api_name) is not None:
+        return get_gui_config(api_name)
+    return default
 
 
 class PredType(Enum):
@@ -14,41 +30,33 @@ class PredType(Enum):
     NUMERIC = 3
 
 
-# add names for "positive" and "negative" values after we have a more concrete idea
-PREDICTION_TYPE = PredType.NUMERIC
-POSITIVE_TERM = None
-NEGATIVE_TERM = None
+def to_pred_type(str_pred_type):
+    if str_pred_type == "numeric":
+        return PredType.NUMERIC
+    if str_pred_type == "categorical":
+        return PredType.CATEGORICAL
+    if str_pred_type == "boolean":
+        return PredType.BOOLEAN
+    raise ValueError("Received invalid pred type %s" % str_pred_type)
 
 
-def pred_format_func(
-    pred,
-):  # Function to use to format the prediction values from model
-    return format_dollar(pred)  # See pre-written options below for defaults
+FLIP_COLORS = get_config("FLIP_COLORS", "model_pred_bad_outcome", False)
+PREDICTION_TYPE = to_pred_type(get_config("PREDICTION_TYPE", "pred_type", "numeric"))
+POSITIVE_TERM = get_config("POSITIVE_TERM", "pos_pred_name", True)
+NEGATIVE_TERM = get_config("NEGATIVE_TERM", "neg_pred_name", False)
+PRED_FORMAT_STRING = get_config("PRED_FORMAT_STRING", "pred_format_string", "{}")
 
 
-# OTHER CONFIGURATIONS ============================================================================
-BAR_LENGTH = 8  # Number of squares to use for contribution/importance bars
-MAX_ENTITIES = 11  # Maximum number of entities to select from. Set this to None to use all
-DATASET_SIZE = 1000  # Max number of entities to use for dataset-wide visualizations
-LOAD_UPFRONT = True  # If true, run heavy computations on initial load, else greedily run as needed
+def pred_format_func(pred):
+    if cfg.get("OVERRIDE_PRED_FORMAT"):
+        return manual_pred_format_func(pred)
+    if PREDICTION_TYPE == PredType.NUMERIC:
+        return PRED_FORMAT_STRING.format(pred)
+    if PREDICTION_TYPE == PredType.BOOLEAN:
+        return POSITIVE_TERM if pred else NEGATIVE_TERM
+    return str(pred)
 
 
-# PRE-WRITTEN FORMAT FUNCTION OPTIONS =============================================================
-def format_none(pred):
-    return pred
-
-
-def format_dollar(pred):
-    return "${:,.2f}".format(pred)
-
-
-def format_class_name(pred, class_names):
-    return class_names[int(pred)]
-
-
-def format_boolean_name(pred):
-    return POSITIVE_TERM if pred else NEGATIVE_TERM
-
-
-def format_number(pred, decimals=2):
-    return "{:,.{prec}f}".format(pred, prec=decimals)
+def manual_pred_format_func(pred):
+    # Not used unless config.OVERRIDE_PRED_FORMAT == True
+    return str(pred)

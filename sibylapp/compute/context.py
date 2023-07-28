@@ -5,6 +5,10 @@ from sibylapp.compute import api
 
 lang = inflect.engine()
 
+# we do this once here instead of caching to avoid a bug caused by calling st.cache_data
+#   in config, before pages have been set up
+context = api.fetch_context()
+
 
 @st.cache_data(show_spinner="Fetching categories...")
 def get_category_list():
@@ -12,14 +16,10 @@ def get_category_list():
     return list(categories["name"])
 
 
-@st.cache_data(show_spinner="Fetching terms...")
-def get_terms():
-    return api.fetch_terms()
-
-
 def get_term(term, p=False, l=False, a=False):
-    if term in get_terms():
-        new_term = get_terms()[term]
+    terms = context["terms"]
+    if term in terms:
+        new_term = terms[term]
     else:
         new_term = term
     if p:
@@ -29,3 +29,9 @@ def get_term(term, p=False, l=False, a=False):
     if a:
         new_term = lang.a(new_term)
     return new_term
+
+
+def get_gui_config(key):
+    if "gui_config" not in context:
+        return None
+    return context["gui_config"].get(key)

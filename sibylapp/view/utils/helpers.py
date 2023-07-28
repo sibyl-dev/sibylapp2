@@ -4,7 +4,14 @@ import pandas as pd
 import streamlit as st
 
 from sibylapp.compute.context import get_term
-from sibylapp.config import BAR_LENGTH, FLIP_COLORS
+from sibylapp.config import (
+    BAR_LENGTH,
+    FLIP_COLORS,
+    NEGATIVE_TERM,
+    POSITIVE_TERM,
+    PREDICTION_TYPE,
+    PredType,
+)
 
 if FLIP_COLORS:
     POS_EM = "🟥"
@@ -134,3 +141,23 @@ def generate_bars_bidirectional(neg_values, pos_values):
 
 def rename_for_pyreal_vis(df):
     return {eid: df[eid].rename(columns={"Feature": "Feature Name"}) for eid in df}
+
+
+def show_legend(similar_entities=False):
+    model_pred = get_term("Prediction", l=True)
+    separator = "&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;"
+    if similar_entities:
+        pos_change = " Increase in %s's contribution to" % get_term("Feature", l=True)
+        neg_change = " Decrease in %s's contribution to" % get_term("Feature", l=True)
+    else:
+        if PREDICTION_TYPE == PredType.BOOLEAN:
+            pos_change = f" towards **{POSITIVE_TERM}** as"
+            neg_change = f" towards **{NEGATIVE_TERM}** as"
+        else:
+            pos_change = " Increase in"
+            neg_change = " Decrease in"
+    st.write(
+        (NEG_EM + neg_change + " " + model_pred)
+        + separator
+        + (POS_EM + pos_change + " " + model_pred)
+    )

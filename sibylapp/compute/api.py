@@ -1,17 +1,21 @@
+from os import path
+
 import pandas as pd
 import requests
 import streamlit as st
+import yaml
 
-from sibylapp.config import BASE_URL, CERT
+with open(path.join(path.dirname(path.dirname(path.abspath(__file__))), "config.yml"), "r") as f:
+    cfg = yaml.safe_load(f)
 
 session = requests.Session()
 session.headers.update({"Access-Control-Allow-Origin": "*"})
-if CERT is not None:
-    session.cert = CERT
+if cfg.get("CERT") is not None:
+    session.cert = cfg.get("CERT")
 
 
 def api_get(url):
-    fetch_url = BASE_URL + url
+    fetch_url = cfg["BASE_URL"] + url
     response = session.get(fetch_url)
     if response.status_code != 200:
         st.error("Error with GET(%s). %s: %s" % (fetch_url, response.status_code, response.reason))
@@ -20,7 +24,7 @@ def api_get(url):
 
 
 def api_post(url, json):
-    fetch_url = BASE_URL + url
+    fetch_url = cfg["BASE_URL"] + url
     response = session.post(fetch_url, json=json)
     if response.status_code != 200:
         st.error(
@@ -110,7 +114,7 @@ def fetch_categories():
     return pd.DataFrame(categories)
 
 
-def fetch_terms():
+def fetch_context():
     context_id = api_get("contexts/")["contexts"][0]["id"]
     url = "context/" + context_id
-    return api_get(url)["context"]["terms"]
+    return api_get(url)["context"]
