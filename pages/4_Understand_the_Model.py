@@ -1,7 +1,9 @@
+# pylint: disable=invalid-name
+
 import extra_streamlit_components as stx
-import numpy as np
 import streamlit as st
 
+from sibylapp import config
 from sibylapp.compute import contributions, model
 from sibylapp.compute.context import get_term
 from sibylapp.view import explore_feature, feature_importance, global_contributions
@@ -14,7 +16,7 @@ filtering.view_filtering()
 
 # Compute -------------------------------------
 predictions = model.get_dataset_predictions()
-discrete = len(np.unique(list(predictions.values()))) <= 6  # todo: ensure non-numeric is discrete
+discrete = config.PREDICTION_TYPE in (config.PredType.BOOLEAN, config.PredType.CATEGORICAL)
 
 all_contributions = contributions.get_dataset_contributions()
 

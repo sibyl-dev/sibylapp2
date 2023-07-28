@@ -1,3 +1,5 @@
+# pylint: disable=invalid-name
+
 import extra_streamlit_components as stx
 import streamlit as st
 
@@ -14,7 +16,7 @@ entity_difference.view_instructions()
 
 # Global options ------------------------------
 if st.session_state["eid"] == st.session_state["eid_comp"]:
-    st.subheader("Please select two different %s!" % get_term("Entity", p=True, l=True))
+    st.subheader("Please select two different %s!" % get_term("Entity", plural=True, lower=True))
 
 else:
     filtering.view_filtering()
@@ -22,7 +24,9 @@ else:
 
     tab = stx.tab_bar(
         data=[
-            stx.TabBarItemData(id=1, title=get_term("Feature Contributions"), description=""),
+            stx.TabBarItemData(
+                id=1, title=get_term("Compare Feature Contributions"), description=""
+            ),
         ],
         default=1,
     )

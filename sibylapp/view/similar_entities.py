@@ -54,10 +54,10 @@ def view_instructions():
     with expander:
         st.markdown(
             "The **Similar Cases** page shows the two {entities} from the training dataset with"
-            " the most similar {feature} values. Rows where a similar {entity} has a different"
-            " value are highlighted.".format(
-                entities=get_term("Entity", p=True, l=True),
-                feature=get_term("Feature", l=True),
-                entity=get_term("Entity", l=True),
+            " the most similar {feature} values. Rows where a similar {entity} has a"
+            " different value are highlighted.".format(
+                entities=get_term("Entity", plural=True, lower=True),
+                feature=get_term("Feature", lower=True),
+                entity=get_term("Entity", lower=True),
             )
         )

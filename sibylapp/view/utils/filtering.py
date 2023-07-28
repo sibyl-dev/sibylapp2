@@ -21,7 +21,7 @@ def filter_eids(eids, eid_dict):
 
 def view_prediction_selection(predictions, disabled=False):
     pred_values = list(predictions.values())
-    if len(np.unique(pred_values)) < 8:  # TODO: ensure non-numeric fall in this category
+    if config.PREDICTION_TYPE in (config.PredType.BOOLEAN, config.PredType.CATEGORICAL):
         chosen_preds = st.multiselect(
             "Predictions to visualize",
             list(np.unique(pred_values)),
@@ -45,9 +45,11 @@ def view_prediction_selection(predictions, disabled=False):
 
 
 def view_entity_select(eid_text="eid", prefix=None, default=0):
-    def format_func(s):
+    def format_func(eid):
         return (
-            f"{context.get_term('Entity')} {s} (" + config.pred_format_func(predictions[s]) + ")"
+            f"{context.get_term('Entity')} {eid} ("
+            + config.pred_format_func(predictions[eid])
+            + ")"
         )
 
     predictions = model.get_predictions(st.session_state["eids"])

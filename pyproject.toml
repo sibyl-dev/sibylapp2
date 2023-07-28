@@ -39,8 +39,8 @@ skip = ["__init__.py"]
 disable = ["missing-docstring",
           "consider-using-f-string",
           "no-member",
-          "fixme",
-          "invalid-name",
           "use-dict-literal",
           "no-else-return",
           "unspecified-encoding"]
+[tool.pylint.BASIC]
+good-names = ["x", "y", "X", "df"]
