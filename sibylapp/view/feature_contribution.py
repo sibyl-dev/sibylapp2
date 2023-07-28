@@ -107,20 +107,20 @@ def view_instructions():
         st.markdown(
             "A large **{positive}** bar means that this {feature}'s value significantly increased"
             " the model's prediction on this {entity}. A large **{negative}** bar means that this"
-            " {feature}'s value significantly decreased the model's prediction. A lack of a bar"
-            " suggests this {feature} had little effect on the model's prediction in this case."
-            .format(
+            " {feature}'s value significantly decreased the model's prediction. A lack of a"
+            " bar suggests this {feature} had little effect on the model's prediction in this"
+            " case.".format(
                 positive=positive,
                 negative=negative,
-                feature=get_term("Feature", l=True),
-                entity=get_term("Entity", l=True),
+                feature=get_term("Feature", lower=True),
+                entity=get_term("Entity", lower=True),
             )
         )
         st.markdown(
             "You can select {a_entity} from the dropdown above, and see the {feature}"
             " contributions. You can also **filter** and **search** the {feature} table or adjust"
             " the **sort order**.".format(
-                a_entity=get_term("Entity", a=True, l=True),
-                feature=get_term("Feature", l=True),
+                a_entity=get_term("Entity", with_a=True, lower=True),
+                feature=get_term("Feature", lower=True),
             )
         )

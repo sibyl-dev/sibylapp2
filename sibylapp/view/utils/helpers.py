@@ -77,17 +77,17 @@ def generate_bars(values, neutral=False, show_number=False):
     epsilon is used to avoid zero division error when all values are zero.
     """
 
-    def format_func(n, v=None):
+    def format_func(num, value=None):
         if neutral:
-            formatted = NEUT_EM * n + BLANK_EM * (BAR_LENGTH - n) + UP_ARROW
+            formatted = NEUT_EM * num + BLANK_EM * (BAR_LENGTH - num) + UP_ARROW
         else:
             formatted = (
-                (POS_EM * n + BLANK_EM * (BAR_LENGTH - n) + UP_ARROW)
-                if n > 0
-                else (DOWN_ARROW + BLANK_EM * (BAR_LENGTH + n) + NEG_EM * -n)
+                (POS_EM * num + BLANK_EM * (BAR_LENGTH - num) + UP_ARROW)
+                if num > 0
+                else (DOWN_ARROW + BLANK_EM * (BAR_LENGTH + num) + NEG_EM * -num)
             )
         if show_number:
-            formatted = "%s    %.3f" % (formatted, v)
+            formatted = "%s    %.3f" % (formatted, value)
         return formatted
 
     def round_away_from_zero(x):
@@ -102,7 +102,7 @@ def generate_bars(values, neutral=False, show_number=False):
         num_to_show = values / max(values.abs()) * BAR_LENGTH
     num_to_show = num_to_show.apply(round_away_from_zero).astype("int")
 
-    return [format_func(n, v) for n, v in zip(num_to_show, values)]
+    return [format_func(num, value) for num, value in zip(num_to_show, values)]
 
 
 def generate_bars_bidirectional(neg_values, pos_values):
@@ -144,11 +144,11 @@ def rename_for_pyreal_vis(df):
 
 
 def show_legend(similar_entities=False):
-    model_pred = get_term("Prediction", l=True)
+    model_pred = get_term("Prediction", lower=True)
     separator = "&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;"
     if similar_entities:
-        pos_change = " Increase in %s's contribution to" % get_term("Feature", l=True)
-        neg_change = " Decrease in %s's contribution to" % get_term("Feature", l=True)
+        pos_change = " Increase in %s's contribution to" % get_term("Feature", lower=True)
+        neg_change = " Decrease in %s's contribution to" % get_term("Feature", lower=True)
     else:
         if PREDICTION_TYPE == PredType.BOOLEAN:
             pos_change = f" towards **{POSITIVE_TERM}** as"

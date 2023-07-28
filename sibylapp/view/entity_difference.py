@@ -128,7 +128,7 @@ def view(eid, eid_comp, save_space=False):
             show_contribution = st.checkbox(
                 "Show original contributions?",
                 help="Show the original %s contributions for both %s"
-                % (get_term("Feature"), get_term("Entity", p=True)),
+                % (get_term("Feature"), get_term("Entity", plural=True)),
             )
     else:
         cols = st.columns(1)
@@ -149,11 +149,11 @@ def view(eid, eid_comp, save_space=False):
 
     options = ["No filtering", "With filtering"]
     show_different = st.radio(
-        "Apply filtering by identical %s values?" % get_term("Feature", l=True),
+        "Apply filtering by identical %s values?" % get_term("Feature", lower=True),
         options,
         horizontal=True,
         help="Show only rows where %s values of two %s are identical"
-        % (get_term("Feature", l=True), get_term("Entity", l=True, p=True)),
+        % (get_term("Feature", lower=True), get_term("Entity", lower=True, plural=True)),
     )
     if show_different == "With filtering":
         to_show = filter_different_rows(to_show)
@@ -168,32 +168,32 @@ def view_instructions():
             "This page compares the **{feature} values** and **{feature} contributions**"
             " of two distinct {entities}."
             " You can select two {entities} you want to compare from the dropdown above.".format(
-                entities=get_term("Entity", p=True, l=True),
-                feature=get_term("Feature", l=True),
+                entities=get_term("Entity", plural=True, lower=True),
+                feature=get_term("Feature", lower=True),
             )
         )
         positive, negative = helpers.get_pos_neg_names()
         st.markdown(
             "The **Contribution Change** column refers to the difference between the {feature}"
             " contribution of the two {entities}. A large **{positive}** bar means that this"
-            " {feature}'s value has a much more positive contribution to the model's prediction on"
-            " the second {entity} than on the first {entity}. A large **{negative}** bar means"
-            " that this {feature}'s value has a much more negative contribution to the model's"
-            " prediction on the second {entity} than on the first {entity}. A lack of a bar"
-            " suggests this {feature} has a similar effect on the model's prediction for both"
-            " cases.".format(
+            " {feature}'s value has a much more positive contribution to the model's"
+            " prediction on the second {entity} than on the first {entity}. A large **{negative}**"
+            " bar means that this {feature}'s value has a much more negative contribution to"
+            " the model's prediction on the second {entity} than on the first {entity}. A lack of"
+            " a bar suggests this {feature} has a similar effect on the model's"
+            " prediction for both cases.".format(
                 positive=positive,
                 negative=negative,
-                feature=get_term("Feature", l=True),
-                entity=get_term("Entity", l=True),
-                entities=get_term("Entity", l=True, p=True),
+                feature=get_term("Feature", lower=True),
+                entity=get_term("Entity", lower=True),
+                entities=get_term("Entity", lower=True, plural=True),
             )
         )
         st.markdown(
             "You can **filter** and **search** the {feature} table or adjust"
             " the **sort order**. You can also look at {features} with identical"
             " {feature} values.".format(
-                feature=get_term("Feature", l=True),
-                features=get_term("Feature", p=True, l=True),
+                feature=get_term("Feature", lower=True),
+                features=get_term("Feature", plural=True, lower=True),
             )
         )

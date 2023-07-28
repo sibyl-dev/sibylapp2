@@ -1,3 +1,5 @@
+# pylint: disable=invalid-name
+
 import streamlit as st
 
 from sibylapp.view import similar_entities
