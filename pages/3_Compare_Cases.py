@@ -22,7 +22,9 @@ else:
 
     tab = stx.tab_bar(
         data=[
-            stx.TabBarItemData(id=1, title=get_term("Feature Contributions"), description=""),
+            stx.TabBarItemData(
+                id=1, title=get_term("Compare Feature Contributions"), description=""
+            ),
         ],
         default=1,
     )
