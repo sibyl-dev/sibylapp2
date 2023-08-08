@@ -1514,13 +1514,13 @@ diagrams = ["jinja2", "railroad-diagrams"]
 
 [[package]]
 name = "pyreal"
-version = "0.4.1"
+version = "0.4.4"
 description = "Library for evaluating and deploying human readable machine learning explanations."
 optional = false
 python-versions = ">=3.8,<3.11"
 files = [
-    {file = "pyreal-0.4.1-py3-none-any.whl", hash = "sha256:6bf689fdf671f02deec1592d9cc3d92dddc6d9b5cba78d937587dd628a5b1204"},
-    {file = "pyreal-0.4.1.tar.gz", hash = "sha256:d724f69549263b99b3c27b97e578395572fc64725e7c511a0546f27557c944ca"},
+    {file = "pyreal-0.4.4-py3-none-any.whl", hash = "sha256:6889d03f07179dd6ced32489250532f9e9b481791f9f01de211f6457c6d96059"},
+    {file = "pyreal-0.4.4.tar.gz", hash = "sha256:75bd46b4da9364b968155073a3b75cdc2d0cd9cbf197b1bc2d25c08064498d17"},
 ]
 
 [package.dependencies]
@@ -1528,13 +1528,10 @@ lime = ">=0.2.0.1,<0.3.0.0"
 matplotlib = ">=3.6.0,<4.0.0"
 numba = ">=0.56.2,<0.57.0"
 numpy = ">=1.23.3,<2.0.0"
-pandas = ">=1.5.0,<2.0.0"
+pandas = ">=1.5,<3.0"
 scikit-learn = ">=1.1.2,<2.0.0"
 seaborn = ">=0.12.2,<0.13.0"
 shap = "0.40.0"
-
-[package.extras]
-examples = ["lightgbm (>=3.3.2,<4.0.0)"]
 
 [[package]]
 name = "pyrsistent"
@@ -2476,4 +2473,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1, <3.11, !=3.9.7"
-content-hash = "7146d88bfb15fdabdcc1b7e443efcdc688202ff0a83f446cb9cbaf4c65a2266b"
+content-hash = "21b528ca80ace74d386048ae4cc28c36814c37ca68dfcf473e8031fcf1f195a2"
