@@ -108,10 +108,12 @@ def view_filtering(include_show_more=False):
             default=st.session_state["filters"],
         )
 
+
 def add_select(to_show):
     selected = [False for _ in to_show.index]
     to_show["View Graph"] = selected
     return to_show
+
 
 def process_options(to_show):
     return process_search(process_filter(process_show_more(to_show)))

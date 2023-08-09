@@ -37,7 +37,9 @@ def get_pos_neg_names():
         return "blue", "red"
 
 
-def show_table(df, page_size=10, key=None):
+def show_table(df, page_size=10, key=None, editable=None):
+    if editable is None:
+        editable = []
     table = st.container()
     _, col1, col2 = st.columns((4, 1, 1))
     with col2:
@@ -62,13 +64,15 @@ def show_table(df, page_size=10, key=None):
         renames[column] = get_term(column)
     df = df.rename(columns=renames)
 
-    table.data_editor(
+    edited_df = table.data_editor(
         df[(page - 1) * page_size : page * page_size],
         hide_index=True,
         use_container_width=True,
         num_rows="fixed",
-        disabled=True,
+        disabled=list(set(df.columns) - set(editable)),
     )
+
+    return edited_df
 
 
 def generate_bars(values, neutral=False, show_number=False):

@@ -2,8 +2,8 @@ import streamlit as st
 
 from sibylapp.compute import importance, model
 from sibylapp.compute.context import get_term
-from sibylapp.view.utils import helpers, filtering
 from sibylapp.view import explore_feature
+from sibylapp.view.utils import filtering, helpers
 
 
 @st.cache_data
@@ -26,8 +26,18 @@ def view():
     to_show = to_show.sort_values(by="Importance Value", axis="index", ascending=False)
     to_show = filtering.process_options(to_show)
     to_show = filtering.add_select(to_show)
-    edited_df = helpers.show_table(to_show.drop("Importance Value", axis="columns"), key="importance", editable = ["View Graph"])
+    edited_df = helpers.show_table(
+        to_show.drop("Importance Value", axis="columns"), key="importance", editable=["View Graph"]
+    )
     graph_placeholder = st.container()
+    with graph_placeholder:
+        selected_features = edited_df.loc[edited_df["View Graph"] == 1]["Factor"]
+        if len(selected_features) > 0:
+            feature_to_show = next(iter(selected_features))
+            all_predictions = model.get_dataset_predictions()
+            all_eids = list(all_predictions)
+            explore_feature.view(all_eids, all_predictions, feature_to_show, discrete=False)
+    return to_show["Feature"]
 
 
 def view_instructions():
