@@ -1,9 +1,9 @@
 import streamlit as st
 
-import sibylapp.view.utils.filtering
-from sibylapp.compute import importance
+from sibylapp.compute import importance, model
 from sibylapp.compute.context import get_term
-from sibylapp.view.utils import helpers
+from sibylapp.view.utils import helpers, filtering
+from sibylapp.view import explore_feature
 
 
 @st.cache_data
@@ -24,9 +24,10 @@ def format_importance_to_view(importance_df):
 def view():
     to_show = format_importance_to_view(importance.compute_importance())
     to_show = to_show.sort_values(by="Importance Value", axis="index", ascending=False)
-    to_show = sibylapp.view.utils.filtering.process_options(to_show)
-    helpers.show_table(to_show.drop("Importance Value", axis="columns"), key="importance")
-    return to_show["Feature"]
+    to_show = filtering.process_options(to_show)
+    to_show = filtering.add_select(to_show)
+    edited_df = helpers.show_table(to_show.drop("Importance Value", axis="columns"), key="importance", editable = ["View Graph"])
+    graph_placeholder = st.container()
 
 
 def view_instructions():
