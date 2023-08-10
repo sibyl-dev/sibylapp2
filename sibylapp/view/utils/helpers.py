@@ -30,6 +30,17 @@ def show_sort_options(options):
     return st.radio("Sort by", options, horizontal=True)
 
 
+def show_text_input_side_by_side(label, default_input=None, numeric=False, **input_params):
+    # TODO: Implement more standard way to resize the columns
+    col1, col2 = st.columns([2, 2])
+    col1.markdown(label)
+
+    if numeric:
+        return col2.number_input("hidden", value=default_input, label_visibility="collapsed")
+    else:
+        return col2.text_input("hidden", value=default_input, label_visibility="collapsed")
+
+
 def get_pos_neg_names():
     if FLIP_COLORS:
         return "red", "blue"

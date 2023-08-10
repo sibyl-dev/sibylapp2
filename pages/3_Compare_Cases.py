@@ -20,7 +20,9 @@ if st.session_state["eid"] == st.session_state["eid_comp"]:
 
 else:
     filtering.view_filtering()
-    entity_difference.view_prediction_difference()
+    entity_difference.view_prediction_difference(
+        st.session_state["eid"], st.session_state["eid_comp"]
+    )
 
     tab = stx.tab_bar(
         data=[
