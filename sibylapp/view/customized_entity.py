@@ -1,10 +1,11 @@
+import pandas as pd
 import streamlit as st
 
 from sibylapp.compute import contributions, model
 from sibylapp.compute.context import get_term
 from sibylapp.compute.features import get_entity
 from sibylapp.config import pred_format_func
-from sibylapp.view.entity_difference import show_sorted_contributions, view_compare_cases_helper
+from sibylapp.view.entity_difference import sort_contributions, view_compare_cases_helper
 from sibylapp.view.utils import helpers
 from sibylapp.view.utils.formatting import format_single_contributions_df
 from sibylapp.view.utils.helpers import show_text_input_side_by_side
@@ -16,13 +17,12 @@ def view_feature_boxes(eid, features_df):
     if "changes" not in st.session_state:
         st.session_state["changes"] = {}
 
-    all_feature_names = features_df["Feature"]
-    features_df_reindex = features_df.reset_index().set_index("Feature")
+    feature_names = features_df["Feature"]
     entity = get_entity(eid)
 
     st.multiselect(
         "Select %s to change:" % get_term("Feature", lower=True, plural=True),
-        all_feature_names,
+        feature_names,
         key="selected_features",
         default=st.session_state["selected_features"],
         placeholder="Select one or multiple %s" % get_term("Feature", lower=True, plural=True),
@@ -30,11 +30,11 @@ def view_feature_boxes(eid, features_df):
 
     for feature in st.session_state["selected_features"]:
         # Sibyl-api expects the raw feature names as input for changes
-        st.session_state["changes"][features_df_reindex.loc[feature, "name"]] = (
+        st.session_state["changes"][features_df.index[feature_names == feature][0]] = (
             show_text_input_side_by_side(
                 f"New value for **{feature.strip()}**",
-                default_input=entity[features_df_reindex.loc[feature, "name"]],
-                numeric=(features_df_reindex.loc[feature, "type"] == "numeric"),
+                default_input=entity[features_df.index[feature_names == feature][0]],
+                numeric=(features_df[feature_names == feature]["type"][0] == "numeric"),
             )
         )
 
@@ -85,10 +85,26 @@ def format_compare_modified_contributions_to_view(
     return compare_df
 
 
+def highlight_differences(to_show, changes, columns=[]):
+    def match_condition(feature, column, props=""):
+        if feature in changes.keys() and column in columns:
+            return props
+        else:
+            return None
+
+    to_show = to_show.style.apply(
+        lambda x: pd.DataFrame(x).style.apply(
+            lambda y: match_condition(x.name, y.name), props="color:purple;", axis=1
+        )
+    )
+
+    return to_show
+
+
 def filter_different_rows(eid, to_show):
     neighbor_col = to_show["%s Value for %s %s" % (get_term("Feature"), get_term("Entity"), eid)]
     selected_col = to_show["%s Value for modified %s" % (get_term("Feature"), get_term("Entity"))]
-    to_show_filtered = to_show[neighbor_col == selected_col]
+    to_show_filtered = to_show[neighbor_col != selected_col]
     return to_show_filtered
 
 
@@ -100,19 +116,22 @@ def view(eid, changes, save_space=False):
         show_number=show_number,
         show_contribution=show_contribution,
     )
-
     options = ["No filtering", "With filtering"]
     show_different = st.radio(
-        "Apply filtering by identical %s values?" % get_term("Feature", lower=True),
+        "Filter out identical %s values?" % get_term("Feature", lower=True),
         options,
         horizontal=True,
-        help="Show only rows where %s values of two %s are identical"
+        help="Show only rows where %s values of two %s are different"
         % (get_term("Feature", lower=True), get_term("Entity", lower=True, plural=True)),
     )
     if show_different == "With filtering":
         to_show = filter_different_rows(eid, to_show)
 
-    show_sorted_contributions(to_show, sort_by)
+    to_show = sort_contributions(to_show, sort_by).drop(
+        "Contribution Change Value", axis="columns"
+    )
+
+    helpers.show_table(to_show)
 
 
 def view_instructions():

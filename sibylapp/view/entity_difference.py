@@ -62,7 +62,7 @@ def view_compare_cases_helper(save_space=False):
     return sort_by, show_number, show_contribution
 
 
-def show_sorted_contributions(to_show, sort_by):
+def sort_contributions(to_show, sort_by):
     helpers.show_legend(similar_entities=True)
     if sort_by == "Absolute Difference":
         to_show = to_show.reindex(
@@ -76,7 +76,7 @@ def show_sorted_contributions(to_show, sort_by):
         to_show = to_show.sort_values(by="Contribution Change Value", axis="index")
 
     to_show = filtering.process_options(to_show)
-    helpers.show_table(to_show.drop("Contribution Change Value", axis="columns"))
+    return to_show
 
 
 def format_two_contributions_to_view(
@@ -146,7 +146,8 @@ def view(eid, eid_comp, save_space=False):
     if show_different == "With filtering":
         to_show = filter_different_rows(to_show)
 
-    show_sorted_contributions(to_show, sort_by)
+    to_show = sort_contributions(to_show, sort_by)
+    helpers.show_table(to_show.drop("Contribution Change Value", axis="columns"))
 
 
 def view_instructions():

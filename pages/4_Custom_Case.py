@@ -1,5 +1,6 @@
 # pylint: disable=invalid-name
 
+import copy
 import extra_streamlit_components as stx
 import streamlit as st
 
@@ -16,8 +17,12 @@ customized_entity.view_instructions()
 # Global options ------------------------------
 customized_entity.view_feature_boxes(st.session_state["eid"], st.session_state["all_features"])
 
+# Update displayed table only when user press the button
 if st.button("Run model and explanations on customized data"):
-    customized_entity.view_prediction(st.session_state["eid"], st.session_state["changes"])
+    st.session_state["show_changes"] = copy.deepcopy(st.session_state["changes"])
+
+if "show_changes" in st.session_state:
+    customized_entity.view_prediction(st.session_state["eid"], st.session_state["show_changes"])
     filtering.view_filtering()
     tab = stx.tab_bar(
         data=[
@@ -29,4 +34,4 @@ if st.button("Run model and explanations on customized data"):
     )
 
     if tab == "1":
-        customized_entity.view(st.session_state["eid"], st.session_state["changes"])
+        customized_entity.view(st.session_state["eid"], st.session_state["show_changes"])
