@@ -16,11 +16,13 @@ filtering.view_entity_select()
 customized_entity.view_instructions()
 
 # Global options ------------------------------
-customized_entity.view_feature_boxes(st.session_state["eid"], st.session_state["all_features"])
+changes = customized_entity.view_feature_boxes(
+    st.session_state["eid"], st.session_state["all_features"]
+)
 
 # Update displayed table only when user press the button
 if st.button("Run model and explanations on customized data"):
-    st.session_state["show_changes"] = copy.deepcopy(st.session_state["changes"])
+    st.session_state["show_changes"] = copy.deepcopy(changes)
 
 if "show_changes" in st.session_state:
     customized_entity.view_prediction(st.session_state["eid"], st.session_state["show_changes"])

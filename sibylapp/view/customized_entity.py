@@ -12,31 +12,32 @@ from sibylapp.view.utils.helpers import show_text_input_side_by_side
 
 
 def view_feature_boxes(eid, features_df):
-    if "selected_features" not in st.session_state:
-        st.session_state["selected_features"] = []
     if "changes" not in st.session_state:
         st.session_state["changes"] = {}
 
-    feature_names = features_df["Feature"]
     entity = get_entity(eid)
-
-    st.multiselect(
+    changes = {}
+    # st.write(st.session_state["changes"].keys())
+    selected_features = st.multiselect(
         "Select %s to change:" % get_term("Feature", lower=True, plural=True),
-        feature_names,
+        features_df.index.tolist(),
+        default=list(st.session_state["changes"].keys()),
+        format_func=lambda feat: features_df.loc[feat, "Feature"],
         key="selected_features",
-        default=st.session_state["selected_features"],
         placeholder="Select one or multiple %s" % get_term("Feature", lower=True, plural=True),
     )
-
-    for feature in st.session_state["selected_features"]:
+    for feature in selected_features:
         # Sibyl-api expects the raw feature names as input for changes
-        st.session_state["changes"][features_df.index[feature_names == feature][0]] = (
-            show_text_input_side_by_side(
-                f"New value for **{feature.strip()}**",
-                default_input=entity[features_df.index[feature_names == feature][0]],
-                numeric=(features_df[feature_names == feature]["type"][0] == "numeric"),
-            )
+        default_input = entity[feature]
+        if feature in st.session_state["changes"].keys():
+            default_input = st.session_state["changes"][feature]
+
+        changes[feature] = show_text_input_side_by_side(
+            f"New value for **{features_df.loc[feature, 'Feature'].strip()}**",
+            default_input=default_input,
+            numeric=(features_df.loc[feature, "type"] == "numeric"),
         )
+    return changes
 
 
 def view_prediction(eid, changes):
@@ -86,17 +87,11 @@ def format_compare_modified_contributions_to_view(
 
 
 def highlight_differences(to_show, changes, columns=[]):
-    def match_condition(feature, column, props=""):
-        if feature in changes.keys() and column in columns:
-            return props
-        else:
-            return None
+    def highlight_row(row):
+        style = "background-color: yellow" if str(row.name) in changes.keys() else ""
+        return [style if col in columns else "" for col in to_show.columns]
 
-    to_show = to_show.style.apply(
-        lambda x: pd.DataFrame(x).style.apply(
-            lambda y: match_condition(x.name, y.name), props="color:purple;", axis=1
-        )
-    )
+    to_show = to_show.style.apply(highlight_row, axis=1)
 
     return to_show
 
@@ -131,7 +126,14 @@ def view(eid, changes, save_space=False):
         "Contribution Change Value", axis="columns"
     )
 
-    helpers.show_table(to_show)
+    helpers.show_table(
+        to_show,
+        style_function=lambda df: highlight_differences(
+            df,
+            changes,
+            columns=["%s Value for modified %s" % (get_term("Feature"), get_term("Entity"))],
+        ),
+    )
 
 
 def view_instructions():
@@ -143,24 +145,25 @@ def view_instructions():
                 feature=get_term("Feature", lower=True), entity=get_term("Entity")
             )
         )
-        positive, negative = helpers.get_pos_neg_names()
         st.markdown(
-            "A large **{positive}** bar means that this {feature}'s value significantly increased"
-            " the model's prediction on this {entity}. A large **{negative}** bar means that this"
-            " {feature}'s value significantly decreased the model's prediction. A lack of a"
-            " bar suggests this {feature} had little effect on the model's prediction in this"
-            " case.".format(
-                positive=positive,
-                negative=negative,
-                feature=get_term("Feature", lower=True),
+            "First, you **select {a_entity}** from the dropdown on the sidebar as a **baseline for"
+            " comparison**. Next, you can **select {features}** from the selection bar and **enter"
+            " new values** for these {features}. Keep in mind that the {feature} values must be"
+            " valid; otherwise, the server will throw an internal error. Finally, when you are"
+            " happy with your edits, you can **press the button** right below to see the model's"
+            " prediction and the {feature} contribution of the {entity} you just created. The"
+            " {features} that have a different value from that of the original will be highlighted"
+            " in the table.".format(
+                a_entity=get_term("Entity", with_a=True, lower=True),
                 entity=get_term("Entity", lower=True),
+                feature=get_term("Feature", lower=True),
+                features=get_term("Feature", lower=True, plural=True),
             )
         )
         st.markdown(
-            "You can select {a_entity} from the dropdown above, and see the {feature}"
-            " contributions. You can also **filter** and **search** the {feature} table or adjust"
-            " the **sort order**.".format(
-                a_entity=get_term("Entity", with_a=True, lower=True),
-                feature=get_term("Feature", lower=True),
+            "The layout and formatting functions in the following table are very similar to that"
+            " in the **Compare Cases** page. However, we provide a different filter here. You can"
+            " focus on the {features} that you have changed.".format(
+                features=get_term("Feature", lower=True, plural=True),
             )
         )

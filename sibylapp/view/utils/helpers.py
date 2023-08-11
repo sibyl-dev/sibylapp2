@@ -77,7 +77,6 @@ def show_table(df, page_size=10, key=None, style_function=None):
     # pandas styler must be display in whole
     if style_function is not None:
         df = style_function(df)
-
     table.data_editor(
         df,
         hide_index=True,
