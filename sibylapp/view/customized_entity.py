@@ -17,7 +17,7 @@ def view_feature_boxes(eid, features_df):
 
     entity = get_entity(eid)
     changes = {}
-    # st.write(st.session_state["changes"].keys())
+
     selected_features = st.multiselect(
         "Select %s to change:" % get_term("Feature", lower=True, plural=True),
         features_df.index.tolist(),
