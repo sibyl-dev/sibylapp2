@@ -31,14 +31,17 @@ def show_sort_options(options):
 
 
 def show_text_input_side_by_side(label, default_input=None, numeric=False, **input_params):
-    # TODO: Implement more standard way to resize the columns
     col1, col2 = st.columns([2, 2])
     col1.markdown(label)
 
     if numeric:
-        return col2.number_input("hidden", value=default_input, label_visibility="collapsed")
+        return col2.number_input(
+            "hidden", value=default_input, label_visibility="collapsed", **input_params
+        )
     else:
-        return col2.text_input("hidden", value=default_input, label_visibility="collapsed")
+        return col2.text_input(
+            "hidden", value=default_input, label_visibility="collapsed", **input_params
+        )
 
 
 def get_pos_neg_names():

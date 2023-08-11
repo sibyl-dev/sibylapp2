@@ -30,7 +30,7 @@ if "show_changes" in st.session_state:
     tab = stx.tab_bar(
         data=[
             stx.TabBarItemData(
-                id=1, title=get_term("Compare Feature Contributions"), description=""
+                id=1, title=get_term("Compare Feature Values and Contributions"), description=""
             ),
         ],
         default=1,

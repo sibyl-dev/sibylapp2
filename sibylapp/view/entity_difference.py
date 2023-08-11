@@ -4,7 +4,7 @@ from sibylapp.compute import contributions, model
 from sibylapp.compute.context import get_term
 from sibylapp.config import PREDICTION_TYPE, PredType, pred_format_func
 from sibylapp.view.utils import filtering, helpers
-from sibylapp.view.utils.formatting import format_single_contributions_df
+from sibylapp.view.utils.formatting import format_two_contributions_to_view
 
 
 def view_prediction_difference(eid, eid_comp):
@@ -79,39 +79,6 @@ def sort_contributions(to_show, sort_by):
     return to_show
 
 
-def format_two_contributions_to_view(
-    contributions, eid1, eid2, show_number=False, show_contribution=False
-):
-    original_df = format_single_contributions_df(contributions[eid1])
-    other_df = format_single_contributions_df(contributions[eid2])
-
-    other_df = other_df.drop(["Category", "Feature"], axis="columns")
-    compare_df = original_df.join(
-        other_df,
-        lsuffix=" for %s %s" % (get_term("Entity"), eid1),
-        rsuffix=" for %s %s" % (get_term("Entity"), eid2),
-    )
-    compare_df["Contribution Change"] = (
-        other_df["Contribution Value"] - original_df["Contribution Value"]
-    )
-    compare_df["Contribution Change Value"] = compare_df["Contribution Change"].copy()
-    compare_df["Contribution Change"] = helpers.generate_bars(
-        compare_df["Contribution Change"], show_number=show_number
-    )
-
-    if not show_contribution:
-        compare_df = compare_df.drop(
-            [
-                "Contribution for %s %s" % (get_term("Entity"), eid1),
-                "Contribution for %s %s" % (get_term("Entity"), eid2),
-                "Contribution Value for %s %s" % (get_term("Entity"), eid1),
-                "Contribution Value for %s %s" % (get_term("Entity"), eid2),
-            ],
-            axis="columns",
-        )
-    return compare_df
-
-
 def filter_different_rows(to_show):
     neighbor_col = to_show[
         "%s Value for %s %s" % (get_term("Feature"), get_term("Entity"), st.session_state["eid"])
@@ -127,10 +94,14 @@ def filter_different_rows(to_show):
 def view(eid, eid_comp, save_space=False):
     sort_by, show_number, show_contribution = view_compare_cases_helper(save_space=save_space)
     contributions_dict = contributions.get_contributions([eid, eid_comp])
+    original_df = contributions_dict[eid]
+    other_df = contributions_dict[eid_comp]
+
     to_show = format_two_contributions_to_view(
-        contributions_dict,
-        eid,
-        eid_comp,
+        original_df,
+        other_df,
+        lsuffix=" for %s %s" % (get_term("Entity"), eid),
+        rsuffix=" for %s %s" % (get_term("Entity"), eid_comp),
         show_number=show_number,
         show_contribution=show_contribution,
     )

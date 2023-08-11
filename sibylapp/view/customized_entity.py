@@ -1,4 +1,3 @@
-import pandas as pd
 import streamlit as st
 
 from sibylapp.compute import contributions, model
@@ -7,7 +6,7 @@ from sibylapp.compute.features import get_entity
 from sibylapp.config import pred_format_func
 from sibylapp.view.entity_difference import sort_contributions, view_compare_cases_helper
 from sibylapp.view.utils import helpers
-from sibylapp.view.utils.formatting import format_single_contributions_df
+from sibylapp.view.utils.formatting import format_two_contributions_to_view
 from sibylapp.view.utils.helpers import show_text_input_side_by_side
 
 
@@ -51,42 +50,10 @@ def view_prediction(eid, changes):
     )
 
 
-def format_compare_modified_contributions_to_view(
-    eid, changes, show_number=False, show_contribution=False
-):
-    contribution_original = contributions.get_contributions([eid])[eid]
-    contribution_custom = contributions.get_contribution_for_modified_data(eid, changes)
-    original_df = format_single_contributions_df(contribution_original)
-    other_df = format_single_contributions_df(contribution_custom)
+def highlight_differences(to_show, changes, columns=None):
+    if columns is None:
+        columns = to_show.columns
 
-    other_df = other_df.drop(["Category", "Feature"], axis="columns")
-    compare_df = original_df.join(
-        other_df,
-        lsuffix=" for %s %s" % (get_term("Entity"), eid),
-        rsuffix=" for modified %s" % get_term("Entity"),
-    )
-    compare_df["Contribution Change"] = (
-        other_df["Contribution Value"] - original_df["Contribution Value"]
-    )
-    compare_df["Contribution Change Value"] = compare_df["Contribution Change"].copy()
-    compare_df["Contribution Change"] = helpers.generate_bars(
-        compare_df["Contribution Change"], show_number=show_number
-    )
-
-    if not show_contribution:
-        compare_df = compare_df.drop(
-            [
-                "Contribution for %s %s" % (get_term("Entity"), eid),
-                "Contribution for modified %s" % get_term("Entity"),
-                "Contribution Value for %s %s" % (get_term("Entity"), eid),
-                "Contribution Value for modified %s" % get_term("Entity"),
-            ],
-            axis="columns",
-        )
-    return compare_df
-
-
-def highlight_differences(to_show, changes, columns=[]):
     def highlight_row(row):
         style = "background-color: yellow" if str(row.name) in changes.keys() else ""
         return [style if col in columns else "" for col in to_show.columns]
@@ -105,9 +72,13 @@ def filter_different_rows(eid, to_show):
 
 def view(eid, changes, save_space=False):
     sort_by, show_number, show_contribution = view_compare_cases_helper(save_space=save_space)
-    to_show = format_compare_modified_contributions_to_view(
-        eid,
-        changes,
+    original_df = contributions.get_contributions([eid])[eid]
+    other_df = contributions.get_contribution_for_modified_data(eid, changes)
+    to_show = format_two_contributions_to_view(
+        original_df,
+        other_df,
+        lsuffix=" for %s %s" % (get_term("Entity"), eid),
+        rsuffix=" for modified %s" % get_term("Entity"),
         show_number=show_number,
         show_contribution=show_contribution,
     )
