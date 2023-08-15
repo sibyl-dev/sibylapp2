@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+import pandas as pd
 import streamlit as st
 
 from sibylapp.compute import contributions, model
@@ -10,7 +13,9 @@ from sibylapp.view.utils.formatting import format_two_contributions_to_view
 from sibylapp.view.utils.helpers import show_text_input_side_by_side
 
 
-def view_feature_boxes(eid, features_df):
+def view_feature_boxes(
+    eid: str, features_df: pd.DataFrame, options_dict: dict[str, list[str | int | float]]
+):
     if "changes" not in st.session_state:
         st.session_state["changes"] = {}
 
@@ -31,10 +36,17 @@ def view_feature_boxes(eid, features_df):
         if feature in st.session_state["changes"].keys():
             default_input = st.session_state["changes"][feature]
 
+        numeric = True
+        options = None
+        if features_df.loc[feature, "type"] != "numeric":
+            numeric = False
+            options = options_dict[feature]
+
         changes[feature] = show_text_input_side_by_side(
             f"New value for **{features_df.loc[feature, 'Feature'].strip()}**",
+            options=options,
             default_input=default_input,
-            numeric=(features_df.loc[feature, "type"] == "numeric"),
+            numeric=numeric,
         )
     return changes
 

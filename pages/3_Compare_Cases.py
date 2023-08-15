@@ -1,6 +1,5 @@
 # pylint: disable=invalid-name
 
-import extra_streamlit_components as stx
 import streamlit as st
 
 from sibylapp.compute.context import get_term
@@ -24,14 +23,4 @@ else:
         st.session_state["eid"], st.session_state["eid_comp"]
     )
 
-    tab = stx.tab_bar(
-        data=[
-            stx.TabBarItemData(
-                id=1, title=get_term("Compare Feature Contributions"), description=""
-            ),
-        ],
-        default=1,
-    )
-
-    if tab == "1":
-        entity_difference.view(st.session_state["eid"], st.session_state["eid_comp"])
+    entity_difference.view(st.session_state["eid"], st.session_state["eid_comp"])

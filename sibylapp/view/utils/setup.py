@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+import pandas as pd
 import streamlit as st
 
 from sibylapp import config
@@ -24,3 +27,7 @@ def setup_page():
 
         contributions.get_dataset_contributions()
         importance.compute_importance()
+
+
+def generate_options_for_features(eids: list[str], features_df: pd.DataFrame):
+    st.session_state["options_dict"] = features.get_options_for_categories(eids, features_df)

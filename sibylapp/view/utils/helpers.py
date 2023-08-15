@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import math
 
 import pandas as pd
@@ -30,7 +32,13 @@ def show_sort_options(options):
     return st.radio("Sort by", options, horizontal=True)
 
 
-def show_text_input_side_by_side(label, default_input=None, numeric=False, **input_params):
+def show_text_input_side_by_side(
+    label: str,
+    options: list | None = None,
+    default_input: str | None = None,
+    numeric: bool = False,
+    **input_params,
+) -> int | float | str:
     col1, col2 = st.columns([2, 2])
     col1.markdown(label)
 
@@ -39,9 +47,18 @@ def show_text_input_side_by_side(label, default_input=None, numeric=False, **inp
             "hidden", value=default_input, label_visibility="collapsed", **input_params
         )
     else:
-        return col2.text_input(
-            "hidden", value=default_input, label_visibility="collapsed", **input_params
-        )
+        if options is None:
+            return col2.text_input(
+                "hidden", value=default_input, label_visibility="collapsed", **input_params
+            )
+        else:
+            return col2.selectbox(
+                "hidden",
+                options=options,
+                index=options.index(default_input),
+                label_visibility="collapsed",
+                **input_params,
+            )
 
 
 def get_pos_neg_names():
