@@ -41,6 +41,7 @@ disable = ["missing-docstring",
           "no-member",
           "use-dict-literal",
           "no-else-return",
-          "unspecified-encoding"]
+          "unspecified-encoding",
+          "too-many-arguments"]
 [tool.pylint.BASIC]
 good-names = ["x", "y", "X", "df"]

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import math
 
 import pandas as pd
@@ -30,6 +32,35 @@ def show_sort_options(options):
     return st.radio("Sort by", options, horizontal=True)
 
 
+def show_text_input_side_by_side(
+    label: str,
+    options: list | None = None,
+    default_input: str | None = None,
+    numeric: bool = False,
+    **input_params,
+) -> int | float | str:
+    col1, col2 = st.columns([2, 2])
+    col1.markdown(label)
+
+    if numeric:
+        return col2.number_input(
+            "hidden", value=default_input, label_visibility="collapsed", **input_params
+        )
+    else:
+        if options is None:
+            return col2.text_input(
+                "hidden", value=default_input, label_visibility="collapsed", **input_params
+            )
+        else:
+            return col2.selectbox(
+                "hidden",
+                options=options,
+                index=options.index(default_input),
+                label_visibility="collapsed",
+                **input_params,
+            )
+
+
 def get_pos_neg_names():
     if FLIP_COLORS:
         return "red", "blue"
@@ -37,7 +68,7 @@ def get_pos_neg_names():
         return "blue", "red"
 
 
-def show_table(df, page_size=10, key=None):
+def show_table(df, page_size=10, key=None, style_function=None):
     table = st.container()
     _, col1, col2 = st.columns((4, 1, 1))
     with col2:
@@ -61,9 +92,13 @@ def show_table(df, page_size=10, key=None):
     for column in df:
         renames[column] = get_term(column)
     df = df.rename(columns=renames)
+    df = df[(page - 1) * page_size : page * page_size]
 
+    # pandas styler must be display in whole
+    if style_function is not None:
+        df = style_function(df)
     table.data_editor(
-        df[(page - 1) * page_size : page * page_size],
+        df,
         hide_index=True,
         use_container_width=True,
         num_rows="fixed",

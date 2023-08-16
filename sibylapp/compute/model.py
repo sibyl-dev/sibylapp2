@@ -30,3 +30,9 @@ def get_dataset_predictions():
     if "dataset_eids" not in st.session_state:
         st.session_state["dataset_eids"] = entities.get_eids(1000)
     return get_predictions(st.session_state["dataset_eids"])
+
+
+@st.cache_data(show_spinner="Getting predictions for your data...")
+def get_modified_prediction(eid, changes):
+    st.session_state["modified_prediction"] = api.fetch_modified_prediction(eid, changes)
+    return st.session_state["modified_prediction"]

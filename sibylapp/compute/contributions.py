@@ -35,6 +35,14 @@ def get_dataset_contributions():
     return get_contributions(st.session_state["dataset_eids"])
 
 
+@st.cache_data(show_spinner="Getting contribution for your data...")
+def get_contribution_for_modified_data(eid, changes):
+    st.session_state["modified_contribution"] = api.fetch_contribution_for_modified_data(
+        eid, changes
+    )
+    return st.session_state["modified_contribution"]
+
+
 @st.cache_data(show_spinner="Getting global contributions...")
 def compute_global_contributions(eids):
     contributions_in_range = get_contributions(eids)

@@ -155,3 +155,6 @@ data.csv
 model.pkl
 features.csv
 certs/
+
+# DS_store
+*.DS_Store

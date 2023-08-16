@@ -4,12 +4,13 @@ from sibylapp.compute import contributions, model
 from sibylapp.compute.context import get_term
 from sibylapp.config import PREDICTION_TYPE, PredType, pred_format_func
 from sibylapp.view.utils import filtering, helpers
+from sibylapp.view.utils.formatting import format_two_contributions_to_view
 
 
-def view_prediction_difference():
+def view_prediction_difference(eid, eid_comp):
     predictions = model.get_predictions(st.session_state["eids"])
-    old_prediction = predictions[st.session_state["eid"]]
-    new_prediction = predictions[st.session_state["eid_comp"]]
+    old_prediction = predictions[eid]
+    new_prediction = predictions[eid_comp]
     if PREDICTION_TYPE == PredType.NUMERIC:
         difference = new_prediction - old_prediction
         output_text = pred_format_func(difference)
@@ -26,94 +27,16 @@ def view_prediction_difference():
         "{prediction} Change from {entity} {eid} to {entity} {eid_comp}:".format(
             prediction=get_term("Prediction"),
             entity=get_term("Entity"),
-            eid=st.session_state["eid"],
-            eid_comp=st.session_state["eid_comp"],
+            eid=eid,
+            eid_comp=eid_comp,
         ),
         output_text,
     )
 
 
-def show_sorted_contributions(to_show, sort_by):
-    helpers.show_legend(similar_entities=True)
-    if sort_by == "Absolute Difference":
-        to_show = to_show.reindex(
-            to_show["Contribution Change Value"].abs().sort_values(ascending=False).index
-        )
-    if sort_by == "Positive Difference":
-        to_show = to_show.sort_values(
-            by="Contribution Change Value", axis="index", ascending=False
-        )
-    if sort_by == "Negative Difference":
-        to_show = to_show.sort_values(by="Contribution Change Value", axis="index")
-
-    to_show = filtering.process_options(to_show)
-    helpers.show_table(to_show.drop("Contribution Change Value", axis="columns"))
-
-
-def format_single_contributions_df(df, show_number=False):
-    formatted_df = df.rename(
-        columns={
-            "category": "Category",
-            "Feature Value": "%s Value" % get_term("Feature"),
-        }
-    )
-    formatted_df = formatted_df[
-        ["Category", "Feature", "%s Value" % get_term("Feature"), "Contribution"]
-    ]
-    formatted_df["Contribution Value"] = formatted_df["Contribution"].copy()
-    formatted_df["Contribution"] = helpers.generate_bars(
-        formatted_df["Contribution"], show_number=show_number
-    )
-    return formatted_df
-
-
-def format_two_contributions_to_view(df1, df2, show_number=False, show_contribution=False):
-    original_df = format_single_contributions_df(df1)
-    other_df = format_single_contributions_df(df2)
-
-    other_df = other_df.drop(["Category", "Feature"], axis="columns")
-    compare_df = original_df.join(
-        other_df,
-        lsuffix=" for %s %s" % (get_term("Entity"), st.session_state["eid"]),
-        rsuffix=" for %s %s" % (get_term("Entity"), st.session_state["eid_comp"]),
-    )
-    compare_df["Contribution Change"] = (
-        other_df["Contribution Value"] - original_df["Contribution Value"]
-    )
-    compare_df["Contribution Change Value"] = compare_df["Contribution Change"].copy()
-    compare_df["Contribution Change"] = helpers.generate_bars(
-        compare_df["Contribution Change"], show_number=show_number
-    )
-
-    if not show_contribution:
-        compare_df = compare_df.drop(
-            [
-                "Contribution for %s %s" % (get_term("Entity"), st.session_state["eid"]),
-                "Contribution for %s %s" % (get_term("Entity"), st.session_state["eid_comp"]),
-                "Contribution Value for %s %s" % (get_term("Entity"), st.session_state["eid"]),
-                "Contribution Value for %s %s"
-                % (get_term("Entity"), st.session_state["eid_comp"]),
-            ],
-            axis="columns",
-        )
-    return compare_df
-
-
-def filter_different_rows(to_show):
-    neighbor_col = to_show[
-        "%s Value for %s %s" % (get_term("Feature"), get_term("Entity"), st.session_state["eid"])
-    ]
-    selected_col = to_show[
-        "%s Value for %s %s"
-        % (get_term("Feature"), get_term("Entity"), st.session_state["eid_comp"])
-    ]
-    to_show_filtered = to_show[neighbor_col == selected_col]
-    return to_show_filtered
-
-
-def view(eid, eid_comp, save_space=False):
+def view_compare_cases_helper(save_space=False):
     show_number = False
-
+    show_contribution = False
     if not save_space:
         cols = st.columns(2)
         with cols[0]:
@@ -136,13 +59,49 @@ def view(eid, eid_comp, save_space=False):
             sort_by = helpers.show_sort_options(
                 ["Absolute Difference", "Positive Difference", "Negative Difference"]
             )
+    return sort_by, show_number, show_contribution
 
+
+def sort_contributions(to_show, sort_by):
+    helpers.show_legend(similar_entities=True)
+    if sort_by == "Absolute Difference":
+        to_show = to_show.reindex(
+            to_show["Contribution Change Value"].abs().sort_values(ascending=False).index
+        )
+    if sort_by == "Positive Difference":
+        to_show = to_show.sort_values(
+            by="Contribution Change Value", axis="index", ascending=False
+        )
+    if sort_by == "Negative Difference":
+        to_show = to_show.sort_values(by="Contribution Change Value", axis="index")
+
+    to_show = filtering.process_options(to_show)
+    return to_show
+
+
+def filter_different_rows(to_show):
+    neighbor_col = to_show[
+        "%s Value for %s %s" % (get_term("Feature"), get_term("Entity"), st.session_state["eid"])
+    ]
+    selected_col = to_show[
+        "%s Value for %s %s"
+        % (get_term("Feature"), get_term("Entity"), st.session_state["eid_comp"])
+    ]
+    to_show_filtered = to_show[neighbor_col == selected_col]
+    return to_show_filtered
+
+
+def view(eid, eid_comp, save_space=False):
+    sort_by, show_number, show_contribution = view_compare_cases_helper(save_space=save_space)
     contributions_dict = contributions.get_contributions([eid, eid_comp])
-    contribution_original = contributions_dict[eid]
-    contribution_compare = contributions_dict[eid_comp]
+    original_df = contributions_dict[eid]
+    other_df = contributions_dict[eid_comp]
+
     to_show = format_two_contributions_to_view(
-        contribution_original,
-        contribution_compare,
+        original_df,
+        other_df,
+        lsuffix=" for %s %s" % (get_term("Entity"), eid),
+        rsuffix=" for %s %s" % (get_term("Entity"), eid_comp),
         show_number=show_number,
         show_contribution=show_contribution,
     )
@@ -158,7 +117,8 @@ def view(eid, eid_comp, save_space=False):
     if show_different == "With filtering":
         to_show = filter_different_rows(to_show)
 
-    show_sorted_contributions(to_show, sort_by)
+    to_show = sort_contributions(to_show, sort_by)
+    helpers.show_table(to_show.drop("Contribution Change Value", axis="columns"))
 
 
 def view_instructions():

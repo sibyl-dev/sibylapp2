@@ -1,7 +1,10 @@
+from __future__ import annotations
+
+import pandas as pd
 import streamlit as st
 
 from sibylapp import config
-from sibylapp.compute import contributions, entities, importance, model
+from sibylapp.compute import contributions, entities, features, importance, model
 
 
 def setup_page():
@@ -15,9 +18,16 @@ def setup_page():
     if "dataset_eids" not in st.session_state:
         st.session_state["dataset_eids"] = entities.get_eids(max_entities=config.DATASET_SIZE)
 
+    if "all_features" not in st.session_state:
+        st.session_state["all_features"] = features.get_features()
+
     # Populate cache -----------------------------
     if config.LOAD_UPFRONT:
         model.get_dataset_predictions()
 
         contributions.get_dataset_contributions()
         importance.compute_importance()
+
+
+def generate_options_for_features(eids: list[str], features_df: pd.DataFrame):
+    st.session_state["options_dict"] = features.get_options_for_categories(eids, features_df)

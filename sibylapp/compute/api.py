@@ -44,6 +44,12 @@ def fetch_eids():
     return [entry["eid"] for entry in entities]
 
 
+def fetch_modified_prediction(eid, changes):
+    json = {"eid": eid, "model_id": fetch_model_id(), "changes": changes}
+    prediction = api_post("modified_prediction/", json)["prediction"]
+    return prediction
+
+
 def fetch_predictions(eids):
     json = {"eids": eids, "model_id": fetch_model_id()}
     predictions = api_post("multi_prediction/", json)["predictions"]
@@ -73,6 +79,13 @@ def fetch_contributions(eids):
             [features_df, pd.read_json(result[eid], orient="index")], axis=1
         )
     return contributions
+
+
+def fetch_contribution_for_modified_data(eid, changes):
+    features_df = fetch_features()
+    json = {"eid": eid, "model_id": fetch_model_id(), "changes": changes}
+    result = api_post("modified_contribution/", json)["contribution"]
+    return pd.concat([features_df, pd.read_json(result, orient="index")], axis=1)
 
 
 def fetch_importance():
