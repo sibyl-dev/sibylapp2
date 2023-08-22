@@ -44,12 +44,16 @@ def show_text_input_side_by_side(
 
     if numeric:
         return col2.number_input(
-            "hidden", value=default_input, label_visibility="collapsed", **input_params
+            "hidden", value=default_input, label_visibility="collapsed", key=label, **input_params
         )
     else:
         if options is None:
             return col2.text_input(
-                "hidden", value=default_input, label_visibility="collapsed", **input_params
+                "hidden",
+                value=default_input,
+                label_visibility="collapsed",
+                key=label,
+                **input_params,
             )
         else:
             return col2.selectbox(
@@ -57,6 +61,7 @@ def show_text_input_side_by_side(
                 options=options,
                 index=options.index(default_input),
                 label_visibility="collapsed",
+                key=label,
                 **input_params,
             )
 
