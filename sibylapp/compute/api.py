@@ -66,7 +66,7 @@ def fetch_features():
 def fetch_entity(eid):
     url = "entities/" + str(eid)
     entity_features = api_get(url)["features"]
-    return pd.Series(entity_features, name="value")
+    return pd.Series(next(iter(entity_features.values())), name="value")
 
 
 def fetch_contributions(eids):
