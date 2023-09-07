@@ -76,7 +76,7 @@ def fetch_contributions(eids):
     contributions = {}
     for eid in result:
         contributions[eid] = pd.concat(
-            [features_df, pd.read_json(result[eid], orient="index")], axis=1
+            [features_df, pd.DataFrame.from_dict(result[eid], orient="index")], axis=1
         )
     return contributions
 
@@ -85,7 +85,7 @@ def fetch_contribution_for_modified_data(eid, changes):
     features_df = fetch_features()
     json = {"eid": eid, "model_id": fetch_model_id(), "changes": changes}
     result = api_post("modified_contribution/", json)["contribution"]
-    return pd.concat([features_df, pd.read_json(result, orient="index")], axis=1)
+    return pd.concat([features_df, pd.DataFrame.from_dict(result, orient="index")], axis=1)
 
 
 def fetch_importance():
@@ -102,11 +102,11 @@ def fetch_similar_examples(eids):
     result = api_post("similar_entities/", json)["similar_entities"]
     similar_entities = {}
     for eid in result:
-        y = pd.read_json(result[eid]["y"], orient="index", typ="frame").T
+        y = pd.Series(result[eid]["y"]).to_frame().T
         X = pd.concat(
             [
                 features_df[["Feature", "category"]],
-                pd.read_json(result[eid]["X"], orient="index", typ="frame").T,
+                pd.DataFrame.from_dict(result[eid]["X"], orient="index").T,
             ],
             axis=1,
         )
