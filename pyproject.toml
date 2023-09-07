@@ -6,9 +6,9 @@ authors = ["zyteka <zyteka@mit.edu>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.8.1, <3.11, !=3.9.7"
+python = ">=3.9, <3.12, !=3.9.7"
 streamlit = "^1.22.0"
-pyreal = "^0.4.1"
+pyreal = "^0.4.5"
 xgboost = "0.90"
 streamlit-aggrid = "^0.3.4.post3"
 plotly = "^5.14.1"
