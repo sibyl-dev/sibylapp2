@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import streamlit as st
-from pyreal.visualize import swarm_plot
+from pyreal.visualize import strip_plot
 
 from sibylapp.compute import contributions
 from sibylapp.compute.context import get_term
@@ -12,7 +12,7 @@ from sibylapp.view.utils.helpers import show_legend
 @st.cache_data(show_spinner="Generating summary plot...")
 def generate_swarm_plot(eids):
     contribution_dict = helpers.rename_for_pyreal_vis(contributions.get_contributions(eids))
-    swarm_plot(contribution_dict, type="strip")
+    strip_plot(contribution_dict, type="strip")
     return plt.gcf()
 
 
