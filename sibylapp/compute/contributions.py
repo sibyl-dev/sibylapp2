@@ -30,10 +30,10 @@ def get_contributions(eids):
 
 @st.cache_data(show_spinner="Getting contributions...")
 def get_contributions_for_rows(eid, row_ids):
-    if "contributions" not in st.session_state:
+    if "contributions_rows" not in st.session_state:
         contributions = api.fetch_contributions([eid], row_ids)
     else:
-        contributions = st.session_state["contributions"]
+        contributions = st.session_state["contributions_rows"]
     return contributions
 
 

@@ -27,10 +27,10 @@ def get_predictions(eids):
 
 @st.cache_data(show_spinner="Getting predictions...")
 def get_predictions_for_rows(eid, row_ids):
-    if "predictions" not in st.session_state:
+    if "predictions_rows" not in st.session_state:
         predictions = api.fetch_predictions([eid], row_ids)
     else:
-        predictions = st.session_state["predictions"]
+        predictions = st.session_state["predictions_rows"]
     return predictions
 
 
