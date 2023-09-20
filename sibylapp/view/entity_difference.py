@@ -154,18 +154,36 @@ def view(eid, eid_comp, save_space=False, use_row_ids=False, row_ids=None, eid_f
     helpers.show_table(to_show.drop("Contribution Change Value", axis="columns"))
 
 
-def view_instructions():
+def view_instructions(use_row_ids=False):
     expander = st.sidebar.expander("How to Use")
     with expander:
-        st.markdown(
-            "This page compares the **{feature} values** and **{feature} contributions**"
-            " of two distinct {entities}."
-            " You can select two {entities} you want to compare from the dropdown above.".format(
-                entities=get_term("Entity", plural=True, lower=True),
-                feature=get_term("Feature", lower=True),
+        if use_row_ids:
+            st.markdown(
+                "This page compares the **{feature} values** and **{feature} contributions**"
+                " of the selected {entity} at the two selected times."
+                " You can select the {entity} and the two time points from the dropdown above."
+                .format(
+                    entity=get_term("Entity", lower=True),
+                    feature=get_term("Feature", lower=True),
+                )
             )
-        )
+        else:
+            st.markdown(
+                "This page compares the **{feature} values** and **{feature} contributions**"
+                " of two distinct {entities}."
+                " You can select two {entities} you want to compare from the dropdown above."
+                .format(
+                    entities=get_term("Entity", plural=True, lower=True),
+                    feature=get_term("Feature", lower=True),
+                )
+            )
         positive, negative = helpers.get_pos_neg_names()
+        if use_row_ids:
+            entity = "prediction time"
+            entities = "prediction times"
+        else:
+            entity = get_term("Entity", lower=True)
+            entities = get_term("Entity", lower=True, plural=True)
         st.markdown(
             "The **Contribution Change** column refers to the difference between the {feature}"
             " contribution of the two {entities}. A large **{positive}** bar means that this"
@@ -178,8 +196,8 @@ def view_instructions():
                 positive=positive,
                 negative=negative,
                 feature=get_term("Feature", lower=True),
-                entity=get_term("Entity", lower=True),
-                entities=get_term("Entity", lower=True, plural=True),
+                entity=entity,
+                entities=entities,
             )
         )
         st.markdown(
