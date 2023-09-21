@@ -10,7 +10,7 @@ LOAD_UPFRONT: True # If true, run heavy computations on initial load, else greed
 
 # APPLICATION-SPECIFIC CONFIGURATIONS (overrides API context) ========================================
 FLIP_COLORS: # If true, positive contributions will be red
-PREDICTION_TYPE: boolean # One of "numeric", "boolean", "categorical"
+PREDICTION_TYPE: # One of "numeric", "boolean", "categorical"
 POSITIVE_TERM: # Term to use for a True prediction for boolean models
 NEGATIVE_TERM: # Term to use for a False prediction for boolean models
 PRED_FORMAT_STRING: # fstring for formatting numeric model outputs
