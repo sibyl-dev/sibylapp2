@@ -44,15 +44,19 @@ def view_prediction_selection(predictions, disabled=False):
     return eids
 
 
-def view_entity_select(eid_text="eid", prefix=None, default=0):
+def view_entity_select(eid_text="eid", prefix=None, default=0, add_prediction=True):
     def format_func(eid):
-        return (
-            f"{context.get_term('Entity')} {eid} ("
-            + config.pred_format_func(predictions[eid])
-            + ")"
-        )
+        if add_prediction:
+            return (
+                f"{context.get_term('Entity')} {eid} ("
+                + str(config.pred_format_func(predictions[eid]))
+                + ")"
+            )
+        else:
+            return f"{context.get_term('Entity')} {eid}"
 
-    predictions = model.get_predictions(st.session_state["eids"])
+    if add_prediction:
+        predictions = model.get_predictions(st.session_state["eids"])
 
     if eid_text in st.session_state:
         st.session_state[f"select_{eid_text}_index"] = st.session_state["eids"].index(
@@ -72,7 +76,32 @@ def view_entity_select(eid_text="eid", prefix=None, default=0):
         index=st.session_state[f"select_{eid_text}_index"],
         key=eid_text,
     )
-    pred = predictions[st.session_state[eid_text]]
+    if add_prediction:
+        pred = predictions[st.session_state[eid_text]]
+        st.sidebar.metric(context.get_term("Prediction"), config.pred_format_func(pred))
+
+
+def view_time_select(eid, row_ids, row_id_text="row_id", prefix=None, default=0):
+    def format_rowid_select(row_id):
+        return f"Timestamp: {row_id}"
+
+    if row_id_text not in st.session_state:
+        st.session_state[f"select_{row_id_text}_index"] = default
+
+    if prefix is None:
+        select_text = "Select prediction time"
+    else:
+        select_text = f"Select {prefix} prediction time"
+
+    row_id = st.sidebar.selectbox(
+        select_text,
+        row_ids,
+        format_func=format_rowid_select,
+        index=st.session_state[f"select_{row_id_text}_index"],
+        key=row_id_text,
+    )
+    predictions = model.get_predictions_for_rows(eid, row_ids)
+    pred = predictions[row_id]
     st.sidebar.metric(context.get_term("Prediction"), config.pred_format_func(pred))
 
 

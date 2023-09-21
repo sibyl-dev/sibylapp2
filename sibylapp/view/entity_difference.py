@@ -7,8 +7,18 @@ from sibylapp.view.utils import filtering, helpers
 from sibylapp.view.utils.formatting import format_two_contributions_to_view
 
 
-def view_prediction_difference(eid, eid_comp):
-    predictions = model.get_predictions(st.session_state["eids"])
+def view_prediction_difference(eid, eid_comp, use_row_ids=False, row_ids=None, eid_for_rows=None):
+    """
+    If use_row_ids is set to True, this function looks at the difference between two rows
+    within a single entity.
+
+    `row_ids` and `eid_for_rows` are only used when `use_row_ids` == True.
+    `eid` and `eid_comp` are used as row_id when `use_row_ids` == True
+    """
+    if use_row_ids:
+        predictions = model.get_predictions_for_rows(eid_for_rows, row_ids)
+    else:
+        predictions = model.get_predictions(st.session_state["eids"])
     old_prediction = predictions[eid]
     new_prediction = predictions[eid_comp]
     if PREDICTION_TYPE == PredType.NUMERIC:
@@ -22,16 +32,19 @@ def view_prediction_difference(eid, eid_comp):
             output_text = (
                 f"From {pred_format_func(old_prediction)} to {pred_format_func(new_prediction)}"
             )
-
-    st.metric(
-        "{prediction} Change from {entity} {eid} to {entity} {eid_comp}:".format(
-            prediction=get_term("Prediction"),
-            entity=get_term("Entity"),
-            eid=eid,
-            eid_comp=eid_comp,
-        ),
-        output_text,
-    )
+    if use_row_ids:
+        st.metric(
+            f"{get_term('Prediction')} Change from {eid} to {eid_comp}:",
+            output_text,
+        )
+    else:
+        st.metric(
+            (
+                f"{get_term('Prediction')} Change from {get_term('Entity')} {eid} to"
+                f" {get_term('Entity')} {eid_comp}:"
+            ),
+            output_text,
+        )
 
 
 def view_compare_cases_helper(save_space=False):
@@ -79,29 +92,49 @@ def sort_contributions(to_show, sort_by):
     return to_show
 
 
-def filter_different_rows(to_show):
-    neighbor_col = to_show[
-        "%s Value for %s %s" % (get_term("Feature"), get_term("Entity"), st.session_state["eid"])
-    ]
-    selected_col = to_show[
-        "%s Value for %s %s"
-        % (get_term("Feature"), get_term("Entity"), st.session_state["eid_comp"])
-    ]
+def filter_different_rows(to_show, use_row_ids=False):
+    if use_row_ids:
+        neighbor_col = to_show[
+            "%s Value for time %s" % (get_term("Feature"), st.session_state["row_id"])
+        ]
+        selected_col = to_show[
+            "%s Value for time %s" % (get_term("Feature"), st.session_state["row_id_comp"])
+        ]
+    else:
+        neighbor_col = to_show[
+            "%s Value for %s %s"
+            % (get_term("Feature"), get_term("Entity"), st.session_state["eid"])
+        ]
+        selected_col = to_show[
+            "%s Value for %s %s"
+            % (get_term("Feature"), get_term("Entity"), st.session_state["eid_comp"])
+        ]
     to_show_filtered = to_show[neighbor_col == selected_col]
     return to_show_filtered
 
 
-def view(eid, eid_comp, save_space=False):
+def view(eid, eid_comp, save_space=False, use_row_ids=False, row_ids=None, eid_for_rows=None):
+    """
+    `row_ids` and `eid_for_rows` are only used when `use_row_ids` == True.
+    `eid` and `eid_comp` are used as row_id when `use_row_ids` == True
+    """
     sort_by, show_number, show_contribution = view_compare_cases_helper(save_space=save_space)
-    contributions_dict = contributions.get_contributions([eid, eid_comp])
+    if use_row_ids:
+        lsuffix = " for time %s" % eid
+        rsuffix = " for time %s" % eid_comp
+        contributions_dict = contributions.get_contributions_for_rows(eid_for_rows, row_ids)
+    else:
+        lsuffix = " for %s %s" % (get_term("Entity"), eid)
+        rsuffix = " for %s %s" % (get_term("Entity"), eid_comp)
+        contributions_dict = contributions.get_contributions([eid, eid_comp])
     original_df = contributions_dict[eid]
     other_df = contributions_dict[eid_comp]
 
     to_show = format_two_contributions_to_view(
         original_df,
         other_df,
-        lsuffix=" for %s %s" % (get_term("Entity"), eid),
-        rsuffix=" for %s %s" % (get_term("Entity"), eid_comp),
+        lsuffix=lsuffix,
+        rsuffix=rsuffix,
         show_number=show_number,
         show_contribution=show_contribution,
     )
@@ -115,24 +148,42 @@ def view(eid, eid_comp, save_space=False):
         % (get_term("Feature", lower=True), get_term("Entity", lower=True, plural=True)),
     )
     if show_different == "With filtering":
-        to_show = filter_different_rows(to_show)
+        to_show = filter_different_rows(to_show, use_row_ids=use_row_ids)
 
     to_show = sort_contributions(to_show, sort_by)
     helpers.show_table(to_show.drop("Contribution Change Value", axis="columns"))
 
 
-def view_instructions():
+def view_instructions(use_row_ids=False):
     expander = st.sidebar.expander("How to Use")
     with expander:
-        st.markdown(
-            "This page compares the **{feature} values** and **{feature} contributions**"
-            " of two distinct {entities}."
-            " You can select two {entities} you want to compare from the dropdown above.".format(
-                entities=get_term("Entity", plural=True, lower=True),
-                feature=get_term("Feature", lower=True),
+        if use_row_ids:
+            st.markdown(
+                "This page compares the **{feature} values** and **{feature} contributions**"
+                " of the selected {entity} at the two selected times."
+                " You can select the {entity} and the two time points from the dropdown above."
+                .format(
+                    entity=get_term("Entity", lower=True),
+                    feature=get_term("Feature", lower=True),
+                )
             )
-        )
+        else:
+            st.markdown(
+                "This page compares the **{feature} values** and **{feature} contributions**"
+                " of two distinct {entities}."
+                " You can select two {entities} you want to compare from the dropdown above."
+                .format(
+                    entities=get_term("Entity", plural=True, lower=True),
+                    feature=get_term("Feature", lower=True),
+                )
+            )
         positive, negative = helpers.get_pos_neg_names()
+        if use_row_ids:
+            entity = "prediction time"
+            entities = "prediction times"
+        else:
+            entity = get_term("Entity", lower=True)
+            entities = get_term("Entity", lower=True, plural=True)
         st.markdown(
             "The **Contribution Change** column refers to the difference between the {feature}"
             " contribution of the two {entities}. A large **{positive}** bar means that this"
@@ -145,8 +196,8 @@ def view_instructions():
                 positive=positive,
                 negative=negative,
                 feature=get_term("Feature", lower=True),
-                entity=get_term("Entity", lower=True),
-                entities=get_term("Entity", lower=True, plural=True),
+                entity=entity,
+                entities=entities,
             )
         )
         st.markdown(

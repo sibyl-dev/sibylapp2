@@ -29,6 +29,15 @@ def get_contributions(eids):
 
 
 @st.cache_data(show_spinner="Getting contributions...")
+def get_contributions_for_rows(eid, row_ids):
+    if "contributions_rows" not in st.session_state:
+        contributions = api.fetch_contributions([eid], row_ids)
+    else:
+        contributions = st.session_state["contributions_rows"]
+    return contributions
+
+
+@st.cache_data(show_spinner="Getting contributions...")
 def get_dataset_contributions():
     if "dataset_eids" not in st.session_state:
         st.session_state["dataset_eids"] = entities.get_eids(1000)

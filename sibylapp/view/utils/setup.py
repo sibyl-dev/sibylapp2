@@ -7,13 +7,19 @@ from sibylapp import config
 from sibylapp.compute import contributions, entities, features, importance, model
 
 
-def setup_page():
+def setup_page(return_row_ids=False):
     st.set_page_config(layout="wide")
     st.title("Sibyl")
 
     # Selecting eids -----------------------------
-    if "eids" not in st.session_state:
-        st.session_state["eids"] = entities.get_eids(max_entities=config.MAX_ENTITIES)
+    if return_row_ids:
+        if "eids" not in st.session_state or "row_id_dict" not in st.session_state:
+            st.session_state["eids"], st.session_state["row_id_dict"] = entities.get_eids(
+                max_entities=config.MAX_ENTITIES, return_row_ids=True
+            )
+    else:
+        if "eids" not in st.session_state:
+            st.session_state["eids"] = entities.get_eids(max_entities=config.MAX_ENTITIES)
 
     if "dataset_eids" not in st.session_state:
         st.session_state["dataset_eids"] = entities.get_eids(max_entities=config.DATASET_SIZE)

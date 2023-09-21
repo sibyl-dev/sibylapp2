@@ -39,9 +39,18 @@ def fetch_model_id():
     return model_id
 
 
-def fetch_eids():
+def fetch_eids(return_row_ids=False):
+    """
+    Return corresponding row_ids in the form of a dictionary where the keys are the eids
+    and the values are the lists of row_ids for each eid, when specified.
+    """
     entities = api_get("entities/")["entities"]
-    return [entry["eid"] for entry in entities]
+    if return_row_ids:
+        return [entry["eid"] for entry in entities], {
+            entry["eid"]: entry["row_ids"] for entry in entities
+        }
+    else:
+        return [entry["eid"] for entry in entities]
 
 
 def fetch_modified_prediction(eid, changes):
@@ -50,8 +59,8 @@ def fetch_modified_prediction(eid, changes):
     return prediction
 
 
-def fetch_predictions(eids):
-    json = {"eids": eids, "model_id": fetch_model_id()}
+def fetch_predictions(eids, row_ids=None):
+    json = {"eids": eids, "model_id": fetch_model_id(), "row_ids": row_ids}
     predictions = api_post("multi_prediction/", json)["predictions"]
     return predictions
 
@@ -69,9 +78,9 @@ def fetch_entity(eid):
     return pd.Series(next(iter(entity_features.values())), name="value")
 
 
-def fetch_contributions(eids):
+def fetch_contributions(eids, row_ids=None):
     features_df = fetch_features()
-    json = {"eids": eids, "model_id": fetch_model_id()}
+    json = {"eids": eids, "model_id": fetch_model_id(), "row_ids": row_ids}
     result = api_post("multi_contributions/", json)["contributions"]
     contributions = {}
     for eid in result:

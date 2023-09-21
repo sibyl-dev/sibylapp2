@@ -25,6 +25,15 @@ def get_predictions(eids):
     return {eid: predictions[eid] for eid in eids}
 
 
+@st.cache_data(show_spinner="Getting predictions...")
+def get_predictions_for_rows(eid, row_ids):
+    if "predictions_rows" not in st.session_state:
+        predictions = api.fetch_predictions([eid], row_ids)
+    else:
+        predictions = st.session_state["predictions_rows"]
+    return predictions
+
+
 @st.cache_data(show_spinner="Getting contributions...")
 def get_dataset_predictions():
     if "dataset_eids" not in st.session_state:
