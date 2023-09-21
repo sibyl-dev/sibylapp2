@@ -14,12 +14,12 @@ tab = stx.tab_bar(
     data=[
         stx.TabBarItemData(
             id=1,
-            title=f"Difference within single {get_term('entity', lower=True)}",
+            title=f"Difference within single {get_term('Entity', lower=True)}",
             description="",
         ),
         stx.TabBarItemData(
             id=2,
-            title=f"Difference between {get_term('entity', plural=True, lower=True)}",
+            title=f"Difference between {get_term('Entity', plural=True, lower=True)}",
             description="",
         ),
     ],
