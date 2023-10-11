@@ -5,7 +5,7 @@ import streamlit as st
 
 from sibylapp.compute.context import get_term
 from sibylapp.view import entity_difference
-from sibylapp.view.utils import filtering, setup
+from sibylapp.view.utils import filtering, formatting, setup
 
 setup.setup_page(return_row_ids=True)
 
@@ -42,10 +42,12 @@ if tab == "1":
         filtering.view_time_select(
             eid, row_ids, row_id_text="row_id_comp", prefix="second", default=1
         )
+        formatting.show_probability_select_box()
         entity_difference.view_instructions(use_row_ids=True)
 elif tab == "2":
     filtering.view_entity_select(eid_text="eid", prefix="first", default=0)
     filtering.view_entity_select(eid_text="eid_comp", prefix="second", default=1)
+    formatting.show_probability_select_box()
     entity_difference.view_instructions()
 
 # Global options ------------------------------

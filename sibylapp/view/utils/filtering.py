@@ -56,7 +56,9 @@ def view_entity_select(eid_text="eid", prefix=None, default=0, add_prediction=Tr
             return f"{context.get_term('Entity')} {eid}"
 
     if add_prediction:
-        predictions = model.get_predictions(st.session_state["eids"])
+        predictions = model.get_predictions(
+            st.session_state["eids"], return_proba=st.session_state["display_proba"]
+        )
 
     if eid_text in st.session_state:
         st.session_state[f"select_{eid_text}_index"] = st.session_state["eids"].index(
@@ -80,6 +82,13 @@ def view_entity_select(eid_text="eid", prefix=None, default=0, add_prediction=Tr
         pred = predictions[st.session_state[eid_text]]
         st.sidebar.metric(context.get_term("Prediction"), config.pred_format_func(pred))
 
+    st.session_state["display_proba"] = st.checkbox(
+        "Show probability",
+        value=st.session_state["display_proba"],
+        help="Display prediction in terms of probability",
+        disabled=not config.SUPPORT_PROBABILITY,
+    )
+
 
 def view_time_select(eid, row_ids, row_id_text="row_id", prefix=None, default=0):
     def format_rowid_select(row_id):
@@ -100,7 +109,9 @@ def view_time_select(eid, row_ids, row_id_text="row_id", prefix=None, default=0)
         index=st.session_state[f"select_{row_id_text}_index"],
         key=row_id_text,
     )
-    predictions = model.get_predictions_for_rows(eid, row_ids)
+    predictions = model.get_predictions_for_rows(
+        eid, row_ids, return_proba=st.session_state["display_proba"]
+    )
     pred = predictions[row_id]
     st.sidebar.metric(context.get_term("Prediction"), config.pred_format_func(pred))
 

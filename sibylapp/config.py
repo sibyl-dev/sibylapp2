@@ -45,6 +45,7 @@ PREDICTION_TYPE = to_pred_type(get_config("PREDICTION_TYPE", "pred_type", "numer
 POSITIVE_TERM = get_config("POSITIVE_TERM", "pos_pred_name", True)
 NEGATIVE_TERM = get_config("NEGATIVE_TERM", "neg_pred_name", False)
 PRED_FORMAT_STRING = get_config("PRED_FORMAT_STRING", "pred_format_string", "{}")
+SUPPORT_PROBABILITY = get_config("SUPPORT_PROBABILITY", "support_probability", False)
 
 
 def pred_format_func(pred):

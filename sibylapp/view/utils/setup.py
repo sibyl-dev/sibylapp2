@@ -27,6 +27,9 @@ def setup_page(return_row_ids=False):
     if "all_features" not in st.session_state:
         st.session_state["all_features"] = features.get_features()
 
+    # Global display options ---------------------
+    if "display_proba" not in st.session_state:
+        st.session_state["display_proba"] = False
     # Populate cache -----------------------------
     if config.LOAD_UPFRONT:
         model.get_dataset_predictions()

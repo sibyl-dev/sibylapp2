@@ -1,3 +1,6 @@
+import streamlit as st
+
+from sibylapp import config
 from sibylapp.compute.context import get_term
 from sibylapp.view.utils import helpers
 
@@ -55,3 +58,12 @@ def format_two_contributions_to_view(
             axis="columns",
         )
     return compare_df
+
+
+def show_probability_select_box():
+    st.session_state["display_proba"] = st.sidebar.checkbox(
+        "Show probability",
+        value=st.session_state["display_proba"],
+        help="Display prediction in terms of probability",
+        disabled=not config.SUPPORT_PROBABILITY,
+    )

@@ -5,12 +5,13 @@ import streamlit as st
 
 from sibylapp.compute.context import get_term
 from sibylapp.view import feature_contribution
-from sibylapp.view.utils import filtering, setup
+from sibylapp.view.utils import filtering, formatting, setup
 
 setup.setup_page()
 
 # Sidebar ------------------------------------
 filtering.view_entity_select()
+formatting.show_probability_select_box()
 feature_contribution.view_instructions()
 
 # Global options ------------------------------
