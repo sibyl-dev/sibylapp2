@@ -28,6 +28,7 @@ tab = stx.tab_bar(
 
 
 # Sidebar ------------------------------------
+formatting.show_probability_select_box()
 if tab == "1":
     filtering.view_entity_select(add_prediction=False)
     eid = st.session_state["eid"]
@@ -42,12 +43,10 @@ if tab == "1":
         filtering.view_time_select(
             eid, row_ids, row_id_text="row_id_comp", prefix="second", default=1
         )
-        formatting.show_probability_select_box()
         entity_difference.view_instructions(use_row_ids=True)
 elif tab == "2":
     filtering.view_entity_select(eid_text="eid", prefix="first", default=0)
     filtering.view_entity_select(eid_text="eid_comp", prefix="second", default=1)
-    formatting.show_probability_select_box()
     entity_difference.view_instructions()
 
 # Global options ------------------------------

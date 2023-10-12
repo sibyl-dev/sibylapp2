@@ -52,13 +52,20 @@ def view_feature_boxes(
 
 
 def view_prediction(eid, changes):
-    prediction = model.get_modified_prediction(eid, changes)
+    pred = model.get_modified_prediction(eid, changes)
+    if st.session_state["display_proba"]:
+        pred_proba = model.get_modified_prediction(eid, changes, return_proba=True)
+        pred_display = (
+            pred_format_func(pred) + " (" + pred_format_func(pred_proba, display_proba=True) + ")"
+        )
+    else:
+        pred_display = pred_format_func(pred)
     st.metric(
         "Model's {prediction} of modified {entity}:".format(
             prediction=get_term("Prediction", lower=True),
             entity=get_term("Entity"),
         ),
-        pred_format_func(prediction),
+        pred_display,
     )
 
 

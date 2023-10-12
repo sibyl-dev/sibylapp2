@@ -12,8 +12,8 @@ setup.generate_options_for_features(
     st.session_state["dataset_eids"], st.session_state["all_features"]
 )
 # Sidebar ------------------------------------
-filtering.view_entity_select()
 formatting.show_probability_select_box()
+filtering.view_entity_select()
 customized_entity.view_instructions()
 
 # Global options ------------------------------

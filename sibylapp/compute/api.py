@@ -35,7 +35,7 @@ def api_post(url, json):
 
 
 def fetch_model_id():
-    model_id = api_get("models/")["models"][0]["id"]
+    model_id = api_get("models/")["models"][0]["model_id"]
     return model_id
 
 

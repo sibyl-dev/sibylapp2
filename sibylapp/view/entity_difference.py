@@ -24,6 +24,27 @@ def view_prediction_difference(eid, eid_comp, use_row_ids=False, row_ids=None, e
     if PREDICTION_TYPE == PredType.NUMERIC:
         difference = new_prediction - old_prediction
         output_text = pred_format_func(difference)
+        if difference > 0:
+            output_text = "+" + output_text
+
+    elif st.session_state["display_proba"]:
+        if use_row_ids:
+            predictions_proba = model.get_predictions_for_rows(
+                eid_for_rows, row_ids, return_proba=True
+            )
+        else:
+            predictions_proba = model.get_predictions(st.session_state["eids"], return_proba=True)
+        old_prediction_proba = predictions_proba[eid]
+        new_prediction_proba = predictions_proba[eid_comp]
+        # Invert the probabilities if prediction is False
+        if not old_prediction:
+            old_prediction_proba = 1 - old_prediction_proba
+        if not new_prediction:
+            new_prediction_proba = 1 - new_prediction_proba
+        difference = new_prediction_proba - old_prediction_proba
+        output_text = pred_format_func(difference, display_proba=True)
+        if difference > 0:
+            output_text = "+" + output_text
 
     else:
         if pred_format_func(new_prediction) == pred_format_func(old_prediction):

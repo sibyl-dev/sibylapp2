@@ -10,8 +10,8 @@ from sibylapp.view.utils import filtering, formatting, setup
 setup.setup_page()
 
 # Sidebar ------------------------------------
-filtering.view_entity_select()
 formatting.show_probability_select_box()
+filtering.view_entity_select()
 feature_contribution.view_instructions()
 
 # Global options ------------------------------
