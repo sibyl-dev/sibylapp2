@@ -2,7 +2,7 @@ import streamlit as st
 
 from sibylapp.compute import contributions, model
 from sibylapp.compute.context import get_term
-from sibylapp.config import PREDICTION_TYPE, PredType, pred_format_func
+from sibylapp.config import POSITIVE_TERM, PREDICTION_TYPE, PredType, pred_format_func
 from sibylapp.view.utils import filtering, helpers
 from sibylapp.view.utils.formatting import format_two_contributions_to_view
 
@@ -42,7 +42,7 @@ def view_prediction_difference(eid, eid_comp, use_row_ids=False, row_ids=None, e
         if not new_prediction:
             new_prediction_proba = 1 - new_prediction_proba
         difference = new_prediction_proba - old_prediction_proba
-        output_text = pred_format_func(difference, display_proba=True)
+        output_text = pred_format_func(difference, display_proba=True) + " " + POSITIVE_TERM
         if difference > 0:
             output_text = "+" + output_text
 

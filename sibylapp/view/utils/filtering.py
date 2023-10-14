@@ -107,7 +107,7 @@ def view_time_select(eid, row_ids, row_id_text="row_id", prefix=None, default=0)
     else:
         select_text = f"Select {prefix} prediction time"
 
-    row_id = st.sidebar.selectbox(
+    st.sidebar.selectbox(
         select_text,
         row_ids,
         format_func=format_rowid_select,
@@ -115,11 +115,11 @@ def view_time_select(eid, row_ids, row_id_text="row_id", prefix=None, default=0)
         key=row_id_text,
     )
     predictions = model.get_predictions_for_rows(eid, row_ids)
-    pred = predictions[row_id]
+    pred = predictions[st.session_state[row_id_text]]
 
     if st.session_state["display_proba"]:
         predictions_proba = model.get_predictions_for_rows(eid, row_ids, return_proba=True)
-        pred_proba = predictions_proba[row_id]
+        pred_proba = predictions_proba[st.session_state[row_id_text]]
         pred_display = (
             config.pred_format_func(pred)
             + " ("
