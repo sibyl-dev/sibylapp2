@@ -60,7 +60,11 @@ def format_contributions_to_view(contribution_df, show_number=False):
     return contribution_df
 
 
-def view(eid, save_space=False, key=None):
+def view(eid, save_space=False, use_row_id=False, eid_for_rows=None, key=None):
+    """
+    `eid_for_rows` is only used when `use_row_id` == True.
+    `eid` are used as row_id when `use_row_id` == True
+    """
     show_number = False
     show_average = False
     if not save_space:
@@ -85,6 +89,9 @@ def view(eid, save_space=False, key=None):
         cols = st.columns(1)
         with cols[0]:
             sort_by = helpers.show_sort_options(["Absolute", "Ascending", "Descending"])
+    # TODO: pickup from here
+    if use_row_id:
+        to_show = format_contributions_to_view(contributions.get_contributions_for_rows())
     to_show = format_contributions_to_view(
         contributions.get_contributions([eid])[eid], show_number=show_number
     )

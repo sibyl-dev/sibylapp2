@@ -13,6 +13,7 @@ BAR_LENGTH = cfg.get("BAR_LENGTH", 8)
 MAX_ENTITIES = cfg.get("MAX_ENTITIES", 11)
 DATASET_SIZE = cfg.get("DATASET_SIZE", 1000)
 LOAD_UPFRONT = cfg.get("LOAD_UPFRONT", True)
+USE_ROWS = cfg.get("USE_ROWS", True)
 
 
 # APPLICATION-SPECIFIC CONFIGURATIONS =============================================================
