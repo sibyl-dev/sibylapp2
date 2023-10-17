@@ -1,6 +1,5 @@
 # pylint: disable=invalid-name
 
-import extra_streamlit_components as stx
 import streamlit as st
 
 from sibylapp import config
