@@ -42,12 +42,15 @@ def to_pred_type(str_pred_type):
 
 FLIP_COLORS = get_config("FLIP_COLORS", "model_pred_bad_outcome", False)
 PREDICTION_TYPE = to_pred_type(get_config("PREDICTION_TYPE", "pred_type", "numeric"))
-POSITIVE_TERM = get_config("POSITIVE_TERM", "pos_pred_name", True)
-NEGATIVE_TERM = get_config("NEGATIVE_TERM", "neg_pred_name", False)
+POSITIVE_TERM = get_config("POSITIVE_TERM", "pos_pred_name", "True")
+NEGATIVE_TERM = get_config("NEGATIVE_TERM", "neg_pred_name", "False")
 PRED_FORMAT_STRING = get_config("PRED_FORMAT_STRING", "pred_format_string", "{}")
+SUPPORT_PROBABILITY = get_config("SUPPORT_PROBABILITY", "support_probability", False)
 
 
-def pred_format_func(pred):
+def pred_format_func(pred, display_proba=False):
+    if display_proba:
+        return f"{pred*100:.1f}%"
     if cfg.get("OVERRIDE_PRED_FORMAT"):
         return manual_pred_format_func(pred)
     if PREDICTION_TYPE == PredType.NUMERIC:

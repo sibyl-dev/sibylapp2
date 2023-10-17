@@ -58,6 +58,9 @@ def view_entity_select(eid_text="eid", prefix=None, default=0, add_prediction=Tr
     if add_prediction:
         predictions = model.get_predictions(st.session_state["eids"])
 
+    if config.SUPPORT_PROBABILITY:
+        predictions_proba = model.get_predictions(st.session_state["eids"], return_proba=True)
+
     if eid_text in st.session_state:
         st.session_state[f"select_{eid_text}_index"] = st.session_state["eids"].index(
             st.session_state[eid_text]
@@ -78,7 +81,18 @@ def view_entity_select(eid_text="eid", prefix=None, default=0, add_prediction=Tr
     )
     if add_prediction:
         pred = predictions[st.session_state[eid_text]]
-        st.sidebar.metric(context.get_term("Prediction"), config.pred_format_func(pred))
+        if st.session_state["display_proba"]:
+            pred_proba = predictions_proba[st.session_state[eid_text]]
+            pred_display = (
+                config.pred_format_func(pred)
+                + " ("
+                + config.pred_format_func(pred_proba, display_proba=True)
+                + ")"
+            )
+        else:
+            pred_display = config.pred_format_func(pred)
+
+        st.sidebar.metric(context.get_term("Prediction"), pred_display)
 
 
 def view_time_select(eid, row_ids, row_id_text="row_id", prefix=None, default=0):
@@ -93,7 +107,7 @@ def view_time_select(eid, row_ids, row_id_text="row_id", prefix=None, default=0)
     else:
         select_text = f"Select {prefix} prediction time"
 
-    row_id = st.sidebar.selectbox(
+    st.sidebar.selectbox(
         select_text,
         row_ids,
         format_func=format_rowid_select,
@@ -101,8 +115,20 @@ def view_time_select(eid, row_ids, row_id_text="row_id", prefix=None, default=0)
         key=row_id_text,
     )
     predictions = model.get_predictions_for_rows(eid, row_ids)
-    pred = predictions[row_id]
-    st.sidebar.metric(context.get_term("Prediction"), config.pred_format_func(pred))
+    pred = predictions[st.session_state[row_id_text]]
+
+    if st.session_state["display_proba"]:
+        predictions_proba = model.get_predictions_for_rows(eid, row_ids, return_proba=True)
+        pred_proba = predictions_proba[st.session_state[row_id_text]]
+        pred_display = (
+            config.pred_format_func(pred)
+            + " ("
+            + config.pred_format_func(pred_proba, display_proba=True)
+            + ")"
+        )
+    else:
+        pred_display = config.pred_format_func(pred)
+    st.sidebar.metric(context.get_term("Prediction"), pred_display)
 
 
 def view_filtering(include_show_more=False):

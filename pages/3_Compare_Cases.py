@@ -5,7 +5,7 @@ import streamlit as st
 
 from sibylapp.compute.context import get_term
 from sibylapp.view import entity_difference
-from sibylapp.view.utils import filtering, setup
+from sibylapp.view.utils import filtering, formatting, setup
 
 setup.setup_page(return_row_ids=True)
 
@@ -28,6 +28,7 @@ tab = stx.tab_bar(
 
 
 # Sidebar ------------------------------------
+formatting.show_probability_select_box()
 if tab == "1":
     filtering.view_entity_select(add_prediction=False)
     eid = st.session_state["eid"]

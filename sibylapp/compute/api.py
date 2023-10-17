@@ -35,7 +35,7 @@ def api_post(url, json):
 
 
 def fetch_model_id():
-    model_id = api_get("models/")["models"][0]["id"]
+    model_id = api_get("models/")["models"][0]["model_id"]
     return model_id
 
 
@@ -53,14 +53,24 @@ def fetch_eids(return_row_ids=False):
         return [entry["eid"] for entry in entities]
 
 
-def fetch_modified_prediction(eid, changes):
-    json = {"eid": eid, "model_id": fetch_model_id(), "changes": changes}
+def fetch_modified_prediction(eid, changes, return_proba=False):
+    json = {
+        "eid": eid,
+        "model_id": fetch_model_id(),
+        "changes": changes,
+        "return_proba": return_proba,
+    }
     prediction = api_post("modified_prediction/", json)["prediction"]
     return prediction
 
 
-def fetch_predictions(eids, row_ids=None):
-    json = {"eids": eids, "model_id": fetch_model_id(), "row_ids": row_ids}
+def fetch_predictions(eids, row_ids=None, return_proba=False):
+    json = {
+        "eids": eids,
+        "model_id": fetch_model_id(),
+        "row_ids": row_ids,
+        "return_proba": return_proba,
+    }
     predictions = api_post("multi_prediction/", json)["predictions"]
     return predictions
 
