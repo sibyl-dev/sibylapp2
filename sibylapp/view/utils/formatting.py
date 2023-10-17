@@ -61,10 +61,10 @@ def format_two_contributions_to_view(
 
 
 def show_probability_select_box():
-    st.sidebar.checkbox(
-        "Show probability",
-        value=st.session_state["display_proba"],
-        help="Display prediction in terms of probability",
-        disabled=not config.SUPPORT_PROBABILITY,
-        key="display_proba",
-    )
+    if config.SUPPORT_PROBABILITY:
+        st.sidebar.checkbox(
+            "Show probability",
+            value=st.session_state["display_proba"],
+            help="Display prediction in terms of probability",
+            key="display_proba",
+        )
