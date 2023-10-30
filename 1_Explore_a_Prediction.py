@@ -34,6 +34,6 @@ tab = stx.tab_bar(
 
 if tab == "1":
     if config.USE_ROWS:
-        feature_contribution.view
+        feature_contribution.view(st.session_state["row_id"], use_row_id=True, eid_for_rows=eid)
     else:
         feature_contribution.view(st.session_state["eid"])
