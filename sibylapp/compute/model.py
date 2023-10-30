@@ -23,5 +23,5 @@ def get_dataset_predictions(return_proba=False):
 
 
 @st.cache_data(show_spinner="Getting predictions for your data...")
-def get_modified_prediction(eid, changes, return_proba=False):
-    return api.fetch_modified_prediction(eid, changes, return_proba=return_proba)
+def get_modified_prediction(eid, changes, row_id=None, return_proba=False):
+    return api.fetch_modified_prediction(eid, changes, row_id=row_id, return_proba=return_proba)

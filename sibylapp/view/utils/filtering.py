@@ -3,6 +3,7 @@ import streamlit as st
 
 from sibylapp import config
 from sibylapp.compute import context, model
+from sibylapp.view.utils import formatting
 
 
 @st.cache_data
@@ -129,6 +130,20 @@ def view_time_select(eid, row_ids, row_id_text="row_id", prefix=None, default=0)
     else:
         pred_display = config.pred_format_func(pred)
     st.sidebar.metric(context.get_term("Prediction"), pred_display)
+
+
+def view_selection():
+    """
+    This function handles the display of entities selection.
+    """
+    formatting.show_probability_select_box()
+    if config.USE_ROWS:
+        view_entity_select(add_prediction=False)
+        eid = st.session_state["eid"]
+        row_ids = st.session_state["row_id_dict"][eid]
+        view_time_select(eid, row_ids, row_id_text="row_id")
+    else:
+        view_entity_select()
 
 
 def view_filtering(include_show_more=False):

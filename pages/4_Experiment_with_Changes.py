@@ -4,29 +4,58 @@ import copy
 
 import streamlit as st
 
+from sibylapp import config
 from sibylapp.view import customized_entity
-from sibylapp.view.utils import filtering, formatting, setup
+from sibylapp.view.utils import filtering, setup
 
-setup.setup_page()
+setup.setup_page(return_row_ids=True)
 setup.generate_options_for_features(
     st.session_state["dataset_eids"], st.session_state["all_features"]
 )
 # Sidebar ------------------------------------
-formatting.show_probability_select_box()
-filtering.view_entity_select()
+filtering.view_selection()
 customized_entity.view_instructions()
 
 # Global options ------------------------------
-changes = customized_entity.view_feature_boxes(
-    st.session_state["eid"], st.session_state["all_features"], st.session_state["options_dict"]
-)
+if config.USE_ROWS:
+    eid = st.session_state["eid"]
+    changes = customized_entity.view_feature_boxes(
+        st.session_state["row_id"],
+        st.session_state["all_features"],
+        st.session_state["options_dict"],
+        use_row_id=True,
+        eid_for_rows=eid,
+    )
+else:
+    changes = customized_entity.view_feature_boxes(
+        st.session_state["eid"],
+        st.session_state["all_features"],
+        st.session_state["options_dict"],
+    )
 
-# Update displayed table only when user press the button
+# Update displayed table after user presses the button
 if st.button("Run model and explanations on customized data"):
     st.session_state["show_changes"] = copy.deepcopy(changes)
 
 if "show_changes" in st.session_state:
-    customized_entity.view_prediction(st.session_state["eid"], st.session_state["show_changes"])
-    filtering.view_filtering()
+    if config.USE_ROWS:
+        customized_entity.view_prediction(
+            st.session_state["row_id"],
+            st.session_state["show_changes"],
+            use_row_id=True,
+            eid_for_rows=eid,
+        )
+        filtering.view_filtering()
+        customized_entity.view(
+            st.session_state["row_id"],
+            st.session_state["show_changes"],
+            use_row_id=True,
+            eid_for_rows=eid,
+        )
 
-    customized_entity.view(st.session_state["eid"], st.session_state["show_changes"])
+    else:
+        customized_entity.view_prediction(
+            st.session_state["eid"], st.session_state["show_changes"]
+        )
+        filtering.view_filtering()
+        customized_entity.view(st.session_state["eid"], st.session_state["show_changes"])

@@ -60,9 +60,9 @@ def get_dataset_contributions():
 
 
 @st.cache_data(show_spinner="Getting contribution for your data...")
-def get_contribution_for_modified_data(eid, changes):
+def get_contribution_for_modified_data(eid, changes, row_id=None):
     st.session_state["modified_contribution"] = api.fetch_contribution_for_modified_data(
-        eid, changes
+        eid, changes, row_id=row_id
     )
     return st.session_state["modified_contribution"]
 

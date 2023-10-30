@@ -95,9 +95,10 @@ def view(eid, save_space=False, use_row_id=False, eid_for_rows=None, key=None):
             contributions.get_contributions_for_rows(eid_for_rows, [eid])[eid],
             show_number=show_number,
         )
-    to_show = format_contributions_to_view(
-        contributions.get_contributions([eid])[eid], show_number=show_number
-    )
+    else:
+        to_show = format_contributions_to_view(
+            contributions.get_contributions([eid])[eid], show_number=show_number
+        )
     if not show_average:
         to_show = to_show.drop("Average/Mode Value", axis="columns")
 

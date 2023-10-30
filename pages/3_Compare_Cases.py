@@ -9,7 +9,6 @@ from sibylapp.view.utils import filtering, formatting, setup
 
 setup.setup_page(return_row_ids=True)
 
-
 # Sidebar ------------------------------------
 formatting.show_probability_select_box()
 if config.USE_ROWS:

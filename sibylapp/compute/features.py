@@ -13,8 +13,8 @@ def get_features() -> pd.DataFrame:
 
 
 @st.cache_data(show_spinner="Fetching data...")
-def get_entity(eid: str) -> pd.Series:
-    feature_values = api.fetch_entity(eid)
+def get_entity(eid: str, row_id: str | None = None) -> pd.Series:
+    feature_values = api.fetch_entity(eid, row_id)
     return feature_values
 
 
