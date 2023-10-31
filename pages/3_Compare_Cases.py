@@ -36,7 +36,7 @@ filtering.view_filtering()
 if config.USE_ROWS:
     if len(row_ids) >= 2:
         if st.session_state["row_id"] == st.session_state["row_id_comp"]:
-            st.warning("Please select two different prediction times!")
+            st.warning("Please select two different rows!")
         else:
             entity_difference.view_prediction_difference(
                 st.session_state["row_id"],

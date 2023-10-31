@@ -13,7 +13,6 @@ BAR_LENGTH = cfg.get("BAR_LENGTH", 8)
 MAX_ENTITIES = cfg.get("MAX_ENTITIES", 11)
 DATASET_SIZE = cfg.get("DATASET_SIZE", 1000)
 LOAD_UPFRONT = cfg.get("LOAD_UPFRONT", True)
-USE_ROWS = cfg.get("USE_ROWS", True)
 
 
 # APPLICATION-SPECIFIC CONFIGURATIONS =============================================================
@@ -47,6 +46,7 @@ POSITIVE_TERM = get_config("POSITIVE_TERM", "pos_pred_name", "True")
 NEGATIVE_TERM = get_config("NEGATIVE_TERM", "neg_pred_name", "False")
 PRED_FORMAT_STRING = get_config("PRED_FORMAT_STRING", "pred_format_string", "{}")
 SUPPORT_PROBABILITY = get_config("SUPPORT_PROBABILITY", "support_probability", False)
+USE_ROWS = get_config("USE_ROWS", "use_rows", False)
 
 
 def pred_format_func(pred, display_proba=False):

@@ -98,15 +98,15 @@ def view_entity_select(eid_text="eid", prefix=None, default=0, add_prediction=Tr
 
 def view_time_select(eid, row_ids, row_id_text="row_id", prefix=None, default=0):
     def format_rowid_select(row_id):
-        return f"Timestamp: {row_id}"
+        return str(row_id)
 
     if row_id_text not in st.session_state:
         st.session_state[f"select_{row_id_text}_index"] = default
 
     if prefix is None:
-        select_text = "Select prediction time"
+        select_text = "Select row"
     else:
-        select_text = f"Select {prefix} prediction time"
+        select_text = f"Select {prefix} row"
 
     st.sidebar.selectbox(
         select_text,
