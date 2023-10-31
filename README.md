@@ -15,6 +15,7 @@ Library for visualizing explanations.
 
 - License: MIT
 - Homepage: https://sibyl-ml.dev/
+- Live Demo: https://sibylapp.streamlit.app/
 
 # Overview
 
