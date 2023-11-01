@@ -46,7 +46,6 @@ POSITIVE_TERM = get_config("POSITIVE_TERM", "pos_pred_name", "True")
 NEGATIVE_TERM = get_config("NEGATIVE_TERM", "neg_pred_name", "False")
 PRED_FORMAT_STRING = get_config("PRED_FORMAT_STRING", "pred_format_string", "{}")
 SUPPORT_PROBABILITY = get_config("SUPPORT_PROBABILITY", "support_probability", False)
-USE_ROWS = get_config("USE_ROWS", "use_rows", False)
 
 
 def pred_format_func(pred, display_proba=False):

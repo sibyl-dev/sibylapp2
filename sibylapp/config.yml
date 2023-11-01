@@ -16,4 +16,3 @@ NEGATIVE_TERM: # Term to use for a False prediction for boolean models
 PRED_FORMAT_STRING: # fstring for formatting numeric model outputs
 OVERRIDE_PRED_FORMAT: # If True, use "config.manual_pred_format_func" to format preds, ignoring previous 3 configs
 SUPPORT_PROBABILITY: # Only set this to True when model supports `predict_proba`
-USE_ROWS: # If true, each data instance would be a row of the entity

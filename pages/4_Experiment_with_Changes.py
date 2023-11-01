@@ -4,7 +4,6 @@ import copy
 
 import streamlit as st
 
-from sibylapp import config
 from sibylapp.view import customized_entity
 from sibylapp.view.utils import filtering, setup
 
@@ -17,8 +16,8 @@ filtering.view_selection()
 customized_entity.view_instructions()
 
 # Global options ------------------------------
-if config.USE_ROWS:
-    eid = st.session_state["eid"]
+eid = st.session_state["eid"]
+if st.session_state["use_rows"]:
     changes = customized_entity.view_feature_boxes(
         st.session_state["row_id"],
         st.session_state["all_features"],
@@ -28,7 +27,7 @@ if config.USE_ROWS:
     )
 else:
     changes = customized_entity.view_feature_boxes(
-        st.session_state["eid"],
+        eid,
         st.session_state["all_features"],
         st.session_state["options_dict"],
     )
@@ -38,7 +37,7 @@ if st.button("Run model and explanations on customized data"):
     st.session_state["show_changes"] = copy.deepcopy(changes)
 
 if "show_changes" in st.session_state:
-    if config.USE_ROWS:
+    if st.session_state["eid"]:
         customized_entity.view_prediction(
             st.session_state["row_id"],
             st.session_state["show_changes"],
@@ -58,4 +57,4 @@ if "show_changes" in st.session_state:
             st.session_state["eid"], st.session_state["show_changes"]
         )
         filtering.view_filtering()
-        customized_entity.view(st.session_state["eid"], st.session_state["show_changes"])
+        customized_entity.view(eid, st.session_state["show_changes"])

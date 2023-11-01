@@ -3,7 +3,6 @@
 import extra_streamlit_components as stx
 import streamlit as st
 
-from sibylapp import config
 from sibylapp.compute.context import get_term
 from sibylapp.view import feature_contribution
 from sibylapp.view.utils import filtering, setup
@@ -25,7 +24,7 @@ tab = stx.tab_bar(
 )
 
 if tab == "1":
-    if config.USE_ROWS:
+    if st.session_state["use_rows"]:
         feature_contribution.view(
             st.session_state["row_id"], use_row_id=True, eid_for_rows=st.session_state["eid"]
         )
