@@ -3,6 +3,7 @@ import streamlit as st
 
 from sibylapp import config
 from sibylapp.compute import context, model
+from sibylapp.view.utils import display
 
 
 @st.cache_data
@@ -44,23 +45,11 @@ def view_prediction_selection(predictions, disabled=False):
     return eids
 
 
-def view_entity_select(eid_text="eid", prefix=None, default=0, add_prediction=True):
+def view_entity_select(eid_text="eid", prefix=None, default=0):
     def format_func(eid):
-        if add_prediction:
-            return (
-                f"{context.get_term('Entity')} {eid} ("
-                + str(config.pred_format_func(predictions[eid]))
-                + ")"
-            )
-        else:
-            return f"{context.get_term('Entity')} {eid}"
+        return f"{context.get_term('Entity')} {eid} ({config.pred_format_func(predictions[eid])})"
 
-    if add_prediction:
-        predictions = model.get_predictions(st.session_state["eids"])
-
-    if config.SUPPORT_PROBABILITY:
-        predictions_proba = model.get_predictions(st.session_state["eids"], return_proba=True)
-
+    predictions = model.get_predictions(st.session_state["eids"])
     if eid_text in st.session_state:
         st.session_state[f"select_{eid_text}_index"] = st.session_state["eids"].index(
             st.session_state[eid_text]
@@ -79,33 +68,19 @@ def view_entity_select(eid_text="eid", prefix=None, default=0, add_prediction=Tr
         index=st.session_state[f"select_{eid_text}_index"],
         key=eid_text,
     )
-    if add_prediction:
-        pred = predictions[st.session_state[eid_text]]
-        if st.session_state["display_proba"]:
-            pred_proba = predictions_proba[st.session_state[eid_text]]
-            pred_display = (
-                config.pred_format_func(pred)
-                + " ("
-                + config.pred_format_func(pred_proba, display_proba=True)
-                + ")"
-            )
-        else:
-            pred_display = config.pred_format_func(pred)
-
-        st.sidebar.metric(context.get_term("Prediction"), pred_display)
 
 
 def view_time_select(eid, row_ids, row_id_text="row_id", prefix=None, default=0):
     def format_rowid_select(row_id):
-        return f"Timestamp: {row_id}"
+        return str(row_id)
 
     if row_id_text not in st.session_state:
         st.session_state[f"select_{row_id_text}_index"] = default
 
     if prefix is None:
-        select_text = "Select prediction time"
+        select_text = "Select row"
     else:
-        select_text = f"Select {prefix} prediction time"
+        select_text = f"Select {prefix} row"
 
     st.sidebar.selectbox(
         select_text,
@@ -129,6 +104,21 @@ def view_time_select(eid, row_ids, row_id_text="row_id", prefix=None, default=0)
     else:
         pred_display = config.pred_format_func(pred)
     st.sidebar.metric(context.get_term("Prediction"), pred_display)
+
+
+def view_selection():
+    """
+    This function handles the display of entities selection.
+    """
+    display.show_probability_select_box()
+    view_entity_select()
+    eid = st.session_state["eid"]
+    row_ids = st.session_state["row_id_dict"][eid]
+    if len(row_ids) > 1:
+        view_time_select(eid, row_ids, row_id_text="row_id")
+        st.session_state["use_rows"] = True
+    else:
+        display.view_prediction(eid)
 
 
 def view_filtering(include_show_more=False):

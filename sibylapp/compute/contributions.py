@@ -28,12 +28,27 @@ def get_contributions(eids):
     return {eid: contributions[eid] for eid in eids}
 
 
+@st.cache_data(show_spinner="Computing contributions...")
+def compute_contributions_for_rows(eid, row_ids):
+    contributions = api.fetch_contributions([eid], row_ids)
+    if "contributions_rows" not in st.session_state:
+        st.session_state["contributions_rows"] = contributions
+    else:
+        st.session_state["contributions_rows"] = dict(
+            st.session_state["contributions_rows"], **contributions
+        )
+    return contributions
+
+
 @st.cache_data(show_spinner="Getting contributions...")
 def get_contributions_for_rows(eid, row_ids):
     if "contributions_rows" not in st.session_state:
-        contributions = api.fetch_contributions([eid], row_ids)
+        contributions = compute_contributions_for_rows(eid, row_ids)
     else:
         contributions = st.session_state["contributions_rows"]
+    missing_row_ids = list(set(row_ids) - contributions.keys())
+    if len(missing_row_ids) > 0:
+        contributions = {**contributions, **compute_contributions_for_rows(eid, missing_row_ids)}
     return contributions
 
 
@@ -45,9 +60,9 @@ def get_dataset_contributions():
 
 
 @st.cache_data(show_spinner="Getting contribution for your data...")
-def get_contribution_for_modified_data(eid, changes):
+def get_contribution_for_modified_data(eid, changes, row_id=None):
     st.session_state["modified_contribution"] = api.fetch_contribution_for_modified_data(
-        eid, changes
+        eid, changes, row_id=row_id
     )
     return st.session_state["modified_contribution"]
 

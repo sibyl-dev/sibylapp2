@@ -53,9 +53,10 @@ def fetch_eids(return_row_ids=False):
         return [entry["eid"] for entry in entities]
 
 
-def fetch_modified_prediction(eid, changes, return_proba=False):
+def fetch_modified_prediction(eid, changes, row_id=None, return_proba=False):
     json = {
         "eid": eid,
+        "row_id": row_id,
         "model_id": fetch_model_id(),
         "changes": changes,
         "return_proba": return_proba,
@@ -82,10 +83,15 @@ def fetch_features():
     return features_df
 
 
-def fetch_entity(eid):
-    url = "entities/" + str(eid)
+def fetch_entity(eid, row_id=None) -> pd.Series:
+    url = f"entities/{eid}"
+    if row_id is not None:
+        url += f"/?row_id={row_id}"
     entity_features = api_get(url)["features"]
-    return pd.Series(next(iter(entity_features.values())), name="value")
+    if row_id is not None:
+        return pd.Series(entity_features)
+    else:
+        return pd.Series(next(iter(entity_features.values())), name="value")
 
 
 def fetch_contributions(eids, row_ids=None):
@@ -100,9 +106,9 @@ def fetch_contributions(eids, row_ids=None):
     return contributions
 
 
-def fetch_contribution_for_modified_data(eid, changes):
+def fetch_contribution_for_modified_data(eid, changes, row_id=None):
     features_df = fetch_features()
-    json = {"eid": eid, "model_id": fetch_model_id(), "changes": changes}
+    json = {"eid": eid, "row_id": row_id, "model_id": fetch_model_id(), "changes": changes}
     result = api_post("modified_contribution/", json)["contribution"]
     return pd.concat([features_df, pd.DataFrame.from_dict(result, orient="index")], axis=1)
 

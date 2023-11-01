@@ -5,13 +5,12 @@ import streamlit as st
 
 from sibylapp.compute.context import get_term
 from sibylapp.view import feature_contribution
-from sibylapp.view.utils import filtering, formatting, setup
+from sibylapp.view.utils import filtering, setup
 
-setup.setup_page()
+setup.setup_page(return_row_ids=True)
 
 # Sidebar ------------------------------------
-formatting.show_probability_select_box()
-filtering.view_entity_select()
+filtering.view_selection()
 feature_contribution.view_instructions()
 
 # Global options ------------------------------
@@ -25,4 +24,9 @@ tab = stx.tab_bar(
 )
 
 if tab == "1":
-    feature_contribution.view(st.session_state["eid"])
+    if st.session_state["use_rows"]:
+        feature_contribution.view(
+            st.session_state["row_id"], use_row_id=True, eid_for_rows=st.session_state["eid"]
+        )
+    else:
+        feature_contribution.view(st.session_state["eid"])
