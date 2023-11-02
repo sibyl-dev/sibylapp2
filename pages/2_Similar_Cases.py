@@ -7,6 +7,9 @@ from sibylapp.view.utils import filtering, setup
 
 setup.setup_page()
 
+st.warning("This page is temporarily disabled for fixes")
+st.stop()
+
 # Sidebar ------------------------------------
 filtering.view_entity_select()
 filtering.view_filtering()
