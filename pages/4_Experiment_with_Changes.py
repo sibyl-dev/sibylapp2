@@ -13,6 +13,7 @@ setup.generate_options_for_features(
 )
 # Sidebar ------------------------------------
 filtering.view_selection()
+filtering.view_model_select()
 customized_entity.view_instructions()
 
 # Global options ------------------------------
@@ -41,6 +42,7 @@ if "show_changes" in st.session_state:
         customized_entity.view_prediction(
             st.session_state["row_id"],
             st.session_state["show_changes"],
+            st.session_state["model_id"],
             use_row_id=True,
             eid_for_rows=eid,
         )
@@ -48,13 +50,14 @@ if "show_changes" in st.session_state:
         customized_entity.view(
             st.session_state["row_id"],
             st.session_state["show_changes"],
+            st.session_state["model_id"],
             use_row_id=True,
             eid_for_rows=eid,
         )
 
     else:
         customized_entity.view_prediction(
-            st.session_state["eid"], st.session_state["show_changes"]
+            st.session_state["eid"], st.session_state["show_changes"], st.session_state["model_id"]
         )
         filtering.view_filtering()
-        customized_entity.view(eid, st.session_state["show_changes"])
+        customized_entity.view(eid, st.session_state["show_changes"], st.session_state["model_id"])

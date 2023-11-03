@@ -30,8 +30,8 @@ def filter_different_rows(to_show, neighbor_names, selected_col_name):
     return to_show_filtered
 
 
-def view(eid):
-    x, y = example_based.get_similar_entities(eid)
+def view(eid, model_id):
+    x, y = example_based.get_similar_entities(eid, model_id=model_id)
     y.index = ["y"]  # Used to prevent bug in data_editor where index is assumed to be numeric
     to_show, neighbor_names, selected_col_name = format_similar_entities(x, y)
     options = ["No filtering"] + neighbor_names

@@ -60,7 +60,7 @@ def format_contributions_to_view(contribution_df, show_number=False):
     return contribution_df
 
 
-def view(eid, save_space=False, use_row_id=False, eid_for_rows=None, key=None):
+def view(eid, model_id, save_space=False, use_row_id=False, eid_for_rows=None, key=None):
     """
     `eid_for_rows` is only used when `use_row_id` == True.
     `eid` are used as row_id when `use_row_id` == True
@@ -92,12 +92,12 @@ def view(eid, save_space=False, use_row_id=False, eid_for_rows=None, key=None):
 
     if use_row_id:
         to_show = format_contributions_to_view(
-            contributions.get_contributions_for_rows(eid_for_rows, [eid])[eid],
+            contributions.get_contributions_for_rows(eid_for_rows, [eid], model_id=model_id)[eid],
             show_number=show_number,
         )
     else:
         to_show = format_contributions_to_view(
-            contributions.get_contributions([eid])[eid], show_number=show_number
+            contributions.get_contributions([eid], model_id=model_id)[eid], show_number=show_number
         )
     if not show_average:
         to_show = to_show.drop("Average/Mode Value", axis="columns")

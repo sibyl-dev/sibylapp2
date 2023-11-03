@@ -12,13 +12,14 @@ from sibylapp.view.utils import filtering, setup
 setup.setup_page()
 
 # Global options ------------------------------
+filtering.view_model_select()
 filtering.view_filtering()
 
 # Compute -------------------------------------
-predictions = model.get_dataset_predictions()
+predictions = model.get_dataset_predictions(st.session_state["model_id"])
 discrete = config.PREDICTION_TYPE in (config.PredType.BOOLEAN, config.PredType.CATEGORICAL)
 
-all_contributions = contributions.get_dataset_contributions()
+all_contributions = contributions.get_dataset_contributions(st.session_state["model_id"])
 
 # Setup tabs ----------------------------------
 pred_filter_container = st.container()
@@ -65,13 +66,13 @@ if tab == "2":
         if len(eids) == 0:
             st.warning("Select predictions above to see explanation!")
         else:
-            global_contributions.view(eids)
+            global_contributions.view(eids, st.session_state["model_id"])
 
 if tab == "3":
     if len(eids) == 0:
         st.warning("Select predictions above to see explanation!")
     else:
-        global_contributions.view_summary_plot(eids)
+        global_contributions.view_summary_plot(eids, st.session_state["model_id"])
 
 if tab == "4":
     with placeholder:
@@ -82,4 +83,6 @@ if tab == "4":
                 "Select a %s" % get_term("feature"),
                 filtering.process_search_on_features(features),
             )
-            explore_feature.view(eids, predictions, feature, discrete)
+            explore_feature.view(
+                eids, predictions, feature, st.session_state["model_id"], discrete
+            )

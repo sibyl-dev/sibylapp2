@@ -11,6 +11,7 @@ setup.setup_page(return_row_ids=True)
 
 # Sidebar ------------------------------------
 filtering.view_selection()
+filtering.view_model_select()
 feature_contribution.view_instructions()
 
 # Global options ------------------------------
@@ -26,7 +27,10 @@ tab = stx.tab_bar(
 if tab == "1":
     if st.session_state["use_rows"]:
         feature_contribution.view(
-            st.session_state["row_id"], use_row_id=True, eid_for_rows=st.session_state["eid"]
+            st.session_state["row_id"],
+            st.session_state["model_id"],
+            use_row_id=True,
+            eid_for_rows=st.session_state["eid"],
         )
     else:
-        feature_contribution.view(st.session_state["eid"])
+        feature_contribution.view(st.session_state["eid"], st.session_state["model_id"])

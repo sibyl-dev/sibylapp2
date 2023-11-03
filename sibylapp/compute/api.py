@@ -34,6 +34,11 @@ def api_post(url, json):
     return response.json()
 
 
+def fetch_models():
+    models = api_get("models/")["models"]
+    return [model["model_id"] for model in models]
+
+
 def fetch_model_id():
     model_id = api_get("models/")["models"][0]["model_id"]
     return model_id
@@ -53,11 +58,13 @@ def fetch_eids(return_row_ids=False):
         return [entry["eid"] for entry in entities]
 
 
-def fetch_modified_prediction(eid, changes, row_id=None, return_proba=False):
+def fetch_modified_prediction(
+    eid, changes, row_id=None, model_id=fetch_model_id(), return_proba=False
+):
     json = {
         "eid": eid,
         "row_id": row_id,
-        "model_id": fetch_model_id(),
+        "model_id": model_id,
         "changes": changes,
         "return_proba": return_proba,
     }
@@ -65,10 +72,10 @@ def fetch_modified_prediction(eid, changes, row_id=None, return_proba=False):
     return prediction
 
 
-def fetch_predictions(eids, row_ids=None, return_proba=False):
+def fetch_predictions(eids, row_ids=None, model_id=fetch_model_id(), return_proba=False):
     json = {
         "eids": eids,
-        "model_id": fetch_model_id(),
+        "model_id": model_id,
         "row_ids": row_ids,
         "return_proba": return_proba,
     }
@@ -94,9 +101,9 @@ def fetch_entity(eid, row_id=None) -> pd.Series:
         return pd.Series(next(iter(entity_features.values())), name="value")
 
 
-def fetch_contributions(eids, row_ids=None):
+def fetch_contributions(eids, row_ids=None, model_id=fetch_model_id()):
     features_df = fetch_features()
-    json = {"eids": eids, "model_id": fetch_model_id(), "row_ids": row_ids}
+    json = {"eids": eids, "model_id": model_id, "row_ids": row_ids}
     result = api_post("multi_contributions/", json)["contributions"]
     contributions = {}
     for eid in result:
@@ -106,24 +113,24 @@ def fetch_contributions(eids, row_ids=None):
     return contributions
 
 
-def fetch_contribution_for_modified_data(eid, changes, row_id=None):
+def fetch_contribution_for_modified_data(eid, changes, row_id=None, model_id=fetch_model_id()):
     features_df = fetch_features()
-    json = {"eid": eid, "row_id": row_id, "model_id": fetch_model_id(), "changes": changes}
+    json = {"eid": eid, "row_id": row_id, "model_id": model_id, "changes": changes}
     result = api_post("modified_contribution/", json)["contribution"]
     return pd.concat([features_df, pd.DataFrame.from_dict(result, orient="index")], axis=1)
 
 
-def fetch_importance():
+def fetch_importance(model_id=fetch_model_id()):
     features_df = fetch_features()
-    url = "importance?model_id=" + fetch_model_id()
+    url = "importance?model_id=" + model_id
     importance = api_get(url)
     importance_df = pd.DataFrame(importance)
     return pd.concat([features_df, importance_df], axis=1)
 
 
-def fetch_similar_examples(eids):
+def fetch_similar_examples(eids, model_id=fetch_model_id()):
     features_df = fetch_features()
-    json = {"eids": eids, "model_id": fetch_model_id()}
+    json = {"eids": eids, "model_id": model_id}
     result = api_post("similar_entities/", json)["similar_entities"]
     similar_entities = {}
     for eid in result:

@@ -10,29 +10,31 @@ from sibylapp.view.utils.helpers import show_legend
 
 
 @st.cache_data(show_spinner="Generating summary plot...")
-def generate_swarm_plot(eids):
-    contribution_dict = helpers.rename_for_pyreal_vis(contributions.get_contributions(eids))
+def generate_swarm_plot(eids, model_id):
+    contribution_dict = helpers.rename_for_pyreal_vis(
+        contributions.get_contributions(eids, model_id)
+    )
     strip_plot(contribution_dict, type="strip")
     return plt.gcf()
 
 
-def view_summary_plot(eids):
+def view_summary_plot(eids, model_id):
     st.pyplot(
-        generate_swarm_plot(eids),
+        generate_swarm_plot(eids, model_id),
         clear_figure=True,
     )
 
 
-def view(eids):
+def view(eids, model_id):
     sort_by = helpers.show_sort_options(["Total", "Most Increasing", "Most Decreasing"])
     show_legend()
 
-    global_contributions = contributions.compute_global_contributions(eids)
+    global_contributions = contributions.compute_global_contributions(eids, model_id)
     bars = helpers.generate_bars_bidirectional(
         global_contributions["negative"], global_contributions["positive"]
     )
 
-    all_contributions = contributions.get_dataset_contributions()
+    all_contributions = contributions.get_dataset_contributions(model_id)
     feature_info = all_contributions[next(iter(all_contributions))][
         ["category", "Feature"]
     ].rename(columns={"category": "Category"})

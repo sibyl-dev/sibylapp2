@@ -7,7 +7,9 @@ from sibylapp.view.utils import filtering, helpers
 from sibylapp.view.utils.formatting import format_two_contributions_to_view
 
 
-def view_prediction_difference(eid, eid_comp, use_row_ids=False, row_ids=None, eid_for_rows=None):
+def view_prediction_difference(
+    eid, eid_comp, model_id, use_row_ids=False, row_ids=None, eid_for_rows=None
+):
     """
     If use_row_ids is set to True, this function looks at the difference between two rows
     within a single entity.
@@ -16,9 +18,9 @@ def view_prediction_difference(eid, eid_comp, use_row_ids=False, row_ids=None, e
     `eid` and `eid_comp` are used as row_id when `use_row_ids` == True
     """
     if use_row_ids:
-        predictions = model.get_predictions_for_rows(eid_for_rows, row_ids)
+        predictions = model.get_predictions_for_rows(eid_for_rows, row_ids, model_id=model_id)
     else:
-        predictions = model.get_predictions(st.session_state["eids"])
+        predictions = model.get_predictions(st.session_state["eids"], model_id=model_id)
     old_prediction = predictions[eid]
     new_prediction = predictions[eid_comp]
     if PREDICTION_TYPE == PredType.NUMERIC:
@@ -30,10 +32,12 @@ def view_prediction_difference(eid, eid_comp, use_row_ids=False, row_ids=None, e
     elif st.session_state["display_proba"]:
         if use_row_ids:
             predictions_proba = model.get_predictions_for_rows(
-                eid_for_rows, row_ids, return_proba=True
+                eid_for_rows, row_ids, model_id=model_id, return_proba=True
             )
         else:
-            predictions_proba = model.get_predictions(st.session_state["eids"], return_proba=True)
+            predictions_proba = model.get_predictions(
+                st.session_state["eids"], model_id=model_id, return_proba=True
+            )
         old_prediction_proba = predictions_proba[eid]
         new_prediction_proba = predictions_proba[eid_comp]
         # Invert the probabilities if prediction is False
@@ -60,8 +64,10 @@ def view_prediction_difference(eid, eid_comp, use_row_ids=False, row_ids=None, e
         )
     else:
         st.metric(
-            f"{get_term('Prediction')} Change from {get_term('Entity')} {eid} to"
-            f" {get_term('Entity')} {eid_comp}:",
+            (
+                f"{get_term('Prediction')} Change from {get_term('Entity')} {eid} to"
+                f" {get_term('Entity')} {eid_comp}:"
+            ),
             output_text,
         )
 
@@ -132,7 +138,9 @@ def filter_different_rows(to_show, use_row_ids=False):
     return to_show_filtered
 
 
-def view(eid, eid_comp, save_space=False, use_row_ids=False, row_ids=None, eid_for_rows=None):
+def view(
+    eid, eid_comp, model_id, save_space=False, use_row_ids=False, row_ids=None, eid_for_rows=None
+):
     """
     `row_ids` and `eid_for_rows` are only used when `use_row_ids` == True.
     `eid` and `eid_comp` are used as row_id when `use_row_ids` == True
@@ -141,11 +149,13 @@ def view(eid, eid_comp, save_space=False, use_row_ids=False, row_ids=None, eid_f
     if use_row_ids:
         lsuffix = " for time %s" % eid
         rsuffix = " for time %s" % eid_comp
-        contributions_dict = contributions.get_contributions_for_rows(eid_for_rows, row_ids)
+        contributions_dict = contributions.get_contributions_for_rows(
+            eid_for_rows, row_ids, model_id=model_id
+        )
     else:
         lsuffix = " for %s %s" % (get_term("Entity"), eid)
         rsuffix = " for %s %s" % (get_term("Entity"), eid_comp)
-        contributions_dict = contributions.get_contributions([eid, eid_comp])
+        contributions_dict = contributions.get_contributions([eid, eid_comp], model_id=model_id)
     original_df = contributions_dict[eid]
     other_df = contributions_dict[eid_comp]
 
