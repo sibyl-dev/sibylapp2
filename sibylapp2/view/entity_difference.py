@@ -1,10 +1,10 @@
 import streamlit as st
 
-from sibylapp.compute import contributions, model
-from sibylapp.compute.context import get_term
-from sibylapp.config import POSITIVE_TERM, PREDICTION_TYPE, PredType, pred_format_func
-from sibylapp.view.utils import filtering, helpers
-from sibylapp.view.utils.formatting import format_two_contributions_to_view
+from sibylapp2.compute import contributions, model
+from sibylapp2.compute.context import get_term
+from sibylapp2.config import POSITIVE_TERM, PREDICTION_TYPE, PredType, pred_format_func
+from sibylapp2.view.utils import filtering, helpers
+from sibylapp2.view.utils.formatting import format_two_contributions_to_view
 
 
 def view_prediction_difference(eid, eid_comp, use_row_ids=False, row_ids=None, eid_for_rows=None):

@@ -1,9 +1,9 @@
 import streamlit as st
 
-from sibylapp.compute import contributions
-from sibylapp.compute.context import get_term
-from sibylapp.view.utils import filtering, helpers
-from sibylapp.view.utils.helpers import show_legend
+from sibylapp2.compute import contributions
+from sibylapp2.compute.context import get_term
+from sibylapp2.view.utils import filtering, helpers
+from sibylapp2.view.utils.helpers import show_legend
 
 
 def show_sorted_contributions(to_show, sort_by, key=None):
