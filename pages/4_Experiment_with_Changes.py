@@ -4,8 +4,8 @@ import copy
 
 import streamlit as st
 
-from sibylapp.view import customized_entity
-from sibylapp.view.utils import filtering, setup
+from sibylapp2.view import customized_entity
+from sibylapp2.view.utils import filtering, setup
 
 setup.setup_page(return_row_ids=True)
 setup.generate_options_for_features(

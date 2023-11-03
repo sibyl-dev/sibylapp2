@@ -4,10 +4,10 @@ import plotly.graph_objects as go
 import streamlit as st
 from streamlit_plotly_events import plotly_events
 
-from sibylapp import config
-from sibylapp.compute import contributions
-from sibylapp.compute.context import get_term
-from sibylapp.view import feature_contribution
+from sibylapp2 import config
+from sibylapp2.compute import contributions
+from sibylapp2.compute.context import get_term
+from sibylapp2.view import feature_contribution
 
 
 @st.cache_data(show_spinner="Generating distribution plot...")

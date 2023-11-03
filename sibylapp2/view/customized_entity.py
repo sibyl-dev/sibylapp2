@@ -3,14 +3,14 @@ from __future__ import annotations
 import pandas as pd
 import streamlit as st
 
-from sibylapp.compute import contributions, model
-from sibylapp.compute.context import get_term
-from sibylapp.compute.features import get_entity
-from sibylapp.config import pred_format_func
-from sibylapp.view.entity_difference import sort_contributions, view_compare_cases_helper
-from sibylapp.view.utils import helpers
-from sibylapp.view.utils.formatting import format_two_contributions_to_view
-from sibylapp.view.utils.helpers import show_text_input_side_by_side
+from sibylapp2.compute import contributions, model
+from sibylapp2.compute.context import get_term
+from sibylapp2.compute.features import get_entity
+from sibylapp2.config import pred_format_func
+from sibylapp2.view.entity_difference import sort_contributions, view_compare_cases_helper
+from sibylapp2.view.utils import helpers
+from sibylapp2.view.utils.formatting import format_two_contributions_to_view
+from sibylapp2.view.utils.helpers import show_text_input_side_by_side
 
 
 def view_feature_boxes(

@@ -3,9 +3,9 @@
 import extra_streamlit_components as stx
 import streamlit as st
 
-from sibylapp.compute.context import get_term
-from sibylapp.view import feature_contribution
-from sibylapp.view.utils import filtering, setup
+from sibylapp2.compute.context import get_term
+from sibylapp2.view import feature_contribution
+from sibylapp2.view.utils import filtering, setup
 
 setup.setup_page(return_row_ids=True)
 

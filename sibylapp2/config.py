@@ -3,7 +3,7 @@ from os import path
 
 import yaml
 
-from sibylapp.compute.context import get_gui_config
+from sibylapp2.compute.context import get_gui_config
 
 with open(path.join(path.dirname(path.abspath(__file__)), "config.yml"), "r") as f:
     cfg = yaml.safe_load(f)
