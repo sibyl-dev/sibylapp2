@@ -19,6 +19,7 @@ if len(row_ids) > 1:
     filtering.view_model_select()
     entity_difference.view_instructions(use_row_ids=True)
 else:
+    display.view_prediction(st.session_state["eid"])
     filtering.view_entity_select(eid_text="eid_comp", prefix="another", default=1)
     display.view_prediction(st.session_state["eid_comp"])
     filtering.view_model_select()
