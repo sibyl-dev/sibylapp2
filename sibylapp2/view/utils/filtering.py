@@ -1,9 +1,9 @@
 import numpy as np
 import streamlit as st
 
-from sibylapp import config
-from sibylapp.compute import context, model
-from sibylapp.view.utils import display
+from sibylapp2 import config
+from sibylapp2.compute import context, model
+from sibylapp2.view.utils import display
 
 
 @st.cache_data

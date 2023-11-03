@@ -5,8 +5,8 @@ import math
 import pandas as pd
 import streamlit as st
 
-from sibylapp.compute.context import get_term
-from sibylapp.config import (
+from sibylapp2.compute.context import get_term
+from sibylapp2.config import (
     BAR_LENGTH,
     FLIP_COLORS,
     NEGATIVE_TERM,
