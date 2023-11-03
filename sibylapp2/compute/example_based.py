@@ -1,6 +1,6 @@
 import streamlit as st
 
-from sibylapp.compute import api
+from sibylapp2.compute import api
 
 
 @st.cache_data

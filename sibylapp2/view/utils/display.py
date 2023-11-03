@@ -1,7 +1,7 @@
 import streamlit as st
 
-from sibylapp.compute import context, model
-from sibylapp.config import SUPPORT_PROBABILITY, pred_format_func
+from sibylapp2.compute import context, model
+from sibylapp2.config import SUPPORT_PROBABILITY, pred_format_func
 
 
 def show_probability_select_box():

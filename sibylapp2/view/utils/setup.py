@@ -3,8 +3,8 @@ from __future__ import annotations
 import pandas as pd
 import streamlit as st
 
-from sibylapp import config
-from sibylapp.compute import contributions, entities, features, importance, model
+from sibylapp2 import config
+from sibylapp2.compute import contributions, entities, features, importance, model
 
 
 def setup_page(return_row_ids=False):

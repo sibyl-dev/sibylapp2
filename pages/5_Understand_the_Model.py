@@ -3,11 +3,11 @@
 import extra_streamlit_components as stx
 import streamlit as st
 
-from sibylapp import config
-from sibylapp.compute import contributions, model
-from sibylapp.compute.context import get_term
-from sibylapp.view import explore_feature, feature_importance, global_contributions
-from sibylapp.view.utils import filtering, setup
+from sibylapp2 import config
+from sibylapp2.compute import contributions, model
+from sibylapp2.compute.context import get_term
+from sibylapp2.view import explore_feature, feature_importance, global_contributions
+from sibylapp2.view.utils import filtering, setup
 
 setup.setup_page()
 

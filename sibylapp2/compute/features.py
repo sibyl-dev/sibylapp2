@@ -3,7 +3,7 @@ from __future__ import annotations
 import pandas as pd
 import streamlit as st
 
-from sibylapp.compute import api
+from sibylapp2.compute import api
 
 
 @st.cache_data(show_spinner="Fetching data...")
