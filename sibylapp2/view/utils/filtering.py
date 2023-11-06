@@ -49,7 +49,9 @@ def view_entity_select(eid_text="eid", prefix=None, default=0):
     def format_func(eid):
         return f"{context.get_term('Entity')} {eid} ({config.pred_format_func(predictions[eid])})"
 
-    predictions = model.get_predictions(st.session_state["eids"])
+    predictions = model.get_predictions(
+        st.session_state["eids"], model_id=st.session_state["model_id"]
+    )
     if eid_text in st.session_state:
         st.session_state[f"select_{eid_text}_index"] = st.session_state["eids"].index(
             st.session_state[eid_text]
@@ -89,11 +91,15 @@ def view_time_select(eid, row_ids, row_id_text="row_id", prefix=None, default=0)
         index=st.session_state[f"select_{row_id_text}_index"],
         key=row_id_text,
     )
-    predictions = model.get_predictions_for_rows(eid, row_ids)
+    predictions = model.get_predictions_for_rows(
+        eid, row_ids, model_id=st.session_state["model_id"]
+    )
     pred = predictions[st.session_state[row_id_text]]
 
     if st.session_state["display_proba"]:
-        predictions_proba = model.get_predictions_for_rows(eid, row_ids, return_proba=True)
+        predictions_proba = model.get_predictions_for_rows(
+            eid, row_ids, model_id=st.session_state["model_id"], return_proba=True
+        )
         pred_proba = predictions_proba[st.session_state[row_id_text]]
         pred_display = (
             config.pred_format_func(pred)
@@ -106,11 +112,28 @@ def view_time_select(eid, row_ids, row_id_text="row_id", prefix=None, default=0)
     st.sidebar.metric(context.get_term("Prediction"), pred_display)
 
 
+def view_model_select(default=0):
+    if "model_id" in st.session_state:
+        st.session_state["select_model_index"] = st.session_state["model_ids"].index(
+            st.session_state["model_id"]
+        )
+    else:
+        st.session_state["select_model_index"] = default
+    if len(st.session_state["model_ids"]) > 1:
+        st.sidebar.selectbox(
+            "Select model",
+            st.session_state["model_ids"],
+            index=st.session_state["select_model_index"],
+            key="model_id",
+        )
+    else:
+        st.session_state["model_id"] = st.session_state["model_ids"][0]
+
+
 def view_selection():
     """
     This function handles the display of entities selection.
     """
-    display.show_probability_select_box()
     view_entity_select()
     eid = st.session_state["eid"]
     row_ids = st.session_state["row_id_dict"][eid]

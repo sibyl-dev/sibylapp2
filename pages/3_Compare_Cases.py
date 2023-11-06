@@ -10,6 +10,7 @@ setup.setup_page(return_row_ids=True)
 
 # Sidebar ------------------------------------
 display.show_probability_select_box()
+filtering.view_model_select()
 filtering.view_entity_select(eid_text="eid")
 eid = st.session_state["eid"]
 row_ids = st.session_state["row_id_dict"][eid]
@@ -18,6 +19,7 @@ if len(row_ids) > 1:
     filtering.view_time_select(eid, row_ids, row_id_text="row_id_comp", prefix="second", default=1)
     entity_difference.view_instructions(use_row_ids=True)
 else:
+    display.view_prediction(st.session_state["eid"])
     filtering.view_entity_select(eid_text="eid_comp", prefix="another", default=1)
     display.view_prediction(st.session_state["eid_comp"])
     entity_difference.view_instructions()
@@ -31,6 +33,7 @@ if len(row_ids) > 1:
         entity_difference.view_prediction_difference(
             st.session_state["row_id"],
             st.session_state["row_id_comp"],
+            st.session_state["model_id"],
             use_row_ids=True,
             row_ids=row_ids,
             eid_for_rows=eid,
@@ -38,6 +41,7 @@ if len(row_ids) > 1:
         entity_difference.view(
             st.session_state["row_id"],
             st.session_state["row_id_comp"],
+            st.session_state["model_id"],
             use_row_ids=True,
             row_ids=row_ids,
             eid_for_rows=eid,
@@ -48,7 +52,9 @@ else:
 
     else:
         entity_difference.view_prediction_difference(
-            st.session_state["eid"], st.session_state["eid_comp"]
+            st.session_state["eid"], st.session_state["eid_comp"], st.session_state["model_id"]
         )
 
-        entity_difference.view(st.session_state["eid"], st.session_state["eid_comp"])
+        entity_difference.view(
+            st.session_state["eid"], st.session_state["eid_comp"], st.session_state["model_id"]
+        )

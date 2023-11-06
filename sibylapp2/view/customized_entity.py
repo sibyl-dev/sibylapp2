@@ -58,18 +58,24 @@ def view_feature_boxes(
     return changes
 
 
-def view_prediction(eid, changes, use_row_id=False, eid_for_rows=None):
+def view_prediction(eid, changes, model_id, use_row_id=False, eid_for_rows=None):
     if use_row_id:
-        pred = model.get_modified_prediction(eid_for_rows, changes, row_id=eid)
+        pred = model.get_modified_prediction(eid_for_rows, changes, row_id=eid, model_id=model_id)
     else:
-        pred = model.get_modified_prediction(eid, changes)
+        pred = model.get_modified_prediction(eid, changes, model_id=model_id)
     if st.session_state["display_proba"]:
         if use_row_id:
             pred_proba = model.get_modified_prediction(
-                eid_for_rows, changes, row_id=eid, return_proba=True
+                eid_for_rows,
+                changes,
+                row_id=eid,
+                model_id=model_id,
+                return_proba=True,
             )
         else:
-            pred_proba = model.get_modified_prediction(eid, changes, return_proba=True)
+            pred_proba = model.get_modified_prediction(
+                eid, changes, model_id=model_id, return_proba=True
+            )
         pred_display = (
             pred_format_func(pred) + " (" + pred_format_func(pred_proba, display_proba=True) + ")"
         )
@@ -104,17 +110,23 @@ def filter_different_rows(eid, to_show):
     return to_show_filtered
 
 
-def view(eid, changes, use_row_id=False, eid_for_rows=None, save_space=False):
+def view(eid, changes, model_id, use_row_id=False, eid_for_rows=None, save_space=False):
     """
     eid is used as `row_id` when use_row_id is True
     """
     sort_by, show_number, show_contribution = view_compare_cases_helper(save_space=save_space)
     if use_row_id:
-        original_df = contributions.get_contributions_for_rows(eid_for_rows, [eid])[eid]
-        other_df = contributions.get_contribution_for_modified_data(eid_for_rows, changes, eid)
+        original_df = contributions.get_contributions_for_rows(
+            eid_for_rows, [eid], model_id=model_id
+        )[eid]
+        other_df = contributions.get_contribution_for_modified_data(
+            eid_for_rows, changes, eid, model_id=model_id
+        )
     else:
-        original_df = contributions.get_contributions([eid])[eid]
-        other_df = contributions.get_contribution_for_modified_data(eid, changes)
+        original_df = contributions.get_contributions([eid], model_id=model_id)[eid]
+        other_df = contributions.get_contribution_for_modified_data(
+            eid, changes, model_id=model_id
+        )
     to_show = format_two_contributions_to_view(
         original_df,
         other_df,

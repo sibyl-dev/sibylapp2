@@ -22,6 +22,12 @@ def setup_page(return_row_ids=False):
         if "eids" not in st.session_state:
             st.session_state["eids"] = entities.get_eids(max_entities=config.MAX_ENTITIES)
 
+    if "model_ids" not in st.session_state:
+        st.session_state["model_ids"] = model.get_models()
+
+    if "model_id" not in st.session_state:
+        st.session_state["model_id"] = st.session_state["model_ids"][0]
+
     if "dataset_eids" not in st.session_state:
         st.session_state["dataset_eids"] = entities.get_eids(max_entities=config.DATASET_SIZE)
 

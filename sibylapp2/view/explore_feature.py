@@ -11,8 +11,8 @@ from sibylapp2.view import feature_contribution
 
 
 @st.cache_data(show_spinner="Generating distribution plot...")
-def generate_feature_distribution_plot(eids, feature):
-    contribution_dict = contributions.get_contributions(eids)
+def generate_feature_distribution_plot(eids, feature, model_id):
+    contribution_dict = contributions.get_contributions(eids, model_id=model_id)
     data = pd.DataFrame(
         [
             contribution_dict[eid][contribution_dict[eid]["Feature"] == feature]["Feature Value"]
@@ -35,8 +35,8 @@ def generate_feature_distribution_plot(eids, feature):
 
 
 @st.cache_data(show_spinner="Generating feature plot...")
-def generate_feature_plot_data(eids, predictions, feature):
-    contributions_to_show = contributions.get_contributions(eids)
+def generate_feature_plot_data(eids, predictions, feature, model_id):
+    contributions_to_show = contributions.get_contributions(eids, model_id=model_id)
     data = {
         i: contributions_to_show[i][contributions_to_show[i]["Feature"] == feature][
             ["Contribution", "Feature Value"]
@@ -58,10 +58,10 @@ def generate_feature_plot_data(eids, predictions, feature):
     return df
 
 
-def generate_feature_plot(eids, predictions, feature, discrete=False):
+def generate_feature_plot(eids, predictions, feature, model_id, discrete=False):
     # The data computation part of this function is separated out to address a bug with
     #   plotly_events when generating the fig with a cached function
-    df = generate_feature_plot_data(eids, predictions, feature)
+    df = generate_feature_plot_data(eids, predictions, feature, model_id=model_id)
     hover_data = {
         "Contribution": ":.3f",
         "Value": True,
@@ -84,12 +84,12 @@ def generate_feature_plot(eids, predictions, feature, discrete=False):
     return fig
 
 
-def view(eids, predictions, feature, discrete=False):
+def view(eids, predictions, feature, model_id, discrete=False):
     col1, col2 = st.columns(2)
     with col1:
-        fig1 = generate_feature_plot(eids, predictions, feature, discrete)
+        fig1 = generate_feature_plot(eids, predictions, feature, model_id, discrete)
         selected_index = plotly_events(fig1)
-        fig2 = generate_feature_distribution_plot(eids, feature)
+        fig2 = generate_feature_distribution_plot(eids, feature, model_id=model_id)
         st.plotly_chart(fig2)
     with col2:
         if len(selected_index) > 0:
@@ -97,7 +97,7 @@ def view(eids, predictions, feature, discrete=False):
             st.subheader(
                 "Contributions for {entity} {eid}".format(entity=get_term("Entity"), eid=eid)
             )
-            feature_contribution.view(eid, save_space=True, key="explore_feature")
+            feature_contribution.view(eid, model_id, save_space=True, key="explore_feature")
         else:
             st.warning("Select a point in the plot to see all contributions!")
 

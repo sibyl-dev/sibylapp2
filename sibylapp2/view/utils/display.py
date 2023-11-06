@@ -15,9 +15,13 @@ def show_probability_select_box():
 
 
 def view_prediction(eid):
-    predictions = model.get_predictions(st.session_state["eids"])
+    predictions = model.get_predictions(
+        st.session_state["eids"], model_id=st.session_state["model_id"]
+    )
     if SUPPORT_PROBABILITY:
-        predictions_proba = model.get_predictions(st.session_state["eids"], return_proba=True)
+        predictions_proba = model.get_predictions(
+            st.session_state["eids"], model_id=st.session_state["model_id"], return_proba=True
+        )
 
     pred = predictions[eid]
     if st.session_state["display_proba"]:
