@@ -64,10 +64,8 @@ def view_prediction_difference(
         )
     else:
         st.metric(
-            (
-                f"{get_term('Prediction')} Change from {get_term('Entity')} {eid} to"
-                f" {get_term('Entity')} {eid_comp}:"
-            ),
+            f"{get_term('Prediction')} Change from {get_term('Entity')} {eid} to"
+            f" {get_term('Entity')} {eid_comp}:",
             output_text,
         )
 

@@ -119,19 +119,21 @@ def view_model_select(default=0):
         )
     else:
         st.session_state["select_model_index"] = default
-    st.sidebar.selectbox(
-        "Select model",
-        st.session_state["model_ids"],
-        index=st.session_state["select_model_index"],
-        key="model_id",
-    )
+    if len(st.session_state["model_ids"]) > 1:
+        st.sidebar.selectbox(
+            "Select model",
+            st.session_state["model_ids"],
+            index=st.session_state["select_model_index"],
+            key="model_id",
+        )
+    else:
+        st.session_state["model_id"] = st.session_state["model_ids"][0]
 
 
 def view_selection():
     """
     This function handles the display of entities selection.
     """
-    display.show_probability_select_box()
     view_entity_select()
     eid = st.session_state["eid"]
     row_ids = st.session_state["row_id_dict"][eid]

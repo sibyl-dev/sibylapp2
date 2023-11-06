@@ -5,15 +5,16 @@ import copy
 import streamlit as st
 
 from sibylapp2.view import customized_entity
-from sibylapp2.view.utils import filtering, setup
+from sibylapp2.view.utils import display, filtering, setup
 
 setup.setup_page(return_row_ids=True)
 setup.generate_options_for_features(
     st.session_state["dataset_eids"], st.session_state["all_features"]
 )
 # Sidebar ------------------------------------
-filtering.view_selection()
+display.show_probability_select_box()
 filtering.view_model_select()
+filtering.view_selection()
 customized_entity.view_instructions()
 
 # Global options ------------------------------

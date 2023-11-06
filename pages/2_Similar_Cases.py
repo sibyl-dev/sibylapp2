@@ -8,8 +8,8 @@ from sibylapp2.view.utils import filtering, setup
 setup.setup_page()
 
 # Sidebar ------------------------------------
-filtering.view_entity_select()
 filtering.view_model_select()
+filtering.view_entity_select()
 filtering.view_filtering()
 similar_entities.view_instructions()
 

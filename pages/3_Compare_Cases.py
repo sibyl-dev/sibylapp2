@@ -10,19 +10,18 @@ setup.setup_page(return_row_ids=True)
 
 # Sidebar ------------------------------------
 display.show_probability_select_box()
+filtering.view_model_select()
 filtering.view_entity_select(eid_text="eid")
 eid = st.session_state["eid"]
 row_ids = st.session_state["row_id_dict"][eid]
 if len(row_ids) > 1:
     filtering.view_time_select(eid, row_ids, row_id_text="row_id", prefix="first", default=0)
     filtering.view_time_select(eid, row_ids, row_id_text="row_id_comp", prefix="second", default=1)
-    filtering.view_model_select()
     entity_difference.view_instructions(use_row_ids=True)
 else:
     display.view_prediction(st.session_state["eid"])
     filtering.view_entity_select(eid_text="eid_comp", prefix="another", default=1)
     display.view_prediction(st.session_state["eid_comp"])
-    filtering.view_model_select()
     entity_difference.view_instructions()
 
 # Global options ------------------------------
