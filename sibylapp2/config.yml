@@ -1,0 +1,18 @@
+# API CONFIGURATIONS ==============================================================================
+BASE_URL: "http://localhost:3000/api/v1/"
+CERT:
+
+# GENERAL CONFIGURATIONS ============================================================================
+BAR_LENGTH: 8 # Number of squares to use for contribution/importance bars
+MAX_ENTITIES: 11 # Maximum number of entities to select from. Set this to None to use all
+DATASET_SIZE: 1000 # Max number of entities to use for dataset-wide visualizations
+LOAD_UPFRONT: True # If true, run heavy computations on initial load, else greedily run as needed
+
+# APPLICATION-SPECIFIC CONFIGURATIONS (overrides API context) ========================================
+FLIP_COLORS: # If true, positive contributions will be red
+PREDICTION_TYPE: # One of "numeric", "boolean", "categorical"
+POSITIVE_TERM: # Term to use for a True prediction for boolean models
+NEGATIVE_TERM: # Term to use for a False prediction for boolean models
+PRED_FORMAT_STRING: # fstring for formatting numeric model outputs
+OVERRIDE_PRED_FORMAT: # If True, use "config.manual_pred_format_func" to format preds, ignoring previous 3 configs
+SUPPORT_PROBABILITY: # Only set this to True when model supports `predict_proba`

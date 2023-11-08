@@ -1,24 +1,25 @@
-import streamlit as st
-from sibylapp.view.utils import filtering, setup
-from sibylapp.view import explore_feature, feature_importance, global_contributions
-from sibylapp.compute.context import get_term
-from sibylapp.compute import model, contributions
-import extra_streamlit_components as stx
-import numpy as np
+# pylint: disable=invalid-name
 
+import extra_streamlit_components as stx
+import streamlit as st
+
+from sibylapp2 import config
+from sibylapp2.compute import contributions, model
+from sibylapp2.compute.context import get_term
+from sibylapp2.view import explore_feature, feature_importance, global_contributions
+from sibylapp2.view.utils import filtering, setup
 
 setup.setup_page()
 
 # Global options ------------------------------
+filtering.view_model_select()
 filtering.view_filtering()
 
 # Compute -------------------------------------
-predictions = model.get_dataset_predictions()
-discrete = (
-    len(np.unique(list(predictions.values()))) <= 6
-)  # todo: ensure non-numeric is discrete
+predictions = model.get_dataset_predictions(st.session_state["model_id"])
+discrete = config.PREDICTION_TYPE in (config.PredType.BOOLEAN, config.PredType.CATEGORICAL)
 
-all_contributions = contributions.get_dataset_contributions()
+all_contributions = contributions.get_dataset_contributions(st.session_state["model_id"])
 
 # Setup tabs ----------------------------------
 pred_filter_container = st.container()
@@ -30,9 +31,7 @@ tab = stx.tab_bar(
             id=2, title="Global %s" % get_term("Feature Contributions"), description=""
         ),
         stx.TabBarItemData(id=3, title="Summary Plot", description=""),
-        stx.TabBarItemData(
-            id=4, title="Explore a %s" % get_term("Feature"), description=""
-        ),
+        stx.TabBarItemData(id=4, title="Explore a %s" % get_term("Feature"), description=""),
     ],
     default=1,
 )
@@ -53,9 +52,7 @@ st.session_state["disabled"] = tab == "1"
 with pred_filter_container:
     if "disabled" not in st.session_state:
         st.session_state["disabled"] = True
-    eids = filtering.view_prediction_selection(
-        predictions, disabled=st.session_state["disabled"]
-    )
+    eids = filtering.view_prediction_selection(predictions, disabled=st.session_state["disabled"])
 
 placeholder = st.container()
 features = all_contributions[next(iter(all_contributions))]["Feature"]
@@ -69,13 +66,13 @@ if tab == "2":
         if len(eids) == 0:
             st.warning("Select predictions above to see explanation!")
         else:
-            global_contributions.view(eids)
+            global_contributions.view(eids, st.session_state["model_id"])
 
 if tab == "3":
     if len(eids) == 0:
         st.warning("Select predictions above to see explanation!")
     else:
-        global_contributions.view_summary_plot(eids)
+        global_contributions.view_summary_plot(eids, st.session_state["model_id"])
 
 if tab == "4":
     with placeholder:
@@ -87,5 +84,5 @@ if tab == "4":
                 filtering.process_search_on_features(features),
             )
             explore_feature.view(
-                eids, predictions, feature, discrete
+                eids, predictions, feature, st.session_state["model_id"], discrete
             )

@@ -1,27 +1,9 @@
 import streamlit as st
 
-from sibylapp.compute import contributions
-from sibylapp.compute.context import get_term
-from sibylapp.config import NEGATIVE_TERM, POSITIVE_TERM, PREDICTION_TYPE, PredType
-from sibylapp.view.utils import filtering, helpers
-from sibylapp.view.utils.helpers import NEG_EM, POS_EM
-
-
-def show_legend():
-    modelPred = get_term("Prediction", l=True)
-    posChange = ""
-    negChange = ""
-    separator = "&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;"
-    # *will add detail for categorical predictions after we figure this out
-    if PREDICTION_TYPE == PredType.NUMERIC:
-        posChange = " Increase in"
-        negChange = " Decrease in"
-    elif PREDICTION_TYPE == PredType.BOOLEAN:
-        posChange = f" towards **{POSITIVE_TERM}** as"
-        negChange = f" towards **{NEGATIVE_TERM}** as"
-    st.write(
-        (NEG_EM + negChange + " " + modelPred) + separator + (POS_EM + posChange + " " + modelPred)
-    )
+from sibylapp2.compute import contributions
+from sibylapp2.compute.context import get_term
+from sibylapp2.view.utils import filtering, helpers
+from sibylapp2.view.utils.helpers import show_legend
 
 
 def show_sorted_contributions(to_show, sort_by, key=None):
@@ -78,7 +60,11 @@ def format_contributions_to_view(contribution_df, show_number=False):
     return contribution_df
 
 
-def view(eid, save_space=False, key=None):
+def view(eid, model_id, save_space=False, use_row_id=False, eid_for_rows=None, key=None):
+    """
+    `eid_for_rows` is only used when `use_row_id` == True.
+    `eid` are used as row_id when `use_row_id` == True
+    """
     show_number = False
     show_average = False
     if not save_space:
@@ -103,9 +89,16 @@ def view(eid, save_space=False, key=None):
         cols = st.columns(1)
         with cols[0]:
             sort_by = helpers.show_sort_options(["Absolute", "Ascending", "Descending"])
-    to_show = format_contributions_to_view(
-        contributions.get_contributions([eid])[eid], show_number=show_number
-    )
+
+    if use_row_id:
+        to_show = format_contributions_to_view(
+            contributions.get_contributions_for_rows(eid_for_rows, [eid], model_id=model_id)[eid],
+            show_number=show_number,
+        )
+    else:
+        to_show = format_contributions_to_view(
+            contributions.get_contributions([eid], model_id=model_id)[eid], show_number=show_number
+        )
     if not show_average:
         to_show = to_show.drop("Average/Mode Value", axis="columns")
 
@@ -125,20 +118,20 @@ def view_instructions():
         st.markdown(
             "A large **{positive}** bar means that this {feature}'s value significantly increased"
             " the model's prediction on this {entity}. A large **{negative}** bar means that this"
-            " {feature}'s value significantly decreased the model's prediction. A lack of a bar"
-            " suggests this {feature} had little effect on the model's prediction in this case."
-            .format(
+            " {feature}'s value significantly decreased the model's prediction. A lack of a"
+            " bar suggests this {feature} had little effect on the model's prediction in this"
+            " case.".format(
                 positive=positive,
                 negative=negative,
-                feature=get_term("Feature").lower(),
-                entity=get_term("Entity").lower(),
+                feature=get_term("Feature", lower=True),
+                entity=get_term("Entity", lower=True),
             )
         )
         st.markdown(
             "You can select {a_entity} from the dropdown above, and see the {feature}"
             " contributions. You can also **filter** and **search** the {feature} table or adjust"
             " the **sort order**.".format(
-                a_entity=get_term("Entity", a=True, l=True),
-                feature=get_term("Feature", l=True),
+                a_entity=get_term("Entity", with_a=True, lower=True),
+                feature=get_term("Feature", lower=True),
             )
         )

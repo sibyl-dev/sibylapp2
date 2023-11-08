@@ -1,10 +1,10 @@
 import pandas as pd
 import streamlit as st
 
-from sibylapp.compute import example_based
-from sibylapp.compute.context import get_term
-from sibylapp.view.utils import helpers
-from sibylapp.view.utils.filtering import process_options
+from sibylapp2.compute import example_based
+from sibylapp2.compute.context import get_term
+from sibylapp2.view.utils import helpers
+from sibylapp2.view.utils.filtering import process_options
 
 
 def format_similar_entities(x, y):
@@ -30,8 +30,8 @@ def filter_different_rows(to_show, neighbor_names, selected_col_name):
     return to_show_filtered
 
 
-def view(eid):
-    x, y = example_based.get_similar_entities(eid)
+def view(eid, model_id):
+    x, y = example_based.get_similar_entities(eid, model_id=model_id)
     y.index = ["y"]  # Used to prevent bug in data_editor where index is assumed to be numeric
     to_show, neighbor_names, selected_col_name = format_similar_entities(x, y)
     options = ["No filtering"] + neighbor_names
@@ -54,10 +54,10 @@ def view_instructions():
     with expander:
         st.markdown(
             "The **Similar Cases** page shows the two {entities} from the training dataset with"
-            " the most similar {feature} values. Rows where a similar {entity} has a different"
-            " value are highlighted.".format(
-                entities=get_term("Entity", p=True, l=True),
-                feature=get_term("Feature", l=True),
-                entity=get_term("Entity", l=True),
+            " the most similar {feature} values. Rows where a similar {entity} has a"
+            " different value are highlighted.".format(
+                entities=get_term("Entity", plural=True, lower=True),
+                feature=get_term("Feature", lower=True),
+                entity=get_term("Entity", lower=True),
             )
         )
