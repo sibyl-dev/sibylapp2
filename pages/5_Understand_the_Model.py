@@ -32,7 +32,6 @@ tab = stx.tab_bar(
         stx.TabBarItemData(
             id=2, title="Global %s" % get_term("Feature Contributions"), description=""
         ),
-        stx.TabBarItemData(id=3, title="Summary Plot", description=""),
         stx.TabBarItemData(id=4, title="Explore a %s" % get_term("Feature"), description=""),
     ],
     default=1,
@@ -70,21 +69,15 @@ if tab == "2":
         else:
             global_contributions.view(eids, st.session_state["model_id"])
 
-# if tab == "3":
-#     if len(eids) == 0:
-#         st.warning("Select predictions above to see explanation!")
-#     else:
-#         global_contributions.view_summary_plot(eids, st.session_state["model_id"])
-#
-# if tab == "4":
-#     with placeholder:
-#         if len(eids) == 0:
-#             st.warning("Select predictions above to see explanation!")
-#         else:
-#             feature = st.selectbox(
-#                 "Select a %s" % get_term("feature"),
-#                 filtering.process_search_on_features(features),
-#             )
-#             explore_feature.view(
-#                 eids, predictions, feature, st.session_state["model_id"], discrete
-#             )
+if tab == "4":
+    with placeholder:
+        if len(eids) == 0:
+            st.warning("Select predictions above to see explanation!")
+        else:
+            feature = st.selectbox(
+                "Select a %s" % get_term("feature"),
+                filtering.process_search_on_features(features),
+            )
+            explore_feature.view(
+                eids, predictions, feature, st.session_state["model_id"], discrete
+            )

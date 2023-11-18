@@ -12,13 +12,9 @@ from sibylapp2.view import feature_contribution
 
 @st.cache_data(show_spinner="Generating distribution plot...")
 def generate_feature_distribution_plot(eids, feature, model_id):
-    contribution_dict = contributions.get_contributions(eids, model_id=model_id)
-    data = pd.DataFrame(
-        [
-            contribution_dict[eid][contribution_dict[eid]["Feature"] == feature]["Feature Value"]
-            for eid in contribution_dict
-        ]
-    ).squeeze()
+    _, value_dict = contributions.get_contributions(eids, model_id=model_id)
+    data = pd.Series(value_dict[feature])
+
     if pd.api.types.is_numeric_dtype(pd.to_numeric(data, errors="ignore")):
         trace1 = go.Box(x=data, boxpoints="all", name="", marker_color="rgb(84, 31, 63)")
         fig = go.Figure(data=[trace1])
@@ -36,25 +32,22 @@ def generate_feature_distribution_plot(eids, feature, model_id):
 
 @st.cache_data(show_spinner="Generating feature plot...")
 def generate_feature_plot_data(eids, predictions, feature, model_id):
-    contributions_to_show = contributions.get_contributions(eids, model_id=model_id)
-    data = {
-        i: contributions_to_show[i][contributions_to_show[i]["Feature"] == feature][
-            ["Contribution", "Feature Value"]
-        ].squeeze()
-        for i in contributions_to_show
-    }
+    contributions_df, values = contributions.get_contributions(eids, model_id=model_id)
+    contributions_for_feature = contributions_df[feature]
+    values_for_feature = values[feature]
+
     formatted_pred = {i: config.pred_format_func(predictions[i]) for i in predictions}
     # Adding the space after prediction as a hack to allow two columns with the same displayed name
     df = pd.concat(
         [
-            pd.DataFrame(data).T,
             pd.Series(predictions, name="Prediction "),
             pd.Series(formatted_pred, name="Prediction"),
         ],
         axis=1,
     )
+    df["Value"] = values_for_feature
+    df["Contribution"] = contributions_for_feature
     df["ID"] = df.index
-    df = df.rename(columns={"Feature Value": "Value"})
     return df
 
 
