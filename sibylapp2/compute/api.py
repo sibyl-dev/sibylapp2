@@ -102,15 +102,11 @@ def fetch_entity(eid, row_id=None) -> pd.Series:
 
 
 def fetch_contributions(eids, row_ids=None, model_id=fetch_model_id()):
-    features_df = fetch_features()
     json = {"eids": eids, "model_id": model_id, "row_ids": row_ids}
-    result = api_post("multi_contributions/", json)["contributions"]
-    contributions = {}
-    for eid in result:
-        contributions[eid] = pd.concat(
-            [features_df, pd.DataFrame.from_dict(result[eid], orient="index")], axis=1
-        )
-    return contributions
+    result = api_post("multi_contributions/", json)
+    contributions = pd.DataFrame.from_dict(result["contributions"], orient="index")
+    values = pd.DataFrame.from_dict(result["values"], orient="index")
+    return contributions, values
 
 
 def fetch_contribution_for_modified_data(eid, changes, row_id=None, model_id=fetch_model_id()):

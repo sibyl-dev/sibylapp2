@@ -1,9 +1,11 @@
 import streamlit as st
 
-from sibylapp2.compute import contributions
+from sibylapp2.compute import contributions, features
 from sibylapp2.compute.context import get_term
 from sibylapp2.view.utils import filtering, helpers
 from sibylapp2.view.utils.helpers import show_legend
+
+import pandas as pd
 
 
 def show_sorted_contributions(to_show, sort_by, key=None):
@@ -42,22 +44,19 @@ def show_sorted_contributions(to_show, sort_by, key=None):
         helpers.show_table(to_show.drop("Contribution Value", axis="columns"), key=key)
 
 
-def format_contributions_to_view(contribution_df, show_number=False):
-    contribution_df = contribution_df.rename(
-        columns={
-            "category": "Category",
-            "Feature Value": "Value",
-            "Average/Mode": "Average/Mode Value",
-        }
+def format_contributions_to_view(eid, show_number=False):
+    contribution_df, value_df = contributions.get_contributions(eid)
+    full_df = features.get_features()
+    full_df["Value"] = value_df.T
+    full_df["Contribution"] = contribution_df.T
+    full_df = full_df.rename(columns={"category": "Category"})
+
+    full_df = full_df[["Category", "Feature", "Value", "Contribution"]]  # reorder
+    full_df["Contribution Value"] = full_df["Contribution"].copy()
+    full_df["Contribution"] = helpers.generate_bars(
+        full_df["Contribution"], show_number=show_number
     )
-    contribution_df = contribution_df[
-        ["Category", "Feature", "Value", "Average/Mode Value", "Contribution"]
-    ]  # reorder
-    contribution_df["Contribution Value"] = contribution_df["Contribution"].copy()
-    contribution_df["Contribution"] = helpers.generate_bars(
-        contribution_df["Contribution"], show_number=show_number
-    )
-    return contribution_df
+    return full_df
 
 
 def view(eid, model_id, save_space=False, use_row_id=False, eid_for_rows=None, key=None):
@@ -96,11 +95,9 @@ def view(eid, model_id, save_space=False, use_row_id=False, eid_for_rows=None, k
             show_number=show_number,
         )
     else:
-        to_show = format_contributions_to_view(
-            contributions.get_contributions([eid], model_id=model_id)[eid], show_number=show_number
-        )
-    if not show_average:
-        to_show = to_show.drop("Average/Mode Value", axis="columns")
+        to_show = format_contributions_to_view(eid, show_number=show_number)
+    # if not show_average:
+    #    to_show = to_show.drop("Average/Mode Value", axis="columns")
 
     show_sorted_contributions(to_show, sort_by, key=key)
 

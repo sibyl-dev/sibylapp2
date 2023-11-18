@@ -4,30 +4,10 @@ import streamlit as st
 from sibylapp2.compute import api, entities
 
 
-@st.cache_data(show_spinner="Computing contribution scores...")
-def compute_contributions(eids, model_id=api.fetch_model_id(), key="contributions"):
-    contributions = api.fetch_contributions(eids, model_id=model_id)
-    if key not in st.session_state:
-        st.session_state[key] = contributions
-    else:
-        st.session_state[key] = dict(st.session_state[key], **contributions)
-    return contributions
-
-
 @st.cache_data(show_spinner="Getting contributions...")
 def get_contributions(eids, model_id=api.fetch_model_id()):
-    key = f"contributions_{model_id}"
-    if key not in st.session_state:
-        contributions = compute_contributions(eids, model_id=model_id, key=key)
-    else:
-        contributions = st.session_state[key]
-    missing_eids = list(set(eids) - contributions.keys())
-    if len(missing_eids) > 0:
-        contributions = {
-            **contributions,
-            **compute_contributions(missing_eids, model_id=model_id, key=key),
-        }
-    return {eid: contributions[eid] for eid in eids}
+    contributions, values = api.fetch_contributions(eids, model_id=model_id)
+    return contributions, values
 
 
 @st.cache_data(show_spinner="Computing contributions...")
