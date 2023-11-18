@@ -55,11 +55,8 @@ def get_contribution_for_modified_data(eid, changes, row_id=None, model_id=api.f
 
 @st.cache_data(show_spinner="Getting global contributions...")
 def compute_global_contributions(eids, model_id):
-    contributions_in_range = get_contributions(eids, model_id=model_id)
-    rows = pd.concat(
-        [contributions_in_range[eid]["Contribution"] for eid in contributions_in_range],
-        axis=1,
-    )
-    negs = rows[rows <= 0].mean(axis=1).fillna(0)
-    poss = rows[rows >= 0].mean(axis=1).fillna(0)
+    contributions_in_range, _ = get_contributions(eids, model_id=model_id)
+    contributions_in_range = contributions_in_range.T
+    negs = contributions_in_range[contributions_in_range <= 0].mean(axis=1).fillna(0)
+    poss = contributions_in_range[contributions_in_range >= 0].mean(axis=1).fillna(0)
     return pd.concat({"negative": negs, "positive": poss}, axis=1)
