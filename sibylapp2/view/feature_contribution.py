@@ -45,7 +45,7 @@ def show_sorted_contributions(to_show, sort_by, key=None):
 
 
 def format_contributions_to_view(eid, show_number=False):
-    contribution_df, value_df = contributions.get_contributions(eid)
+    contribution_df, value_df = contributions.get_contributions([eid])
     full_df = features.get_features()
     full_df["Value"] = value_df.T
     full_df["Contribution"] = contribution_df.T
