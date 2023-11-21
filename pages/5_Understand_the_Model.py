@@ -75,7 +75,7 @@ if tab == "4":
             st.warning("Select predictions above to see explanation!")
         else:
             feature = st.selectbox(
-                "Select a %s" % get_term("feature"),
+                "Select a %s" % get_term("Feature", lower=True),
                 filtering.process_search_on_features(features),
             )
             explore_feature.view(

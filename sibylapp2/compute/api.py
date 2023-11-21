@@ -135,7 +135,7 @@ def fetch_similar_examples(eids, model_id=fetch_model_id()):
         y = pd.Series(result[eid]["y"]).to_frame().T
         X = pd.concat(
             [
-                features_df[["Feature", "category"]],
+                features_df,
                 pd.DataFrame.from_dict(result[eid]["X"], orient="index").T,
             ],
             axis=1,
