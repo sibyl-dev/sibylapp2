@@ -2,13 +2,14 @@ from __future__ import annotations
 
 import pandas as pd
 import streamlit as st
+from sibylapp2.compute.context import get_term
 
 from sibylapp2.compute import api
 
 
 @st.cache_data(show_spinner="Fetching data...")
 def get_features() -> pd.DataFrame:
-    features = api.fetch_features()
+    features = api.fetch_features()[["Feature", "Category"]]
     return features
 
 

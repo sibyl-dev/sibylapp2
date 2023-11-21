@@ -1,10 +1,12 @@
 import streamlit as st
 
-from sibylapp2.compute import contributions, model
+from sibylapp2.compute import contributions, model, features
 from sibylapp2.compute.context import get_term
 from sibylapp2.config import POSITIVE_TERM, PREDICTION_TYPE, PredType, pred_format_func
 from sibylapp2.view.utils import filtering, helpers
 from sibylapp2.view.utils.formatting import format_two_contributions_to_view
+
+import pandas as pd
 
 
 def view_prediction_difference(
@@ -153,13 +155,21 @@ def view(
     else:
         lsuffix = " for %s %s" % (get_term("Entity"), eid)
         rsuffix = " for %s %s" % (get_term("Entity"), eid_comp)
-        contributions_dict = contributions.get_contributions([eid, eid_comp], model_id=model_id)
-    original_df = contributions_dict[eid]
-    other_df = contributions_dict[eid_comp]
+        contributions_df, values_df = contributions.get_contributions(
+            [eid, eid_comp], model_id=model_id
+        )
+        features_df = features.get_features()
+    original_df = pd.DataFrame(
+        {"Contribution": contributions_df.loc[eid], "Value": values_df.loc[eid]}
+    )
+    other_df = pd.DataFrame(
+        {"Contribution": contributions_df.loc[eid_comp], "Value": values_df.loc[eid_comp]}
+    )
 
     to_show = format_two_contributions_to_view(
         original_df,
         other_df,
+        features_df,
         lsuffix=lsuffix,
         rsuffix=rsuffix,
         show_number=show_number,
