@@ -9,7 +9,7 @@ from sibylapp2.compute import api
 
 @st.cache_data(show_spinner="Fetching data...")
 def get_features() -> pd.DataFrame:
-    features = api.fetch_features()[["Feature", "Category"]]
+    features = api.fetch_features()[["Category", "Feature"]]
     return features
 
 
