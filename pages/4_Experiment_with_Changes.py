@@ -17,7 +17,7 @@ customized_entity.view_instructions()
 
 # Global options ------------------------------
 eid = st.session_state["eid"]
-if st.session_state["use_rows"]:
+if "use_rows" in st.session_state and st.session_state["use_rows"]:
     changes = customized_entity.view_feature_boxes(
         st.session_state["row_id"],
         st.session_state["options_dict"],
@@ -35,7 +35,7 @@ if st.button("Run model and explanations on customized data"):
     st.session_state["changes_to_show"] = copy.deepcopy(changes)
 
 if "changes_to_show" in st.session_state:
-    if st.session_state["use_rows"]:
+    if "use_rows" in st.session_state and st.session_state["use_rows"]:
         customized_entity.view_prediction(
             st.session_state["row_id"],
             st.session_state["changes_to_show"],
