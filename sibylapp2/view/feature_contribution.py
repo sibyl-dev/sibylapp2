@@ -44,8 +44,11 @@ def show_sorted_contributions(to_show, sort_by, key=None):
         helpers.show_table(to_show.drop("Contribution Value", axis="columns"), key=key)
 
 
-def format_contributions_to_view(eid, show_number=False):
-    contribution_df, value_df = contributions.get_contributions([eid])
+def format_contributions_to_view(eid, row_id=None, show_number=False):
+    if row_id is not None:
+        contribution_df, value_df = contributions.get_contributions_for_rows(eid, row_id)
+    else:
+        contribution_df, value_df = contributions.get_contributions([eid])
     full_df = features.get_features()
     full_df["Value"] = value_df.T
     full_df["Contribution"] = contribution_df.T
@@ -59,7 +62,7 @@ def format_contributions_to_view(eid, show_number=False):
     return full_df
 
 
-def view(eid, model_id, save_space=False, use_row_id=False, eid_for_rows=None, key=None):
+def view(eid, model_id, row_id=None, save_space=False, key=None):
     """
     `eid_for_rows` is only used when `use_row_id` == True.
     `eid` are used as row_id when `use_row_id` == True
@@ -89,13 +92,7 @@ def view(eid, model_id, save_space=False, use_row_id=False, eid_for_rows=None, k
         with cols[0]:
             sort_by = helpers.show_sort_options(["Absolute", "Ascending", "Descending"])
 
-    if use_row_id:
-        to_show = format_contributions_to_view(
-            contributions.get_contributions_for_rows(eid_for_rows, [eid], model_id=model_id)[eid],
-            show_number=show_number,
-        )
-    else:
-        to_show = format_contributions_to_view(eid, show_number=show_number)
+    to_show = format_contributions_to_view(eid, row_id=row_id, show_number=show_number)
     # if not show_average:
     #    to_show = to_show.drop("Average/Mode Value", axis="columns")
 

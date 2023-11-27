@@ -40,7 +40,6 @@ def setup_page(return_row_ids=False):
     # Populate cache -----------------------------
     if config.LOAD_UPFRONT:
         model.get_dataset_predictions()
-
         contributions.get_dataset_contributions()
         importance.compute_importance()
 

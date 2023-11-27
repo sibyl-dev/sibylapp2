@@ -10,32 +10,10 @@ def get_contributions(eids, model_id=api.fetch_model_id()):
     return contributions, values
 
 
-@st.cache_data(show_spinner="Computing contributions...")
-def compute_contributions_for_rows(
-    eid, row_ids, model_id=api.fetch_model_id(), key="contributions_rows"
-):
-    contributions = api.fetch_contributions([eid], row_ids, model_id=model_id)
-    if key not in st.session_state:
-        st.session_state[key] = contributions
-    else:
-        st.session_state[key] = dict(st.session_state[key], **contributions)
-    return contributions
-
-
 @st.cache_data(show_spinner="Getting contributions...")
-def get_contributions_for_rows(eid, row_ids, model_id=api.fetch_model_id()):
-    key = f"contributions_rows_{model_id}"
-    if key not in st.session_state:
-        contributions = compute_contributions_for_rows(eid, row_ids, model_id=model_id, key=key)
-    else:
-        contributions = st.session_state[key]
-    missing_row_ids = list(set(row_ids) - contributions.keys())
-    if len(missing_row_ids) > 0:
-        contributions = {
-            **contributions,
-            **compute_contributions_for_rows(eid, missing_row_ids, model_id=model_id, key=key),
-        }
-    return contributions
+def get_contributions_for_rows(eid, row_id, model_id=api.fetch_model_id()):
+    contributions, values = api.fetch_contributions([eid], [row_id], model_id=model_id)
+    return contributions, values
 
 
 @st.cache_data(show_spinner="Getting contributions...")
