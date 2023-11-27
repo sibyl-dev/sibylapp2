@@ -158,7 +158,7 @@ def view(
         contributions_df, values_df = contributions.get_contributions(
             [eid, eid_comp], model_id=model_id
         )
-        features_df = features.get_features()
+    features_df = features.get_features()
     original_df = pd.DataFrame(
         {"Contribution": contributions_df.loc[eid], "Value": values_df.loc[eid]}
     )

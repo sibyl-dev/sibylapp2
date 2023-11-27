@@ -1,34 +1,32 @@
 from __future__ import annotations
 
-import pandas as pd
 import streamlit as st
 
-from sibylapp2.compute import contributions, model
+from sibylapp2.compute import contributions, model, features
 from sibylapp2.compute.context import get_term
-from sibylapp2.compute.features import get_entity
 from sibylapp2.config import pred_format_func
 from sibylapp2.view.entity_difference import sort_contributions, view_compare_cases_helper
 from sibylapp2.view.utils import helpers
 from sibylapp2.view.utils.formatting import format_two_contributions_to_view
 from sibylapp2.view.utils.helpers import show_text_input_side_by_side
 
+import pandas as pd
+
 
 def view_feature_boxes(
     eid: str,
-    features_df: pd.DataFrame,
     options_dict: dict[str, list[str | int | float]],
     use_row_id: bool = False,
     eid_for_rows: str | None = None,
 ):
     if "changes" not in st.session_state:
         st.session_state["changes"] = {}
-
     if use_row_id:
-        entity = get_entity(eid_for_rows, eid)
+        entity = features.get_entity(eid_for_rows, eid)
     else:
-        entity = get_entity(eid)
+        entity = features.get_entity(eid)
     changes = {}
-
+    features_df = features.get_features(include_type=True)
     selected_features = st.multiselect(
         "Select %s to change:" % get_term("Feature", lower=True, plural=True),
         features_df.index.tolist(),
@@ -45,7 +43,7 @@ def view_feature_boxes(
 
         numeric = True
         options = None
-        if features_df.loc[feature, "type"] != "numeric":
+        if features_df.loc[feature, "Type"] != "numeric":
             numeric = False
             options = options_dict[feature]
 
@@ -123,13 +121,19 @@ def view(eid, changes, model_id, use_row_id=False, eid_for_rows=None, save_space
             eid_for_rows, changes, eid, model_id=model_id
         )
     else:
-        original_df = contributions.get_contributions([eid], model_id=model_id)[eid]
-        other_df = contributions.get_contribution_for_modified_data(
+        original_df, original_values_df = contributions.get_contributions([eid], model_id=model_id)
+        other_df, other_values_df = contributions.get_contribution_for_modified_data(
             eid, changes, model_id=model_id
         )
+    original_df = pd.DataFrame(
+        {"Contribution": original_df.loc[eid], "Value": original_values_df.loc[eid]}
+    )
+    other_df = pd.DataFrame({"Contribution": other_df.loc[eid], "Value": other_values_df.loc[eid]})
+    feature_df = features.get_features()
     to_show = format_two_contributions_to_view(
         original_df,
         other_df,
+        feature_df,
         lsuffix=" for %s %s" % (get_term("Entity"), eid),
         rsuffix=" for modified %s" % get_term("Entity"),
         show_number=show_number,

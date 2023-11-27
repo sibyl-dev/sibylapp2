@@ -32,7 +32,7 @@ def setup_page(return_row_ids=False):
         st.session_state["dataset_eids"] = entities.get_eids(max_entities=config.DATASET_SIZE)
 
     if "all_features" not in st.session_state:
-        st.session_state["all_features"] = features.get_features()
+        st.session_state["all_features"] = features.get_features(include_type=True)
 
     # Global display options ---------------------
     if "display_proba" not in st.session_state:
@@ -45,5 +45,5 @@ def setup_page(return_row_ids=False):
         importance.compute_importance()
 
 
-def generate_options_for_features(eids: list[str], features_df: pd.DataFrame):
-    st.session_state["options_dict"] = features.get_options_for_categories(eids, features_df)
+def generate_options_for_features(eids: list[str]):
+    st.session_state["options_dict"] = features.get_options_for_categories(eids)

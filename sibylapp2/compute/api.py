@@ -86,7 +86,7 @@ def fetch_predictions(eids, row_ids=None, model_id=fetch_model_id(), return_prob
 def fetch_features():
     features = api_get("features/")["features"]
     features_df = pd.DataFrame(features).rename(
-        columns={"description": "Feature", "category": "Category"}
+        columns={"description": "Feature", "category": "Category", "type": "Type"}
     )
     features_df = features_df.set_index("name")
     return features_df
@@ -112,10 +112,11 @@ def fetch_contributions(eids, row_ids=None, model_id=fetch_model_id()):
 
 
 def fetch_contribution_for_modified_data(eid, changes, row_id=None, model_id=fetch_model_id()):
-    features_df = fetch_features()
     json = {"eid": eid, "row_id": row_id, "model_id": model_id, "changes": changes}
-    result = api_post("modified_contribution/", json)["contribution"]
-    return pd.concat([features_df, pd.DataFrame.from_dict(result, orient="index")], axis=1)
+    result = api_post("modified_contribution/", json)
+    contributions = pd.DataFrame.from_dict(result["contributions"], orient="index")
+    values = pd.DataFrame.from_dict(result["values"], orient="index")
+    return contributions, values
 
 
 def fetch_importance(model_id=fetch_model_id()):
