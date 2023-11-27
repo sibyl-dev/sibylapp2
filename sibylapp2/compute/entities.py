@@ -4,14 +4,16 @@ from sibylapp2.compute import api
 
 
 @st.cache_data(show_spinner="Fetching data...")
-def get_eids(max_entities=None, return_row_ids=False):
+def get_eids(
+    max_entities=None,
+    return_row_ids=False,
+):
+    """
+    Returns:
+        eids: list[str]
+        row_id_dict (only if return_row_ids=True): dict[str, list[int]]
+    """
     if return_row_ids:
-        eids, row_id_dict = api.fetch_eids(return_row_ids=True)
+        return api.fetch_eids(return_row_ids=True, max_entities=max_entities)
     else:
-        eids = api.fetch_eids()
-    if max_entities is not None:
-        eids = eids[:max_entities]
-    if return_row_ids:
-        return eids, row_id_dict
-    else:
-        return eids
+        return api.fetch_eids(max_entities=max_entities)

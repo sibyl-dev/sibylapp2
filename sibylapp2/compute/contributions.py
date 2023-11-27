@@ -17,10 +17,26 @@ def get_contributions_for_rows(eid, row_ids, model_id=api.fetch_model_id()):
 
 
 @st.cache_data(show_spinner="Getting contributions...")
-def get_dataset_contributions(model_id=api.fetch_model_id()):
-    if "dataset_eids" not in st.session_state:
-        st.session_state["dataset_eids"] = entities.get_eids(1000)
-    return get_contributions(st.session_state["dataset_eids"], model_id=model_id)
+def get_dataset_contributions(model_id=api.fetch_model_id(), all_rows=True):
+    if "dataset_eids" not in st.session_state or (
+        all_rows and "dataset_row_id_dict" not in st.session_state
+    ):
+        st.session_state["dataset_eids"], st.session_state["dataset_row_id_dict"] = (
+            entities.get_eids(max_entities=1000, return_row_ids=all_rows)
+        )
+    # confirm at least one entity has more than one row
+    if any(len(lst) > 1 for lst in st.session_state["dataset_row_id_dict"].values()):
+        all_contributions = []
+        all_values = []
+        for eid in st.session_state["dataset_eids"]:
+            contributions, values = get_contributions_for_rows(
+                eid, st.session_state["dataset_row_id_dict"][eid], model_id=model_id
+            )
+            all_contributions.append(contributions)
+            all_values.append(values)
+        return pd.concat(all_contributions, axis="rows"), pd.concat(all_values, axis="rows")
+    else:
+        return get_contributions(st.session_state["dataset_eids"], model_id=model_id)
 
 
 @st.cache_data(show_spinner="Getting contribution for your data...")

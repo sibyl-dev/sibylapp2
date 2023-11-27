@@ -9,7 +9,7 @@ from sibylapp2.compute.context import get_term
 from sibylapp2.view import explore_feature, feature_importance, global_contributions
 from sibylapp2.view.utils import filtering, setup
 
-setup.setup_page()
+setup.setup_page(return_row_ids=True)
 
 # Global options ------------------------------
 filtering.view_model_select()

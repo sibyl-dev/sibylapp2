@@ -14,13 +14,12 @@ filtering.view_model_select()
 filtering.view_entity_select(eid_text="eid")
 
 row_ids = st.session_state["row_id_dict"][st.session_state["eid"]]
-if "use_rows" not in st.session_state:
-    st.session_state["use_rows"] = len(row_ids) > 1
-if st.session_state["use_rows"]:
-    filtering.view_time_select(
+
+if len(row_ids) > 1:
+    filtering.view_row_select(
         st.session_state["eid"], row_ids, row_id_text="row_id", prefix="first", default=0
     )
-    filtering.view_time_select(
+    filtering.view_row_select(
         st.session_state["eid"], row_ids, row_id_text="row_id_comp", prefix="second", default=1
     )
     compare_entities.view_instructions(use_row_ids=True)
@@ -32,7 +31,7 @@ else:
 
 # Global options ------------------------------
 filtering.view_filtering()
-if st.session_state["use_rows"]:
+if len(row_ids) > 1:
     if st.session_state["row_id"] == st.session_state["row_id_comp"]:
         st.warning("Please select two different rows!")
     else:

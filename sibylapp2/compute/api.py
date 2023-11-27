@@ -44,12 +44,17 @@ def fetch_model_id():
     return model_id
 
 
-def fetch_eids(return_row_ids=False):
+def fetch_eids(
+    max_entities=None,
+    return_row_ids=False,
+):
     """
     Return corresponding row_ids in the form of a dictionary where the keys are the eids
     and the values are the lists of row_ids for each eid, when specified.
     """
     entities = api_get("entities/")["entities"]
+    if max_entities is not None:
+        entities = entities[:max_entities]
     if return_row_ids:
         return [entry["eid"] for entry in entities], {
             entry["eid"]: entry["row_ids"] for entry in entities
