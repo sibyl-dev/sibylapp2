@@ -12,7 +12,6 @@ def setup_page(return_row_ids=False):
     st.title("Sibyl")
 
     # Selecting eids -----------------------------
-    st.session_state["use_rows"] = False
     if return_row_ids:
         if "eids" not in st.session_state or "row_id_dict" not in st.session_state:
             st.session_state["eids"], st.session_state["row_id_dict"] = entities.get_eids(

@@ -138,37 +138,46 @@ def filter_different_rows(to_show, use_row_ids=False):
     return to_show_filtered
 
 
-def view(
-    eid, eid_comp, model_id, save_space=False, use_row_ids=False, row_ids=None, eid_for_rows=None
-):
+def view(model_id, eid, eid_comp=None, row_id=None, row_id_comp=None, save_space=False):
     """
-    `row_ids` and `eid_for_rows` are only used when `use_row_ids` == True.
-    `eid` and `eid_comp` are used as row_id when `use_row_ids` == True
+    Either `eid_comp` or `row_id`/`row_id_comp` must be given. If `eid_comp` is given,
+    compare entity `eid` to entity `eid_comp`. If the row_ids are given, compare entity `eid`'s
+    `row_id` to its `row_id_comp`.
     """
-    sort_by, show_number, show_contribution = view_compare_cases_helper(save_space=save_space)
-    if use_row_ids:
-        lsuffix = " for time %s" % eid
-        rsuffix = " for time %s" % eid_comp
-        contributions_dict = contributions.get_contributions_for_rows(
-            eid_for_rows, row_ids, model_id=model_id
+    sort_by, show_number, show_contribution = view_compare_cases_helper(save_space)
+
+    if eid_comp is None:
+        if row_id is None or row_id_comp is None:
+            raise ValueError("row_id/row_id_comp must be provided if eid_comp is not provided")
+        lsuffix = " for time %s" % row_id
+        rsuffix = " for time %s" % row_id_comp
+        contribution_df, values_df = contributions.get_contributions_for_rows(
+            eid, [row_id], model_id=model_id
+        )
+        contribution_comp_df, values_comp_df = contributions.get_contributions_for_rows(
+            eid, [row_id_comp], model_id=model_id
         )
     else:
         lsuffix = " for %s %s" % (get_term("Entity"), eid)
         rsuffix = " for %s %s" % (get_term("Entity"), eid_comp)
-        contributions_df, values_df = contributions.get_contributions(
-            [eid, eid_comp], model_id=model_id
+        # Doing this calls separately improves caching
+        contribution_df, values_df = contributions.get_contributions([eid], model_id=model_id)
+        contribution_comp_df, values_comp_df = contributions.get_contributions(
+            [eid_comp], model_id=model_id
         )
+
     features_df = features.get_features()
+
     original_df = pd.DataFrame(
-        {"Contribution": contributions_df.loc[eid], "Value": values_df.loc[eid]}
+        {"Contribution": contribution_df.iloc[0], "Value": values_df.iloc[0]}
     )
-    other_df = pd.DataFrame(
-        {"Contribution": contributions_df.loc[eid_comp], "Value": values_df.loc[eid_comp]}
+    comp_df = pd.DataFrame(
+        {"Contribution": contribution_comp_df.iloc[0], "Value": values_comp_df.iloc[0]}
     )
 
     to_show = format_two_contributions_to_view(
         original_df,
-        other_df,
+        comp_df,
         features_df,
         lsuffix=lsuffix,
         rsuffix=rsuffix,
@@ -185,7 +194,7 @@ def view(
         % (get_term("Feature", lower=True), get_term("Entity", lower=True, plural=True)),
     )
     if show_different == "With filtering":
-        to_show = filter_different_rows(to_show, use_row_ids=use_row_ids)
+        to_show = filter_different_rows(to_show, use_row_ids=(eid_comp is None))
 
     to_show = sort_contributions(to_show, sort_by)
     helpers.show_table(to_show.drop("Contribution Change Value", axis="columns"))

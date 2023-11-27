@@ -11,8 +11,8 @@ def get_contributions(eids, model_id=api.fetch_model_id()):
 
 
 @st.cache_data(show_spinner="Getting contributions...")
-def get_contributions_for_rows(eid, row_id, model_id=api.fetch_model_id()):
-    contributions, values = api.fetch_contributions([eid], [row_id], model_id=model_id)
+def get_contributions_for_rows(eid, row_ids, model_id=api.fetch_model_id()):
+    contributions, values = api.fetch_contributions([eid], row_ids, model_id=model_id)
     return contributions, values
 
 
