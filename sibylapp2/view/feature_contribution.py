@@ -46,7 +46,7 @@ def show_sorted_contributions(to_show, sort_by, key=None):
 
 def format_contributions_to_view(eid, row_id=None, show_number=False):
     if row_id is not None:
-        contribution_df, value_df = contributions.get_contributions_for_rows(eid, row_id)
+        contribution_df, value_df = contributions.get_contributions_for_rows(eid, [row_id])
     else:
         contribution_df, value_df = contributions.get_contributions([eid])
     full_df = features.get_features()

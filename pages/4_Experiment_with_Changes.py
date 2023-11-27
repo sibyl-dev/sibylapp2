@@ -32,29 +32,35 @@ else:
 
 # Update displayed table after user presses the button
 if st.button("Run model and explanations on customized data"):
-    st.session_state["show_changes"] = copy.deepcopy(changes)
+    st.session_state["changes_to_show"] = copy.deepcopy(changes)
 
-if "show_changes" in st.session_state:
+if "changes_to_show" in st.session_state:
     if st.session_state["use_rows"]:
         customized_entity.view_prediction(
             st.session_state["row_id"],
-            st.session_state["show_changes"],
+            st.session_state["changes_to_show"],
             st.session_state["model_id"],
             use_row_id=True,
             eid_for_rows=eid,
         )
         filtering.view_filtering()
         customized_entity.view(
-            st.session_state["row_id"],
-            st.session_state["show_changes"],
+            st.session_state["eid"],
+            st.session_state["changes_to_show"],
             st.session_state["model_id"],
-            use_row_id=True,
-            eid_for_rows=eid,
+            st.session_state["row_id"],
         )
 
     else:
         customized_entity.view_prediction(
-            st.session_state["eid"], st.session_state["show_changes"], st.session_state["model_id"]
+            st.session_state["eid"],
+            st.session_state["changes_to_show"],
+            st.session_state["model_id"],
         )
         filtering.view_filtering()
-        customized_entity.view(eid, st.session_state["show_changes"], st.session_state["model_id"])
+        customized_entity.view(
+            st.session_state["eid"],
+            st.session_state["changes_to_show"],
+            st.session_state["model_id"],
+            None,
+        )

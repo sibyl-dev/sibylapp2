@@ -25,10 +25,7 @@ def get_dataset_contributions(model_id=api.fetch_model_id()):
 
 @st.cache_data(show_spinner="Getting contribution for your data...")
 def get_contribution_for_modified_data(eid, changes, row_id=None, model_id=api.fetch_model_id()):
-    st.session_state["modified_contribution"] = api.fetch_contribution_for_modified_data(
-        eid, changes, row_id=row_id, model_id=model_id
-    )
-    return st.session_state["modified_contribution"]
+    return api.fetch_contribution_for_modified_data(eid, changes, row_id=row_id, model_id=model_id)
 
 
 @st.cache_data(show_spinner="Getting global contributions...")
