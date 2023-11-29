@@ -3,6 +3,16 @@ import ruamel.yaml as yaml
 import os
 
 
+NEG_EM = "🟥"
+POS_EM = "🟦"
+NEUT_EM = "🟪"
+NEUT_EM_2 = "🟫"
+BLANK_EM = "⬜"
+UP_ARROW = "⬆"
+DOWN_ARROW = "⬇"
+DIVIDING_BAR = "|"
+
+
 def represent_none(self, _):
     return self.represent_scalar("tag:yaml.org,2002:null", "")
 
@@ -16,21 +26,58 @@ def main():
     # Load existing configuration if available
     existing_config = load_existing_config(loader)
 
-    config_data = {}
+    with st.form("config_form"):
+        config_data = dict()
 
-    # Question 1: Color Scheme
-    config_data["COLOR"] = st.radio("Which color scheme would you like?", ["A", "B", "C"])
+        # Question 1: Color Scheme
+        config_data["COLOR"] = st.radio(
+            "What color scheme should we use?",
+            ["Standard", "Reversed", "Neutral"],
+            captions=[
+                (
+                    f"{DOWN_ARROW}{NEG_EM}{NEG_EM}{DIVIDING_BAR}{POS_EM}{POS_EM}{UP_ARROW}"
+                    "  \nHigher model outputs are good"
+                ),
+                (
+                    f"{DOWN_ARROW}{POS_EM}{POS_EM}{DIVIDING_BAR}{NEG_EM}{NEG_EM}{UP_ARROW}"
+                    "  \nHigher model outputs are bad"
+                ),
+                (
+                    f"{DOWN_ARROW}{NEUT_EM_2}{NEUT_EM_2}{DIVIDING_BAR}{NEUT_EM}{NEUT_EM}{UP_ARROW}"
+                    "  \nModel outputs are neutral"
+                ),
+            ],
+            horizontal=True,
+        )
 
-    # Question 2: Use Multiple Rows
-    config_data["USE_MULTIPLE_ROWS"] = st.radio(
-        "Does your data have multiple rows?", ["Yes", "No"]
-    )
+        # Question 2: Use Multiple Rows
+        config_data["USE_MULTIPLE_ROWS"] = st.radio(
+            "Does your data have multiple rows?", ["Yes", "No"], horizontal=True
+        )
 
-    config_data["BAR_LENGTH"] = st.number_input(
-        "What is the length of the bar?", min_value=0, max_value=10, value=8
-    )
+        if config_data["USE_MULTIPLE_ROWS"] == "Yes":
+            config_data["ROW_LABEL"] = st.text_input(
+                "How should we label rows?", value="Timestamp"
+            )
 
-    save_config(loader, config_data, existing_config)
+        config_data["BAR_LENGTH"] = st.number_input(
+            "What is the length of the bar?", min_value=0, max_value=10, value=8
+        )
+
+        with st.expander("Modify terms"):
+            terms = [
+                ("Entity", "Label of whatever is being predicted on"),
+                ("Feature", ""),
+                ("Positive", "Features that increase the model output"),
+                ("Negative", "Features that decrease the model output"),
+            ]
+            for term, helper in terms:
+                st.text_input(term, max_chars=15, placeholder=helper)
+
+        submitted = st.form_submit_button("Save config")
+
+    if submitted:
+        save_config(loader, config_data, existing_config)
 
 
 def load_existing_config(loader):
@@ -42,13 +89,17 @@ def load_existing_config(loader):
 
 
 def save_config(loader, config_data, existing_config):
-    existing_config.update(config_data)
     loader.default_flow_style = False
-    for key, value in config_data.items():
-        if value is None:
-            existing_config[key] = ""
-        else:
-            existing_config[key] = value
+
+    if "COLOR" in config_data:
+        color_option = config_data.pop("COLOR")
+        if color_option is "Reversed":
+            existing_config["FLIP_COLORS"] = True
+        elif color_option in ["Standard", "Neutral"]:
+            existing_config["FLIP_COLORS"] = False
+
+    existing_config.update(config_data)
+
     with open("config2.yml", "w") as yaml_file:
         loader.dump(existing_config, yaml_file)
     st.success("Configuration saved successfully!")
