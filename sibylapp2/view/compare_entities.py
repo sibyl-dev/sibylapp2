@@ -127,12 +127,8 @@ def filter_rows(to_show, same, use_row_ids=False):
             If true, use row_ids instead of eids
     """
     if use_row_ids:
-        neighbor_col = to_show[
-            "%s Value for time %s" % (get_term("Feature"), st.session_state["row_id"])
-        ]
-        selected_col = to_show[
-            "%s Value for time %s" % (get_term("Feature"), st.session_state["row_id_comp"])
-        ]
+        neighbor_col = to_show["Value for time %s" % (st.session_state["row_id"])]
+        selected_col = to_show["Value for time %s" % (st.session_state["row_id_comp"])]
     else:
         neighbor_col = to_show["Value for %s %s" % (get_term("Entity"), st.session_state["eid"])]
         selected_col = to_show[
