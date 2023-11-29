@@ -102,8 +102,8 @@ def highlight_differences(to_show, changes, columns=None):
 
 
 def filter_different_rows(eid, to_show):
-    neighbor_col = to_show["%s Value for %s %s" % (get_term("Feature"), get_term("Entity"), eid)]
-    selected_col = to_show["%s Value for modified %s" % (get_term("Feature"), get_term("Entity"))]
+    neighbor_col = to_show["Value for %s %s" % (get_term("Entity"), eid)]
+    selected_col = to_show["Value for modified %s" % (get_term("Entity"))]
     to_show_filtered = to_show[neighbor_col != selected_col]
     return to_show_filtered
 

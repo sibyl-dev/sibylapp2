@@ -117,7 +117,16 @@ def sort_contributions(to_show, sort_by):
     return to_show
 
 
-def filter_different_rows(to_show, use_row_ids=False):
+def filter_rows(to_show, same, use_row_ids=False):
+    """
+    Args:
+        to_show (DataFrame):
+            Data to filter
+        same (Boolean):
+            If True, show only rows where features are the same
+        use_row_ids (Boolean):
+            If true, use row_ids instead of eids
+    """
     if use_row_ids:
         neighbor_col = to_show[
             "%s Value for time %s" % (get_term("Feature"), st.session_state["row_id"])
@@ -126,15 +135,14 @@ def filter_different_rows(to_show, use_row_ids=False):
             "%s Value for time %s" % (get_term("Feature"), st.session_state["row_id_comp"])
         ]
     else:
-        neighbor_col = to_show[
-            "%s Value for %s %s"
-            % (get_term("Feature"), get_term("Entity"), st.session_state["eid"])
-        ]
+        neighbor_col = to_show["Value for %s %s" % (get_term("Entity"), st.session_state["eid"])]
         selected_col = to_show[
-            "%s Value for %s %s"
-            % (get_term("Feature"), get_term("Entity"), st.session_state["eid_comp"])
+            "Value for %s %s" % (get_term("Entity"), st.session_state["eid_comp"])
         ]
-    to_show_filtered = to_show[neighbor_col == selected_col]
+    if same:
+        to_show_filtered = to_show[neighbor_col == selected_col]
+    else:
+        to_show_filtered = to_show[neighbor_col != selected_col]
     return to_show_filtered
 
 
@@ -185,16 +193,18 @@ def view(model_id, eid, eid_comp=None, row_id=None, row_id_comp=None, save_space
         show_contribution=show_contribution,
     )
 
-    options = ["No filtering", "With filtering"]
+    options = ["No filtering", "Show same values only", "Show different values only"]
     show_different = st.radio(
-        "Apply filtering by identical %s values?" % get_term("Feature", lower=True),
+        "Apply filtering?",
         options,
         horizontal=True,
         help="Show only rows where %s values of two %s are identical"
         % (get_term("Feature", lower=True), get_term("Entity", lower=True, plural=True)),
     )
-    if show_different == "With filtering":
-        to_show = filter_different_rows(to_show, use_row_ids=(eid_comp is None))
+    if show_different == "Show same values only":
+        to_show = filter_rows(to_show, same=True, use_row_ids=(eid_comp is None))
+    if show_different == "Show different values only":
+        to_show = filter_rows(to_show, same=False, use_row_ids=(eid_comp is None))
 
     to_show = sort_contributions(to_show, sort_by)
     helpers.show_table(to_show.drop("Contribution Change Value", axis="columns"))
