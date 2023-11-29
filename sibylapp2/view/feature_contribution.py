@@ -5,8 +5,6 @@ from sibylapp2.compute.context import get_term
 from sibylapp2.view.utils import filtering, helpers
 from sibylapp2.view.utils.helpers import show_legend
 
-import pandas as pd
-
 
 def show_sorted_contributions(to_show, sort_by, key=None):
     show_legend()
@@ -44,11 +42,13 @@ def show_sorted_contributions(to_show, sort_by, key=None):
         helpers.show_table(to_show.drop("Contribution Value", axis="columns"), key=key)
 
 
-def format_contributions_to_view(eid, row_id=None, show_number=False):
+def format_contributions_to_view(eid, model_id, row_id=None, show_number=False):
     if row_id is not None:
-        contribution_df, value_df = contributions.get_contributions_for_rows(eid, [row_id])
+        contribution_df, value_df = contributions.get_contributions_for_rows(
+            eid, [row_id], model_id=model_id
+        )
     else:
-        contribution_df, value_df = contributions.get_contributions([eid])
+        contribution_df, value_df = contributions.get_contributions([eid], model_id=model_id)
     full_df = features.get_features()
     full_df["Value"] = value_df.T
     full_df["Contribution"] = contribution_df.T
@@ -68,7 +68,6 @@ def view(eid, model_id, row_id=None, save_space=False, key=None):
     `eid` are used as row_id when `use_row_id` == True
     """
     show_number = False
-    show_average = False
     if not save_space:
         cols = st.columns(2)
         with cols[0]:
@@ -76,13 +75,6 @@ def view(eid, model_id, row_id=None, save_space=False, key=None):
                 ["Absolute", "Ascending", "Descending", "Side-by-side"]
             )
         with cols[1]:
-            show_average = st.checkbox(
-                "Show average values?",
-                help=(
-                    "Contributions are based on the difference from the average value in the"
-                    " training set"
-                ),
-            )
             show_number = st.checkbox(
                 "Show numeric contributions?",
                 help="Show the exact amount this feature contributes to the model prediction",
@@ -92,9 +84,7 @@ def view(eid, model_id, row_id=None, save_space=False, key=None):
         with cols[0]:
             sort_by = helpers.show_sort_options(["Absolute", "Ascending", "Descending"])
 
-    to_show = format_contributions_to_view(eid, row_id=row_id, show_number=show_number)
-    # if not show_average:
-    #    to_show = to_show.drop("Average/Mode Value", axis="columns")
+    to_show = format_contributions_to_view(eid, model_id, row_id=row_id, show_number=show_number)
 
     show_sorted_contributions(to_show, sort_by, key=key)
 

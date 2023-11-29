@@ -1,7 +1,6 @@
-from sibylapp2.compute.context import get_term
-from sibylapp2.view.utils import helpers
-import streamlit as st
 import pandas as pd
+
+from sibylapp2.view.utils import helpers
 
 
 def format_single_contributions_df(df, show_number=False):

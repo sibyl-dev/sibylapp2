@@ -1,16 +1,15 @@
 from __future__ import annotations
 
+import pandas as pd
 import streamlit as st
 
-from sibylapp2.compute import contributions, model, features
+from sibylapp2.compute import contributions, features, model
 from sibylapp2.compute.context import get_term
 from sibylapp2.config import pred_format_func
 from sibylapp2.view.compare_entities import sort_contributions, view_compare_cases_helper
 from sibylapp2.view.utils import helpers
 from sibylapp2.view.utils.formatting import format_two_contributions_to_view
 from sibylapp2.view.utils.helpers import show_text_input_side_by_side
-
-import pandas as pd
 
 
 def view_feature_boxes(

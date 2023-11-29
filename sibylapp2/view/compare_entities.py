@@ -1,12 +1,11 @@
+import pandas as pd
 import streamlit as st
 
-from sibylapp2.compute import contributions, model, features
+from sibylapp2.compute import contributions, features, model
 from sibylapp2.compute.context import get_term
 from sibylapp2.config import POSITIVE_TERM, PREDICTION_TYPE, PredType, pred_format_func
 from sibylapp2.view.utils import filtering, helpers
 from sibylapp2.view.utils.formatting import format_two_contributions_to_view
-
-import pandas as pd
 
 
 def view_prediction_difference(
@@ -202,9 +201,9 @@ def view(model_id, eid, eid_comp=None, row_id=None, row_id_comp=None, save_space
         % (get_term("Feature", lower=True), get_term("Entity", lower=True, plural=True)),
     )
     if show_different == "Show same values only":
-        to_show = filter_rows(to_show, same=True, use_row_ids=(eid_comp is None))
+        to_show = filter_rows(to_show, same=True, use_row_ids=eid_comp is None)
     if show_different == "Show different values only":
-        to_show = filter_rows(to_show, same=False, use_row_ids=(eid_comp is None))
+        to_show = filter_rows(to_show, same=False, use_row_ids=eid_comp is None)
 
     to_show = sort_contributions(to_show, sort_by)
     helpers.show_table(to_show.drop("Contribution Change Value", axis="columns"))

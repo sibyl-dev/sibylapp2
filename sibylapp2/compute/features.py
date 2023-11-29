@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import pandas as pd
 import streamlit as st
-from sibylapp2.compute.context import get_term
 
 from sibylapp2.compute import api
 
