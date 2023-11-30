@@ -22,19 +22,21 @@ DOWN_ARROW = "⬇"
 DIVIDING_BAR = "|"
 
 
-def pos_em():
-    if get_color_scheme() == "Reversed":
+def pos_em(color_scheme=None):
+    color_scheme = get_color_scheme() if color_scheme is None else color_scheme
+    if color_scheme == "Reversed":
         return "🟥"
-    elif get_color_scheme() == "Standard":
+    elif color_scheme == "Standard":
         return "🟦"
     else:
         return "🟪"
 
 
-def neg_em():
-    if get_color_scheme() == "Reversed":
+def neg_em(color_scheme=None):
+    color_scheme = get_color_scheme() if color_scheme is None else color_scheme
+    if color_scheme == "Reversed":
         return "🟦"
-    elif get_color_scheme() == "Standard":
+    elif color_scheme == "Standard":
         return "🟥"
     else:
         return "🟨"

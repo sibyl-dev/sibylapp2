@@ -2,6 +2,9 @@ import streamlit as st
 import ruamel.yaml as yaml
 import os
 from sibylapp2 import config
+from sibylapp2.compute.contributions import get_dataset_contributions
+from sibylapp2.compute.model import get_dataset_predictions
+from sibylapp2.view.utils.helpers import neg_em, pos_em
 
 
 NEG_EM = "🟥"
@@ -38,21 +41,11 @@ def save_config(loader, config_data, existing_config):
         st.toast("Configuration saved successfully!", icon="✅")
 
 
-def color_scheme_descriptions():
-    return [
-        (
-            f"{DOWN_ARROW}{NEG_EM}{NEG_EM}{DIVIDING_BAR}{POS_EM}{POS_EM}{UP_ARROW}"
-            "  \nHigher model outputs are good"
-        ),
-        (
-            f"{DOWN_ARROW}{POS_EM}{POS_EM}{DIVIDING_BAR}{NEG_EM}{NEG_EM}{UP_ARROW}"
-            "  \nHigher model outputs are bad"
-        ),
-        (
-            f"{DOWN_ARROW}{NEUT_EM_2}{NEUT_EM_2}{DIVIDING_BAR}{NEUT_EM}{NEUT_EM}{UP_ARROW}"
-            "  \nModel outputs are neutral"
-        ),
-    ]
+def generate_color_scheme_caption(color_scheme, description):
+    return (
+        f"{DOWN_ARROW}{neg_em(color_scheme)*2}{DIVIDING_BAR}{pos_em(color_scheme)*2}{UP_ARROW}  \n"
+        + description
+    )
 
 
 def view():
@@ -66,10 +59,18 @@ def view():
 
     # Question 1: Color Scheme
     color_scheme_options = ["Standard", "Reversed", "Neutral"]
+    color_scheme_descriptions = [
+        "Higher model outputs are good",
+        "Higher model outputs are bad",
+        "Model outputs are neutral",
+    ]
     config_data["COLOR_SCHEME"] = st.radio(
         "Color scheme:",
         color_scheme_options,
-        captions=color_scheme_descriptions(),
+        captions=[
+            generate_color_scheme_caption(scheme, description)
+            for scheme, description in zip(color_scheme_options, color_scheme_descriptions)
+        ],
         horizontal=True,
         index=color_scheme_options.index(config.get_color_scheme()),
     )
@@ -78,26 +79,32 @@ def view():
         "Length of bars:", min_value=4, max_value=10, value=config.get_bar_length()
     )
 
-    def remove_eids_and_row_id_dict():
-        if "eids" in existing_config:
-            del existing_config["eids"]
-        if "row_id_dict" in existing_config:
-            del existing_config["row_id_dict"]
+    def clear_eid_data():
+        if "eids" in st.session_state:
+            del st.session_state["eids"]
+        if "row_id_dict" in st.session_state:
+            del st.session_state["row_id_dict"]
 
     config_data["MAX_ENTITIES"] = st.number_input(
         "Number of entities to include:",
         min_value=1,
         max_value=50,
         value=config.get_max_entities(),
-        on_change=remove_eids_and_row_id_dict,
+        on_change=clear_eid_data,
     )
+
+    def clear_dataset_data():
+        if "dataset_eids" in st.session_state:
+            del st.session_state["dataset_eids"]
+        get_dataset_contributions.clear()
+        get_dataset_predictions.clear()
 
     config_data["DATASET_SIZE"] = st.number_input(
         "Number of dataset entries to load:",
         min_value=10,
         value=config.get_dataset_size(),
         help="High values will slow down the application",
-        on_change=lambda: st.session_state.pop("dataset_eids"),
+        on_change=clear_dataset_data(),
     )
 
     save_config(loader, config_data, existing_config)

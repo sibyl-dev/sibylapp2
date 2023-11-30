@@ -4,12 +4,12 @@ CERT:
 
 # GENERAL CONFIGURATIONS ============================================================================
 BAR_LENGTH: 5  # Number of squares to use for contribution/importance bars
-MAX_ENTITIES: 3  # Maximum number of entities to select from. Set this to None to use all
-DATASET_SIZE: 1000 # Max number of entities to use for dataset-wide visualizations
+MAX_ENTITIES: 10 # Maximum number of entities to select from. Set this to None to use all
+DATASET_SIZE: 100  # Max number of entities to use for dataset-wide visualizations
 LOAD_UPFRONT: true # If true, run heavy computations on initial load, else greedily run as needed
 
-# APPLICATION-SPECIFIC CONFIGURATIONS (overrides API context) ========================================
-COLOR_SCHEME: Neutral  # Standard: positive is blue. Reversed: positive is red. Neutral: Neither
+# APPLICATION-SPECIFIC CONFIGURATIONS (overrides API context) =====================F===================
+COLOR_SCHEME: Reversed # Standard: positive is blue. Reversed: positive is red. Neutral: Neither
 PREDICTION_TYPE: # One of "numeric", "boolean", "categorical"
 POSITIVE_TERM: # Term to use for a True prediction for boolean models
 NEGATIVE_TERM: # Term to use for a False prediction for boolean models
