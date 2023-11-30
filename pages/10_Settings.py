@@ -72,7 +72,11 @@ def view():
             for scheme, description in zip(color_scheme_options, color_scheme_descriptions)
         ],
         horizontal=True,
-        index=color_scheme_options.index(config.get_color_scheme()),
+        index=(
+            0
+            if config.get_color_scheme() not in color_scheme_options
+            else color_scheme_options.index(config.get_color_scheme())
+        ),
     )
 
     config_data["BAR_LENGTH"] = st.slider(

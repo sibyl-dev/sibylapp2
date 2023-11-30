@@ -32,7 +32,8 @@ def get_load_upfront():
 
 
 def get_color_scheme():
-    return load_config().get("COLOR_SCHEME", "Standard")
+    flip_colors = load_config().get("FLIP_COLORS", False)
+    return load_config().get("COLOR_SCHEME", "Reversed" if flip_colors else "Standard")
 
 
 # APPLICATION-SPECIFIC CONFIGURATIONS =============================================================
