@@ -4,21 +4,41 @@ from os import path
 import yaml
 
 from sibylapp2.compute.context import get_gui_config
+import streamlit as st
 
-with open(path.join(path.dirname(path.abspath(__file__)), "config.yml"), "r") as f:
-    cfg = yaml.safe_load(f)
+
+@st.cache_data(show_spinner=False)
+def load_config():
+    with open(path.join(path.dirname(path.abspath(__file__)), "config.yml"), "r") as f:
+        cfg = yaml.safe_load(f)
+    return cfg
+
 
 # GENERAL CONFIGURATIONS ==========================================================================
-BAR_LENGTH = cfg.get("BAR_LENGTH", 8)
-MAX_ENTITIES = cfg.get("MAX_ENTITIES", 11)
-DATASET_SIZE = cfg.get("DATASET_SIZE", 1000)
-LOAD_UPFRONT = cfg.get("LOAD_UPFRONT", True)
+def get_bar_length():
+    return load_config().get("BAR_LENGTH", 8)
+
+
+def get_max_entities():
+    return load_config().get("MAX_ENTITIES", 11)
+
+
+def get_dataset_size():
+    return load_config().get("DATASET_SIZE", 1000)
+
+
+def get_load_upfront():
+    return load_config().get("LOAD_UPFRONT", True)
+
+
+def get_color_scheme():
+    return load_config().get("COLOR_SCHEME", "Standard")
 
 
 # APPLICATION-SPECIFIC CONFIGURATIONS =============================================================
 def get_config(name, api_name, default):
-    if cfg.get(name) is not None:
-        return cfg.get(name)
+    if load_config().get(name) is not None:
+        return load_config().get(name)
     if get_gui_config(api_name) is not None:
         return get_gui_config(api_name)
     return default
@@ -51,7 +71,7 @@ SUPPORT_PROBABILITY = get_config("SUPPORT_PROBABILITY", "support_probability", F
 def pred_format_func(pred, display_proba=False):
     if display_proba:
         return f"{pred*100:.1f}%"
-    if cfg.get("OVERRIDE_PRED_FORMAT"):
+    if load_config().get("OVERRIDE_PRED_FORMAT"):
         return manual_pred_format_func(pred)
     if PREDICTION_TYPE == PredType.NUMERIC:
         return PRED_FORMAT_STRING.format(pred)
