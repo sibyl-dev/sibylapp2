@@ -19,6 +19,7 @@ def represent_none(self, _):
 
 def main():
     loader = yaml.YAML()
+    # loader.add_representer(type(None), represent_none)
 
     st.title("Configuration Wizard")
 
@@ -59,16 +60,11 @@ def main():
                 "How should we label rows?", value="Timestamp"
             )
 
-        with st.expander("General configurations"):
-            config_data["BAR_LENGTH"] = st.slider(
-                "How long should bars be?",
-                min_value=2,
-                max_value=10,
-                value=8,
-                step=2,
-            )
+        config_data["BAR_LENGTH"] = st.number_input(
+            "What is the length of the bar?", min_value=0, max_value=10, value=8
+        )
 
-        with st.expander("Configure terms"):
+        with st.expander("Modify terms"):
             terms = [
                 ("Entity", "Label of whatever is being predicted on"),
                 ("Feature", ""),
@@ -97,7 +93,7 @@ def save_config(loader, config_data, existing_config):
 
     if "COLOR" in config_data:
         color_option = config_data.pop("COLOR")
-        if color_option == "Reversed":
+        if color_option is "Reversed":
             existing_config["FLIP_COLORS"] = True
         elif color_option in ["Standard", "Neutral"]:
             existing_config["FLIP_COLORS"] = False
