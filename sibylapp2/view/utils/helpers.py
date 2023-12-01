@@ -7,12 +7,12 @@ import streamlit as st
 
 from sibylapp2.compute.context import get_term
 from sibylapp2.config import (
-    get_bar_length,
-    get_color_scheme,
     NEGATIVE_TERM,
     POSITIVE_TERM,
     PREDICTION_TYPE,
     PredType,
+    get_bar_length,
+    get_color_scheme,
 )
 
 NEUT_EM = "🟪"

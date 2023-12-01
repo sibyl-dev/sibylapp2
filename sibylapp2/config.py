@@ -1,16 +1,16 @@
 from enum import Enum
 from os import path
 
+import streamlit as st
 import yaml
 
 from sibylapp2.compute.context import get_gui_config
-import streamlit as st
 
 
 @st.cache_data(show_spinner=False)
 def load_config():
-    with open(path.join(path.dirname(path.abspath(__file__)), "config.yml"), "r") as f:
-        cfg = yaml.safe_load(f)
+    with open(path.join(path.dirname(path.abspath(__file__)), "config.yml"), "r") as file:
+        cfg = yaml.safe_load(file)
     return cfg
 
 
