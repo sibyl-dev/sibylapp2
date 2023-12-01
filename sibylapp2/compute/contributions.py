@@ -2,6 +2,7 @@ import pandas as pd
 import streamlit as st
 
 from sibylapp2.compute import api, entities
+from sibylapp2.config import get_dataset_size
 
 
 @st.cache_data(show_spinner="Computing contribution scores...")
@@ -61,7 +62,7 @@ def get_contributions_for_rows(eid, row_ids, model_id=api.fetch_model_id()):
 @st.cache_data(show_spinner="Getting contributions...")
 def get_dataset_contributions(model_id=api.fetch_model_id()):
     if "dataset_eids" not in st.session_state:
-        st.session_state["dataset_eids"] = entities.get_eids(1000)
+        st.session_state["dataset_eids"] = entities.get_eids(get_dataset_size())
     return get_contributions(st.session_state["dataset_eids"], model_id=model_id)
 
 

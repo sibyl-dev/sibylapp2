@@ -1,6 +1,7 @@
 import streamlit as st
 
 from sibylapp2.compute import api, entities
+from sibylapp2.config import get_dataset_size
 
 
 def get_models():
@@ -25,7 +26,7 @@ def get_predictions_for_rows(eid, row_ids, model_id=api.fetch_model_id(), return
 @st.cache_data(show_spinner="Getting model predictions...")
 def get_dataset_predictions(model_id=api.fetch_model_id(), return_proba=False):
     if "dataset_eids" not in st.session_state:
-        st.session_state["dataset_eids"] = entities.get_eids(1000)
+        st.session_state["dataset_eids"] = entities.get_eids(get_dataset_size())
     return get_predictions(
         st.session_state["dataset_eids"], model_id=model_id, return_proba=return_proba
     )
