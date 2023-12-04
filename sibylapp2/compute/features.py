@@ -7,8 +7,11 @@ from sibylapp2.compute import api
 
 
 @st.cache_data(show_spinner="Fetching data...")
-def get_features() -> pd.DataFrame:
-    features = api.fetch_features()
+def get_features(include_type=False) -> pd.DataFrame:
+    columns = ["Category", "Feature"]
+    if include_type:
+        columns.append("Type")
+    features = api.fetch_features()[columns]
     return features
 
 
@@ -19,11 +22,9 @@ def get_entity(eid: str, row_id: str | None = None) -> pd.Series:
 
 
 @st.cache_data(show_spinner="Fetching data...")
-def get_options_for_categories(
-    entities: list[str], features_df: pd.DataFrame
-) -> dict[str, list[str | int | float]]:
+def get_options_for_categories(entities: list[str]) -> dict[str, list[str | int | float]]:
     """
-    This function should be replaced when API call for options of non numeric
+    This function should be replaced when API call for options of non-numeric
     variables is implemented. This function currently iterates through all
     entities in `dataset_eids` to generate options.
     """
@@ -31,6 +32,6 @@ def get_options_for_categories(
     # each column is an entity
     dataset = pd.concat([get_entity(eid) for eid in entities], axis=1)
     for feature in dataset.index:
-        if features_df.loc[feature, "type"] != "numeric":
+        if get_features(include_type=True).loc[feature, "Type"] != "numeric":
             options[feature] = pd.unique(dataset.loc[feature, :]).tolist()
     return options

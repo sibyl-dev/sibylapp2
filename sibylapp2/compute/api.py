@@ -44,12 +44,17 @@ def fetch_model_id():
     return model_id
 
 
-def fetch_eids(return_row_ids=False):
+def fetch_eids(
+    max_entities=None,
+    return_row_ids=False,
+):
     """
     Return corresponding row_ids in the form of a dictionary where the keys are the eids
     and the values are the lists of row_ids for each eid, when specified.
     """
     entities = api_get("entities/")["entities"]
+    if max_entities is not None:
+        entities = entities[:max_entities]
     if return_row_ids:
         return [entry["eid"] for entry in entities], {
             entry["eid"]: entry["row_ids"] for entry in entities
@@ -85,7 +90,9 @@ def fetch_predictions(eids, row_ids=None, model_id=fetch_model_id(), return_prob
 
 def fetch_features():
     features = api_get("features/")["features"]
-    features_df = pd.DataFrame(features).rename(columns={"description": "Feature"})
+    features_df = pd.DataFrame(features).rename(
+        columns={"description": "Feature", "category": "Category", "type": "Type"}
+    )
     features_df = features_df.set_index("name")
     return features_df
 
@@ -102,22 +109,19 @@ def fetch_entity(eid, row_id=None) -> pd.Series:
 
 
 def fetch_contributions(eids, row_ids=None, model_id=fetch_model_id()):
-    features_df = fetch_features()
     json = {"eids": eids, "model_id": model_id, "row_ids": row_ids}
-    result = api_post("multi_contributions/", json)["contributions"]
-    contributions = {}
-    for eid in result:
-        contributions[eid] = pd.concat(
-            [features_df, pd.DataFrame.from_dict(result[eid], orient="index")], axis=1
-        )
-    return contributions
+    result = api_post("multi_contributions/", json)
+    contributions = pd.DataFrame.from_dict(result["contributions"], orient="index")
+    values = pd.DataFrame.from_dict(result["values"], orient="index")
+    return contributions, values
 
 
 def fetch_contribution_for_modified_data(eid, changes, row_id=None, model_id=fetch_model_id()):
-    features_df = fetch_features()
     json = {"eid": eid, "row_id": row_id, "model_id": model_id, "changes": changes}
-    result = api_post("modified_contribution/", json)["contribution"]
-    return pd.concat([features_df, pd.DataFrame.from_dict(result, orient="index")], axis=1)
+    result = api_post("modified_contribution/", json)
+    contributions = pd.DataFrame.from_dict(result["contributions"], orient="index")
+    values = pd.DataFrame.from_dict(result["values"], orient="index")
+    return contributions, values
 
 
 def fetch_importance(model_id=fetch_model_id()):
@@ -137,7 +141,7 @@ def fetch_similar_examples(eids, model_id=fetch_model_id()):
         y = pd.Series(result[eid]["y"]).to_frame().T
         X = pd.concat(
             [
-                features_df[["Feature", "category"]],
+                features_df,
                 pd.DataFrame.from_dict(result[eid]["X"], orient="index").T,
             ],
             axis=1,

@@ -3,7 +3,7 @@ import pandas as pd
 import streamlit as st
 from pyreal.visualize import strip_plot
 
-from sibylapp2.compute import contributions
+from sibylapp2.compute import contributions, features
 from sibylapp2.compute.context import get_term
 from sibylapp2.view.utils import filtering, helpers
 from sibylapp2.view.utils.helpers import show_legend
@@ -34,10 +34,7 @@ def view(eids, model_id):
         global_contributions["negative"], global_contributions["positive"]
     )
 
-    all_contributions = contributions.get_dataset_contributions(model_id)
-    feature_info = all_contributions[next(iter(all_contributions))][
-        ["category", "Feature"]
-    ].rename(columns={"category": "Category"})
+    feature_info = features.get_features().rename(columns={"category": "Category"})
     to_show = pd.concat([feature_info, bars, global_contributions], axis="columns")
 
     if sort_by == "Total":

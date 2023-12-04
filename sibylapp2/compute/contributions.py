@@ -5,82 +5,50 @@ from sibylapp2.compute import api, entities
 from sibylapp2.config import get_dataset_size
 
 
-@st.cache_data(show_spinner="Computing contribution scores...")
-def compute_contributions(eids, model_id=api.fetch_model_id(), key="contributions"):
-    contributions = api.fetch_contributions(eids, model_id=model_id)
-    if key not in st.session_state:
-        st.session_state[key] = contributions
-    else:
-        st.session_state[key] = dict(st.session_state[key], **contributions)
-    return contributions
-
-
 @st.cache_data(show_spinner="Getting contributions...")
 def get_contributions(eids, model_id=api.fetch_model_id()):
-    key = f"contributions_{model_id}"
-    if key not in st.session_state:
-        contributions = compute_contributions(eids, model_id=model_id, key=key)
-    else:
-        contributions = st.session_state[key]
-    missing_eids = list(set(eids) - contributions.keys())
-    if len(missing_eids) > 0:
-        contributions = {
-            **contributions,
-            **compute_contributions(missing_eids, model_id=model_id, key=key),
-        }
-    return {eid: contributions[eid] for eid in eids}
-
-
-@st.cache_data(show_spinner="Computing contributions...")
-def compute_contributions_for_rows(
-    eid, row_ids, model_id=api.fetch_model_id(), key="contributions_rows"
-):
-    contributions = api.fetch_contributions([eid], row_ids, model_id=model_id)
-    if key not in st.session_state:
-        st.session_state[key] = contributions
-    else:
-        st.session_state[key] = dict(st.session_state[key], **contributions)
-    return contributions
+    contributions, values = api.fetch_contributions(eids, model_id=model_id)
+    return contributions, values
 
 
 @st.cache_data(show_spinner="Getting contributions...")
 def get_contributions_for_rows(eid, row_ids, model_id=api.fetch_model_id()):
-    key = f"contributions_rows_{model_id}"
-    if key not in st.session_state:
-        contributions = compute_contributions_for_rows(eid, row_ids, model_id=model_id, key=key)
-    else:
-        contributions = st.session_state[key]
-    missing_row_ids = list(set(row_ids) - contributions.keys())
-    if len(missing_row_ids) > 0:
-        contributions = {
-            **contributions,
-            **compute_contributions_for_rows(eid, missing_row_ids, model_id=model_id, key=key),
-        }
-    return contributions
+    contributions, values = api.fetch_contributions([eid], row_ids, model_id=model_id)
+    return contributions, values
 
 
 @st.cache_data(show_spinner="Getting contributions...")
-def get_dataset_contributions(model_id=api.fetch_model_id()):
-    if "dataset_eids" not in st.session_state:
-        st.session_state["dataset_eids"] = entities.get_eids(get_dataset_size())
-    return get_contributions(st.session_state["dataset_eids"], model_id=model_id)
+def get_dataset_contributions(model_id=api.fetch_model_id(), all_rows=True):
+    if "dataset_eids" not in st.session_state or (
+        all_rows and "dataset_row_id_dict" not in st.session_state
+    ):
+        st.session_state["dataset_eids"], st.session_state["dataset_row_id_dict"] = (
+            entities.get_eids(max_entities=get_dataset_size(), return_row_ids=all_rows)
+        )
+    # confirm at least one entity has more than one row
+    if any(len(lst) > 1 for lst in st.session_state["dataset_row_id_dict"].values()):
+        all_contributions = []
+        all_values = []
+        for eid in st.session_state["dataset_eids"]:
+            contributions, values = get_contributions_for_rows(
+                eid, st.session_state["dataset_row_id_dict"][eid], model_id=model_id
+            )
+            all_contributions.append(contributions)
+            all_values.append(values)
+        return pd.concat(all_contributions, axis="rows"), pd.concat(all_values, axis="rows")
+    else:
+        return get_contributions(st.session_state["dataset_eids"], model_id=model_id)
 
 
 @st.cache_data(show_spinner="Getting contribution for your data...")
 def get_contribution_for_modified_data(eid, changes, row_id=None, model_id=api.fetch_model_id()):
-    st.session_state["modified_contribution"] = api.fetch_contribution_for_modified_data(
-        eid, changes, row_id=row_id, model_id=model_id
-    )
-    return st.session_state["modified_contribution"]
+    return api.fetch_contribution_for_modified_data(eid, changes, row_id=row_id, model_id=model_id)
 
 
 @st.cache_data(show_spinner="Getting global contributions...")
 def compute_global_contributions(eids, model_id):
-    contributions_in_range = get_contributions(eids, model_id=model_id)
-    rows = pd.concat(
-        [contributions_in_range[eid]["Contribution"] for eid in contributions_in_range],
-        axis=1,
-    )
-    negs = rows[rows <= 0].mean(axis=1).fillna(0)
-    poss = rows[rows >= 0].mean(axis=1).fillna(0)
+    contributions_in_range, _ = get_contributions(eids, model_id=model_id)
+    contributions_in_range = contributions_in_range.T
+    negs = contributions_in_range[contributions_in_range <= 0].mean(axis=1).fillna(0)
+    poss = contributions_in_range[contributions_in_range >= 0].mean(axis=1).fillna(0)
     return pd.concat({"negative": negs, "positive": poss}, axis=1)

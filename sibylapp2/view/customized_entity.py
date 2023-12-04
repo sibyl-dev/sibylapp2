@@ -3,11 +3,10 @@ from __future__ import annotations
 import pandas as pd
 import streamlit as st
 
-from sibylapp2.compute import contributions, model
+from sibylapp2.compute import contributions, features, model
 from sibylapp2.compute.context import get_term
-from sibylapp2.compute.features import get_entity
 from sibylapp2.config import pred_format_func
-from sibylapp2.view.entity_difference import sort_contributions, view_compare_cases_helper
+from sibylapp2.view.compare_entities import sort_contributions, view_compare_cases_helper
 from sibylapp2.view.utils import helpers
 from sibylapp2.view.utils.formatting import format_two_contributions_to_view
 from sibylapp2.view.utils.helpers import show_text_input_side_by_side
@@ -15,20 +14,18 @@ from sibylapp2.view.utils.helpers import show_text_input_side_by_side
 
 def view_feature_boxes(
     eid: str,
-    features_df: pd.DataFrame,
     options_dict: dict[str, list[str | int | float]],
     use_row_id: bool = False,
     eid_for_rows: str | None = None,
 ):
     if "changes" not in st.session_state:
         st.session_state["changes"] = {}
-
     if use_row_id:
-        entity = get_entity(eid_for_rows, eid)
+        entity = features.get_entity(eid_for_rows, eid)
     else:
-        entity = get_entity(eid)
+        entity = features.get_entity(eid)
     changes = {}
-
+    features_df = features.get_features(include_type=True)
     selected_features = st.multiselect(
         "Select %s to change:" % get_term("Feature", lower=True, plural=True),
         features_df.index.tolist(),
@@ -45,7 +42,7 @@ def view_feature_boxes(
 
         numeric = True
         options = None
-        if features_df.loc[feature, "type"] != "numeric":
+        if features_df.loc[feature, "Type"] != "numeric":
             numeric = False
             options = options_dict[feature]
 
@@ -104,32 +101,43 @@ def highlight_differences(to_show, changes, columns=None):
 
 
 def filter_different_rows(eid, to_show):
-    neighbor_col = to_show["%s Value for %s %s" % (get_term("Feature"), get_term("Entity"), eid)]
-    selected_col = to_show["%s Value for modified %s" % (get_term("Feature"), get_term("Entity"))]
+    neighbor_col = to_show["Value for %s %s" % (get_term("Entity"), eid)]
+    selected_col = to_show["Value for modified %s" % (get_term("Entity"))]
     to_show_filtered = to_show[neighbor_col != selected_col]
     return to_show_filtered
 
 
-def view(eid, changes, model_id, use_row_id=False, eid_for_rows=None, save_space=False):
+def view(eid, changes, model_id, row_id=None, save_space=False):
     """
     eid is used as `row_id` when use_row_id is True
     """
     sort_by, show_number, show_contribution = view_compare_cases_helper(save_space=save_space)
-    if use_row_id:
-        original_df = contributions.get_contributions_for_rows(
-            eid_for_rows, [eid], model_id=model_id
-        )[eid]
-        other_df = contributions.get_contribution_for_modified_data(
-            eid_for_rows, changes, eid, model_id=model_id
+    if row_id is not None:
+        original_contribution_df, original_values_df = contributions.get_contributions_for_rows(
+            eid, [row_id], model_id=model_id
+        )
+        other_contribution_df, other_values_df = contributions.get_contribution_for_modified_data(
+            eid, changes, row_id=row_id, model_id=model_id
         )
     else:
-        original_df = contributions.get_contributions([eid], model_id=model_id)[eid]
-        other_df = contributions.get_contribution_for_modified_data(
+        original_contribution_df, original_values_df = contributions.get_contributions(
+            [eid], model_id=model_id
+        )
+        other_contribution_df, other_values_df = contributions.get_contribution_for_modified_data(
             eid, changes, model_id=model_id
         )
+
+    original_df = pd.DataFrame(
+        {"Contribution": original_contribution_df.iloc[0], "Value": original_values_df.iloc[0]}
+    )
+    other_df = pd.DataFrame(
+        {"Contribution": other_contribution_df.iloc[0], "Value": other_values_df.iloc[0]}
+    )
+    feature_df = features.get_features()
     to_show = format_two_contributions_to_view(
         original_df,
         other_df,
+        feature_df,
         lsuffix=" for %s %s" % (get_term("Entity"), eid),
         rsuffix=" for modified %s" % get_term("Entity"),
         show_number=show_number,

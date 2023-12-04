@@ -1,6 +1,7 @@
+import pandas as pd
 import streamlit as st
 
-from sibylapp2.compute import contributions, model
+from sibylapp2.compute import contributions, features, model
 from sibylapp2.compute.context import get_term
 from sibylapp2.config import POSITIVE_TERM, PREDICTION_TYPE, PredType, pred_format_func
 from sibylapp2.view.utils import filtering, helpers
@@ -115,67 +116,90 @@ def sort_contributions(to_show, sort_by):
     return to_show
 
 
-def filter_different_rows(to_show, use_row_ids=False):
+def filter_rows(to_show, same, use_row_ids=False):
+    """
+    Args:
+        to_show (DataFrame):
+            Data to filter
+        same (Boolean):
+            If True, show only rows where features are the same
+        use_row_ids (Boolean):
+            If true, use row_ids instead of eids
+    """
     if use_row_ids:
-        neighbor_col = to_show[
-            "%s Value for time %s" % (get_term("Feature"), st.session_state["row_id"])
-        ]
-        selected_col = to_show[
-            "%s Value for time %s" % (get_term("Feature"), st.session_state["row_id_comp"])
-        ]
+        neighbor_col = to_show["Value for time %s" % (st.session_state["row_id"])]
+        selected_col = to_show["Value for time %s" % (st.session_state["row_id_comp"])]
     else:
-        neighbor_col = to_show[
-            "%s Value for %s %s"
-            % (get_term("Feature"), get_term("Entity"), st.session_state["eid"])
-        ]
+        neighbor_col = to_show["Value for %s %s" % (get_term("Entity"), st.session_state["eid"])]
         selected_col = to_show[
-            "%s Value for %s %s"
-            % (get_term("Feature"), get_term("Entity"), st.session_state["eid_comp"])
+            "Value for %s %s" % (get_term("Entity"), st.session_state["eid_comp"])
         ]
-    to_show_filtered = to_show[neighbor_col == selected_col]
+    if same:
+        to_show_filtered = to_show[neighbor_col == selected_col]
+    else:
+        to_show_filtered = to_show[neighbor_col != selected_col]
     return to_show_filtered
 
 
-def view(
-    eid, eid_comp, model_id, save_space=False, use_row_ids=False, row_ids=None, eid_for_rows=None
-):
+def view(model_id, eid, eid_comp=None, row_id=None, row_id_comp=None, save_space=False):
     """
-    `row_ids` and `eid_for_rows` are only used when `use_row_ids` == True.
-    `eid` and `eid_comp` are used as row_id when `use_row_ids` == True
+    Either `eid_comp` or `row_id`/`row_id_comp` must be given. If `eid_comp` is given,
+    compare entity `eid` to entity `eid_comp`. If the row_ids are given, compare entity `eid`'s
+    `row_id` to its `row_id_comp`.
     """
-    sort_by, show_number, show_contribution = view_compare_cases_helper(save_space=save_space)
-    if use_row_ids:
-        lsuffix = " for time %s" % eid
-        rsuffix = " for time %s" % eid_comp
-        contributions_dict = contributions.get_contributions_for_rows(
-            eid_for_rows, row_ids, model_id=model_id
+    sort_by, show_number, show_contribution = view_compare_cases_helper(save_space)
+
+    if eid_comp is None:
+        if row_id is None or row_id_comp is None:
+            raise ValueError("row_id/row_id_comp must be provided if eid_comp is not provided")
+        lsuffix = " for time %s" % row_id
+        rsuffix = " for time %s" % row_id_comp
+        contribution_df, values_df = contributions.get_contributions_for_rows(
+            eid, [row_id], model_id=model_id
+        )
+        contribution_comp_df, values_comp_df = contributions.get_contributions_for_rows(
+            eid, [row_id_comp], model_id=model_id
         )
     else:
         lsuffix = " for %s %s" % (get_term("Entity"), eid)
         rsuffix = " for %s %s" % (get_term("Entity"), eid_comp)
-        contributions_dict = contributions.get_contributions([eid, eid_comp], model_id=model_id)
-    original_df = contributions_dict[eid]
-    other_df = contributions_dict[eid_comp]
+        # Doing this calls separately improves caching
+        contribution_df, values_df = contributions.get_contributions([eid], model_id=model_id)
+        contribution_comp_df, values_comp_df = contributions.get_contributions(
+            [eid_comp], model_id=model_id
+        )
+
+    features_df = features.get_features()
+
+    original_df = pd.DataFrame(
+        {"Contribution": contribution_df.iloc[0], "Value": values_df.iloc[0]}
+    )
+    comp_df = pd.DataFrame(
+        {"Contribution": contribution_comp_df.iloc[0], "Value": values_comp_df.iloc[0]}
+    )
 
     to_show = format_two_contributions_to_view(
         original_df,
-        other_df,
+        comp_df,
+        features_df,
         lsuffix=lsuffix,
         rsuffix=rsuffix,
         show_number=show_number,
         show_contribution=show_contribution,
     )
 
-    options = ["No filtering", "With filtering"]
+    options = ["No filtering", "Show same values only", "Show different values only"]
     show_different = st.radio(
-        "Apply filtering by identical %s values?" % get_term("Feature", lower=True),
+        "Apply filtering?",
         options,
         horizontal=True,
         help="Show only rows where %s values of two %s are identical"
         % (get_term("Feature", lower=True), get_term("Entity", lower=True, plural=True)),
     )
-    if show_different == "With filtering":
-        to_show = filter_different_rows(to_show, use_row_ids=use_row_ids)
+    if show_different == "Show same values only":
+        to_show = filter_rows(to_show, same=True, use_row_ids=eid_comp is None)
+    if show_different == "Show different values only":
+        to_show = filter_rows(to_show, same=False, use_row_ids=eid_comp is None)
 
     to_show = sort_contributions(to_show, sort_by)
     helpers.show_table(to_show.drop("Contribution Change Value", axis="columns"))
