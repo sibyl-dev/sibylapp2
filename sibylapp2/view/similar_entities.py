@@ -56,8 +56,8 @@ def view_instructions():
             "The **Similar Cases** page shows the two {entities} from the training dataset with"
             " the most similar {feature} values. Rows where a similar {entity} has a"
             " different value are highlighted.".format(
-                entities=get_term("Entity", plural=True, lower=True),
-                feature=get_term("Feature", lower=True),
-                entity=get_term("Entity", lower=True),
+                entities=get_term("entity", plural=True),
+                feature=get_term("feature"),
+                entity=get_term("entity"),
             )
         )

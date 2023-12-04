@@ -60,7 +60,7 @@ def view_instructions():
             " model prediction overall across the training dataset. Each row shows the average"
             " positive and negative contribution for that {feature}.".format(
                 feature_contributions=get_term("Feature Contributions"),
-                feature=get_term("Feature", lower=True),
+                feature=get_term("feature"),
             )
         )
         st.markdown(
@@ -68,12 +68,10 @@ def view_instructions():
             " {feature} often greatly increases the model prediction, and never decreases it. A"
             " large **{pos}** bar and a large **{neg}** bar means this {feature} can both"
             " increase and decrease the model prediction, depending on its value and the context."
-            .format(feature=get_term("Feature", lower=True), pos=positive, neg=negative)
+            .format(feature=get_term("feature"), pos=positive, neg=negative)
         )
         st.markdown(
             "You can **filter** and **search** the {feature} table or adjust the **sort order**."
             " You can also use the selector to visualize the contributions for rows in the dataset"
-            " with only a select subset of predictions.".format(
-                feature=get_term("Feature", lower=True)
-            )
+            " with only a select subset of predictions.".format(feature=get_term("feature"))
         )

@@ -52,7 +52,7 @@ if len(row_ids) > 1:
         )
 else:
     if st.session_state["eid"] == st.session_state["eid_comp"]:
-        st.warning("Please select two different %s!" % get_term("Entity", plural=True, lower=True))
+        st.warning("Please select two different %s!" % get_term("entity", plural=True))
 
     else:
         compare_entities.view_prediction_difference(

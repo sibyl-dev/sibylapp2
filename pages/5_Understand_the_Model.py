@@ -28,9 +28,13 @@ pred_filter_container = st.container()
 
 tab = stx.tab_bar(
     data=[
-        stx.TabBarItemData(id=1, title=get_term("Feature Importance"), description=""),
         stx.TabBarItemData(
-            id=2, title="Global %s" % get_term("Feature Contributions"), description=""
+            id=1, title=get_term(f"{get_term('Feature')} Importance"), description=""
+        ),
+        stx.TabBarItemData(
+            id=2,
+            title="Global %s" % get_term(f"{get_term('Feature')} Contributions"),
+            description="",
         ),
         stx.TabBarItemData(id=4, title="Explore a %s" % get_term("Feature"), description=""),
     ],
@@ -75,7 +79,7 @@ if tab == "4":
             st.warning("Select predictions above to see explanation!")
         else:
             feature = st.selectbox(
-                "Select a %s" % get_term("Feature", lower=True),
+                "Select a %s" % get_term("feature"),
                 filtering.process_search_on_features(features),
             )
             explore_feature.view(

@@ -194,7 +194,7 @@ def view(model_id, eid, eid_comp=None, row_id=None, row_id_comp=None, save_space
         options,
         horizontal=True,
         help="Show only rows where %s values of two %s are identical"
-        % (get_term("Feature", lower=True), get_term("Entity", lower=True, plural=True)),
+        % (get_term("feature"), get_term("entity", plural=True)),
     )
     if show_different == "Show same values only":
         to_show = filter_rows(to_show, same=True, use_row_ids=eid_comp is None)
@@ -214,8 +214,8 @@ def view_instructions(use_row_ids=False):
                 " of the selected {entity} at the two selected times."
                 " You can select the {entity} and the two time points from the dropdown above."
                 .format(
-                    entity=get_term("Entity", lower=True),
-                    feature=get_term("Feature", lower=True),
+                    entity=get_term("entity"),
+                    feature=get_term("feature"),
                 )
             )
         else:
@@ -224,8 +224,8 @@ def view_instructions(use_row_ids=False):
                 " of two distinct {entities}."
                 " You can select two {entities} you want to compare from the dropdown above."
                 .format(
-                    entities=get_term("Entity", plural=True, lower=True),
-                    feature=get_term("Feature", lower=True),
+                    entities=get_term("entity", plural=True),
+                    feature=get_term("feature"),
                 )
             )
         positive, negative = helpers.get_pos_neg_names()
@@ -233,8 +233,8 @@ def view_instructions(use_row_ids=False):
             entity = "prediction time"
             entities = "prediction times"
         else:
-            entity = get_term("Entity", lower=True)
-            entities = get_term("Entity", lower=True, plural=True)
+            entity = get_term("entity")
+            entities = get_term("entity", plural=True)
         st.markdown(
             "The **Contribution Change** column refers to the difference between the {feature}"
             " contribution of the two {entities}. A large **{positive}** bar means that this"
@@ -246,7 +246,7 @@ def view_instructions(use_row_ids=False):
             " prediction for both cases.".format(
                 positive=positive,
                 negative=negative,
-                feature=get_term("Feature", lower=True),
+                feature=get_term("feature"),
                 entity=entity,
                 entities=entities,
             )
@@ -255,7 +255,7 @@ def view_instructions(use_row_ids=False):
             "You can **filter** and **search** the {feature} table or adjust"
             " the **sort order**. You can also look at {features} with identical"
             " {feature} values.".format(
-                feature=get_term("Feature", lower=True),
-                features=get_term("Feature", plural=True, lower=True),
+                feature=get_term("feature"),
+                features=get_term("feature", plural=True),
             )
         )

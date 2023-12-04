@@ -27,12 +27,12 @@ def view_feature_boxes(
     changes = {}
     features_df = features.get_features(include_type=True)
     selected_features = st.multiselect(
-        "Select %s to change:" % get_term("Feature", lower=True, plural=True),
+        "Select %s to change:" % get_term("feature", plural=True),
         features_df.index.tolist(),
         default=list(st.session_state["changes"].keys()),
         format_func=lambda feat: features_df.loc[feat, "Feature"],
         key="selected_features",
-        placeholder="Select one or multiple %s" % get_term("Feature", lower=True, plural=True),
+        placeholder="Select one or multiple %s" % get_term("feature", plural=True),
     )
     for feature in selected_features:
         # Sibyl-api expects the raw feature names as input for changes
@@ -80,7 +80,7 @@ def view_prediction(eid, changes, model_id, use_row_id=False, eid_for_rows=None)
         pred_display = pred_format_func(pred)
     st.metric(
         "Model's {prediction} of modified {entity}:".format(
-            prediction=get_term("Prediction", lower=True),
+            prediction=get_term("prediction"),
             entity=get_term("Entity"),
         ),
         pred_display,
@@ -145,11 +145,11 @@ def view(eid, changes, model_id, row_id=None, save_space=False):
     )
     options = ["No filtering", "With filtering"]
     show_different = st.radio(
-        "Filter out identical %s values?" % get_term("Feature", lower=True),
+        "Filter out identical %s values?" % get_term("feature"),
         options,
         horizontal=True,
         help="Show only rows where %s values of two %s are different"
-        % (get_term("Feature", lower=True), get_term("Entity", lower=True, plural=True)),
+        % (get_term("feature"), get_term("entity", plural=True)),
     )
     if show_different == "With filtering":
         to_show = filter_different_rows(eid, to_show)
@@ -174,7 +174,7 @@ def view_instructions():
         st.markdown(
             "This page presents the change in **prediction** and **{feature} contribution**"
             " by the selected_features you added to the selected {entity}.".format(
-                feature=get_term("Feature", lower=True), entity=get_term("Entity")
+                feature=get_term("feature"), entity=get_term("Entity")
             )
         )
         st.markdown(
@@ -186,16 +186,16 @@ def view_instructions():
             " prediction and the {feature} contribution of the {entity} you just created. The"
             " {features} that have a different value from that of the original will be highlighted"
             " in the table.".format(
-                a_entity=get_term("Entity", with_a=True, lower=True),
-                entity=get_term("Entity", lower=True),
-                feature=get_term("Feature", lower=True),
-                features=get_term("Feature", lower=True, plural=True),
+                a_entity=get_term("entity", with_a=True),
+                entity=get_term("entity"),
+                feature=get_term("feature"),
+                features=get_term("feature", plural=True),
             )
         )
         st.markdown(
             "The layout and formatting functions in the following table are very similar to that"
             " in the **Compare Cases** page. However, we provide a different filter here. You can"
             " focus on the {features} that you have changed.".format(
-                features=get_term("Feature", lower=True, plural=True),
+                features=get_term("feature", plural=True),
             )
         )
