@@ -80,9 +80,7 @@ def view(eid, model_id, row_id=None, save_space=False, key=None):
                 help="Show the exact amount this feature contributes to the model prediction",
             )
     else:
-        cols = st.columns(1)
-        with cols[0]:
-            sort_by = helpers.show_sort_options(["Absolute", "Ascending", "Descending"])
+        sort_by = helpers.show_sort_options(["Absolute", "Ascending", "Descending"])
 
     to_show = format_contributions_to_view(eid, model_id, row_id=row_id, show_number=show_number)
 
