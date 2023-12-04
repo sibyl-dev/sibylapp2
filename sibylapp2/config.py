@@ -4,7 +4,7 @@ from os import path
 import streamlit as st
 import yaml
 
-from sibylapp2.compute.context import get_gui_config
+from sibylapp2.compute.context import get_config
 
 
 @st.cache_data(show_spinner=False)
@@ -37,11 +37,11 @@ def get_color_scheme():
 
 
 # APPLICATION-SPECIFIC CONFIGURATIONS =============================================================
-def get_config(name, api_name, default):
+def select_config(name, api_name, default):
     if load_config().get(name) is not None:
         return load_config().get(name)
-    if get_gui_config(api_name) is not None:
-        return get_gui_config(api_name)
+    if get_config(api_name) is not None:
+        return get_config(api_name)
     return default
 
 
@@ -61,12 +61,12 @@ def to_pred_type(str_pred_type):
     raise ValueError("Received invalid pred type %s" % str_pred_type)
 
 
-FLIP_COLORS = get_config("FLIP_COLORS", "model_pred_bad_outcome", False)
-PREDICTION_TYPE = to_pred_type(get_config("PREDICTION_TYPE", "pred_type", "numeric"))
-POSITIVE_TERM = get_config("POSITIVE_TERM", "pos_pred_name", "True")
-NEGATIVE_TERM = get_config("NEGATIVE_TERM", "neg_pred_name", "False")
-PRED_FORMAT_STRING = get_config("PRED_FORMAT_STRING", "pred_format_string", "{}")
-SUPPORT_PROBABILITY = get_config("SUPPORT_PROBABILITY", "support_probability", False)
+FLIP_COLORS = select_config("FLIP_COLORS", "output_sentiment_is_negative", False)
+PREDICTION_TYPE = to_pred_type(select_config("PREDICTION_TYPE", "output_type", "numeric"))
+POSITIVE_TERM = select_config("POSITIVE_TERM", "output_pos_label", "True")
+NEGATIVE_TERM = select_config("NEGATIVE_TERM", "output_neg_label", "False")
+PRED_FORMAT_STRING = select_config("PRED_FORMAT_STRING", "output_format_string", "{}")
+SUPPORT_PROBABILITY = select_config("SUPPORT_PROBABILITY", "show_probs", False)
 
 
 def pred_format_func(pred, display_proba=False):

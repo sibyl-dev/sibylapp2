@@ -103,14 +103,14 @@ def view_instructions():
             " specific {feature} in more detail. The plot on the left shows how much each value"
             " for the chosen {feature} contributes to the model's prediction across the training"
             " set, as well as the corresponding model predictions.".format(
-                feature_up=get_term("Feature"), feature=get_term("Feature", lower=True)
+                feature_up=get_term("Feature"), feature=get_term("feature")
             )
         )
         st.markdown(
             "The plot on the right shows how the values for the chosen {feature} varied across the"
             " training dataset. For numeric features, you will see a box-and-whiskers plot"
             " with some notable distribution values (hover for specifics). For categorical"
-            " features, you will see a pie chart.".format(feature=get_term("Feature", lower=True))
+            " features, you will see a pie chart.".format(feature=get_term("feature"))
         )
         st.markdown(
             "You can use the selector to visualize only rows in the training set with a"

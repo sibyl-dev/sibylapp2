@@ -36,10 +36,10 @@ def view_instructions():
             "**{feature_up} Importance** refers to how much the model uses a specific"
             " {feature} overall in its predictions. A large importance bar means this {feature} is"
             " used frequently, while a smaller bar means it is used less.".format(
-                feature_up=get_term("Feature"), feature=get_term("Feature", lower=True)
+                feature_up=get_term("Feature"), feature=get_term("feature")
             )
         )
         st.markdown(
             "You can also **filter** and **search** the {feature} table or adjust the **sort"
-            " order**.".format(feature=get_term("Feature", lower=True))
+            " order**.".format(feature=get_term("feature"))
         )

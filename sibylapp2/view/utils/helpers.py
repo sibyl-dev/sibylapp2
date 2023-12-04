@@ -200,11 +200,11 @@ def rename_for_pyreal_vis(df):
 
 
 def show_legend(similar_entities=False):
-    model_pred = get_term("Prediction", lower=True)
+    model_pred = get_term("prediction")
     separator = "&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;"
     if similar_entities:
-        pos_change = " Increase in %s's contribution to" % get_term("Feature", lower=True)
-        neg_change = " Decrease in %s's contribution to" % get_term("Feature", lower=True)
+        pos_change = " Increase in %s's contribution to" % get_term("feature")
+        neg_change = " Decrease in %s's contribution to" % get_term("feature")
     else:
         if PREDICTION_TYPE == PredType.BOOLEAN:
             pos_change = f" towards **{POSITIVE_TERM}** as"

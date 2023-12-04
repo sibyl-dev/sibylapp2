@@ -105,15 +105,15 @@ def view_instructions():
             " case.".format(
                 positive=positive,
                 negative=negative,
-                feature=get_term("Feature", lower=True),
-                entity=get_term("Entity", lower=True),
+                feature=get_term("feature"),
+                entity=get_term("entity"),
             )
         )
         st.markdown(
             "You can select {a_entity} from the dropdown above, and see the {feature}"
             " contributions. You can also **filter** and **search** the {feature} table or adjust"
             " the **sort order**.".format(
-                a_entity=get_term("Entity", with_a=True, lower=True),
-                feature=get_term("Feature", lower=True),
+                a_entity=get_term("entity", with_a=True),
+                feature=get_term("feature"),
             )
         )
