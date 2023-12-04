@@ -31,7 +31,8 @@ def get_options_for_categories(entities: list[str]) -> dict[str, list[str | int 
     options = {}
     # each column is an entity
     dataset = pd.concat([get_entity(eid) for eid in entities], axis=1)
+    features = get_features(include_type=True)
     for feature in dataset.index:
-        if get_features(include_type=True).loc[feature, "Type"] != "numeric":
+        if feature in features.index and features.loc[feature, "Type"] != "numeric":
             options[feature] = pd.unique(dataset.loc[feature, :]).tolist()
     return options
