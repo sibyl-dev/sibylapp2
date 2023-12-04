@@ -23,7 +23,7 @@ def get_dataset_contributions(model_id=api.fetch_model_id(), all_rows=True):
         all_rows and "dataset_row_id_dict" not in st.session_state
     ):
         st.session_state["dataset_eids"], st.session_state["dataset_row_id_dict"] = (
-            entities.get_eids(max_entities=1000, return_row_ids=all_rows)
+            entities.get_eids(max_entities=get_dataset_size(), return_row_ids=all_rows)
         )
     # confirm at least one entity has more than one row
     if any(len(lst) > 1 for lst in st.session_state["dataset_row_id_dict"].values()):
