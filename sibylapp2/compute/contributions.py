@@ -2,6 +2,7 @@ import pandas as pd
 import streamlit as st
 
 from sibylapp2.compute import api, entities
+from sibylapp2.config import get_dataset_size
 
 
 @st.cache_data(show_spinner="Getting contributions...")

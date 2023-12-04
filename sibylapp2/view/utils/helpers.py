@@ -7,25 +7,39 @@ import streamlit as st
 
 from sibylapp2.compute.context import get_term
 from sibylapp2.config import (
-    BAR_LENGTH,
-    FLIP_COLORS,
     NEGATIVE_TERM,
     POSITIVE_TERM,
     PREDICTION_TYPE,
     PredType,
+    get_bar_length,
+    get_color_scheme,
 )
 
-if FLIP_COLORS:
-    POS_EM = "🟥"
-    NEG_EM = "🟦"
-else:
-    POS_EM = "🟦"
-    NEG_EM = "🟥"
 NEUT_EM = "🟪"
 BLANK_EM = "⬜"
 UP_ARROW = "⬆"
 DOWN_ARROW = "⬇"
 DIVIDING_BAR = "|"
+
+
+def pos_em(color_scheme=None):
+    color_scheme = get_color_scheme() if color_scheme is None else color_scheme
+    if color_scheme == "Reversed":
+        return "🟥"
+    elif color_scheme == "Standard":
+        return "🟦"
+    else:
+        return "🟪"
+
+
+def neg_em(color_scheme=None):
+    color_scheme = get_color_scheme() if color_scheme is None else color_scheme
+    if color_scheme == "Reversed":
+        return "🟦"
+    elif color_scheme == "Standard":
+        return "🟥"
+    else:
+        return "🟨"
 
 
 def show_sort_options(options):
@@ -67,13 +81,15 @@ def show_text_input_side_by_side(
 
 
 def get_pos_neg_names():
-    if FLIP_COLORS:
+    if get_color_scheme() == "Reversed":
         return "red", "blue"
-    else:
+    elif get_color_scheme() == "Standard":
         return "blue", "red"
+    else:
+        return "purple", "yellow"
 
 
-def show_table(df, page_size=10, key=None, style_function=None):
+def show_table(df, key=None, style_function=None):
     table = st.container()
     _, col1, col2 = st.columns((4, 1, 1))
     with col2:
@@ -119,12 +135,12 @@ def generate_bars(values, neutral=False, show_number=False):
 
     def format_func(num, value=None):
         if neutral:
-            formatted = NEUT_EM * num + BLANK_EM * (BAR_LENGTH - num) + UP_ARROW
+            formatted = NEUT_EM * num + BLANK_EM * (get_bar_length() - num) + UP_ARROW
         else:
             formatted = (
-                (POS_EM * num + BLANK_EM * (BAR_LENGTH - num) + UP_ARROW)
+                (pos_em() * num + BLANK_EM * (get_bar_length() - num) + UP_ARROW)
                 if num > 0
-                else (DOWN_ARROW + BLANK_EM * (BAR_LENGTH + num) + NEG_EM * -num)
+                else (DOWN_ARROW + BLANK_EM * (get_bar_length() + num) + neg_em() * -num)
             )
         if show_number:
             formatted = "%s    %.3f" % (formatted, value)
@@ -137,9 +153,9 @@ def generate_bars(values, neutral=False, show_number=False):
             return math.ceil(x - 0.5)
 
     if max(values.abs()) == 0:
-        num_to_show = values * BAR_LENGTH  # this work since values is zero
+        num_to_show = values * get_bar_length()  # this work since values is zero
     else:
-        num_to_show = values / max(values.abs()) * BAR_LENGTH
+        num_to_show = values / max(values.abs()) * get_bar_length()
     num_to_show = num_to_show.apply(round_away_from_zero).astype("int")
 
     return [format_func(num, value) for num, value in zip(num_to_show, values)]
@@ -152,7 +168,7 @@ def generate_bars_bidirectional(neg_values, pos_values):
         else:
             return math.ceil(x - 0.5)
 
-    half_bar_length = math.ceil(BAR_LENGTH / 2)
+    half_bar_length = math.ceil(get_bar_length() / 2)
 
     neg_num_to_show = (
         (neg_values / max(neg_values.abs()) * half_bar_length)
@@ -168,9 +184,9 @@ def generate_bars_bidirectional(neg_values, pos_values):
         (
             DOWN_ARROW
             + BLANK_EM * (half_bar_length + neg)
-            + (NEG_EM * -neg)
+            + (neg_em() * -neg)
             + DIVIDING_BAR
-            + (POS_EM * pos)
+            + (pos_em() * pos)
             + (BLANK_EM * (half_bar_length - pos))
             + UP_ARROW
         )
@@ -197,7 +213,7 @@ def show_legend(similar_entities=False):
             pos_change = " Increase in"
             neg_change = " Decrease in"
     st.write(
-        (NEG_EM + neg_change + " " + model_pred)
+        (neg_em() + neg_change + " " + model_pred)
         + separator
-        + (POS_EM + pos_change + " " + model_pred)
+        + (pos_em() + pos_change + " " + model_pred)
     )
