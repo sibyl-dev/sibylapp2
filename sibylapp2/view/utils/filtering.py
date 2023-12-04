@@ -191,7 +191,7 @@ def process_show_more(to_show):
 def process_search(to_show):
     if st.session_state["search_term"] is not None:
         to_show = to_show[
-            to_show["Feature"].str.contains(st.session_state["search_term"], case=False)
+            to_show["Feature"].str.contains(st.session_state["search_term"], case=False, na=False)
         ]
     return to_show
 
@@ -199,7 +199,7 @@ def process_search(to_show):
 def process_search_on_features(features):
     if st.session_state["search_term"] is not None:
         features = features.index[
-            features.index.str.contains(st.session_state["search_term"], case=False)
+            features.index.str.contains(st.session_state["search_term"], case=False, na=False)
         ]
     return features
 
