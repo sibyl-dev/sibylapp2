@@ -38,8 +38,8 @@ def get_color_scheme():
 
 # APPLICATION-SPECIFIC CONFIGURATIONS =============================================================
 def select_config(name, api_name, default):
-    if cfg.get(name) is not None:
-        return cfg.get(name)
+    if load_config().get(name) is not None:
+        return load_config().get(name)
     if get_config(api_name) is not None:
         return get_config(api_name)
     return default
