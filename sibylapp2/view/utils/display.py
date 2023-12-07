@@ -1,3 +1,5 @@
+import altair as alt
+import pandas as pd
 import streamlit as st
 
 from sibylapp2.compute import context, model
@@ -33,3 +35,21 @@ def view_prediction(eid):
         pred_display = pred_format_func(pred)
 
     st.sidebar.metric(context.get_term("Prediction"), pred_display)
+
+
+def plot_temporal_line_charts(df: pd.DataFrame):
+    """
+    Transform dataframe from wide form to long form for streamlit visualizations.
+    """
+    df = df.set_index("Feature").transpose().reset_index(names=["time"])
+
+    df = df.melt(
+        id_vars=["time"],
+        value_vars=set(df.columns) - set(["time"]),
+        var_name="feature",
+        value_name="contribution",
+    )
+    chart = (
+        alt.Chart(df).mark_line(point=True).encode(x="time", y="contribution:Q", color="feature:N")
+    )
+    st.altair_chart(chart, use_container_width=True)

@@ -32,6 +32,10 @@ def show_sort_options(options):
     return st.radio("Sort by", options, horizontal=True)
 
 
+def show_filter_options(options):
+    return st.radio("Filter by", options, horizontal=True)
+
+
 def show_text_input_side_by_side(
     label: str,
     options: list | None = None,
