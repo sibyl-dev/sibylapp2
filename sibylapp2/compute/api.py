@@ -16,19 +16,29 @@ if cfg.get("CERT") is not None:
 
 def api_get(url):
     fetch_url = cfg["BASE_URL"] + url
-    response = session.get(fetch_url)
+    try:
+        response = session.get(fetch_url)
+    except requests.exceptions.RequestException:
+        st.error("Connection error. Please check your connection and refresh the page")
+        st.stop()
     if response.status_code != 200:
-        st.error("Error with GET(%s). %s: %s" % (fetch_url, response.status_code, response.reason))
+        st.error(
+            "Error with request (%s) %s: %s" % (fetch_url, response.status_code, response.reason)
+        )
         st.stop()
     return response.json()
 
 
 def api_post(url, json):
     fetch_url = cfg["BASE_URL"] + url
-    response = session.post(fetch_url, json=json)
+    try:
+        response = session.post(fetch_url, json=json)
+    except requests.exceptions.RequestException:
+        st.error("Connection error. Please check your connection and refresh the page")
+        st.stop()
     if response.status_code != 200:
         st.error(
-            "Error with POST(%s). %s: %s" % (fetch_url, response.status_code, response.reason)
+            "Error with request (%s) %s: %s" % (fetch_url, response.status_code, response.reason)
         )
         st.stop()
     return response.json()
