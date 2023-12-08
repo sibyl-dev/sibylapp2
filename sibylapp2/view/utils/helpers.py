@@ -70,6 +70,8 @@ def show_text_input_side_by_side(
                 **input_params,
             )
         else:
+            if default_input not in options:
+                options.append(default_input)
             return col2.selectbox(
                 "hidden",
                 options=options,
