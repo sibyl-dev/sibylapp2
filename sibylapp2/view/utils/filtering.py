@@ -72,7 +72,7 @@ def view_entity_select(eid_text="eid", prefix=None, default=0):
     )
 
 
-def view_time_select(eid, row_ids, row_id_text="row_id", prefix=None, default=0):
+def view_row_select(eid, row_ids, row_id_text="row_id", prefix=None, default=0):
     def format_rowid_select(row_id):
         return str(row_id)
 
@@ -138,9 +138,10 @@ def view_selection():
     eid = st.session_state["eid"]
     row_ids = st.session_state["row_id_dict"][eid]
     if len(row_ids) > 1:
-        view_time_select(eid, row_ids, row_id_text="row_id")
+        view_row_select(eid, row_ids, row_id_text="row_id")
         st.session_state["use_rows"] = True
     else:
+        st.session_state["row_id"] = None
         display.view_prediction(eid)
 
 
@@ -190,17 +191,15 @@ def process_show_more(to_show):
 def process_search(to_show):
     if st.session_state["search_term"] is not None:
         to_show = to_show[
-            to_show["Feature"].str.contains(st.session_state["search_term"], case=False)
+            to_show["Feature"].str.contains(st.session_state["search_term"], case=False, na=False)
         ]
     return to_show
 
 
 def process_search_on_features(features):
     if st.session_state["search_term"] is not None:
-        features = [
-            feature
-            for feature in features
-            if st.session_state["search_term"].lower() in feature.lower()
+        features = features.index[
+            features.index.str.contains(st.session_state["search_term"], case=False, na=False)
         ]
     return features
 

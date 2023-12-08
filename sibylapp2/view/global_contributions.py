@@ -3,7 +3,7 @@ import pandas as pd
 import streamlit as st
 from pyreal.visualize import strip_plot
 
-from sibylapp2.compute import contributions
+from sibylapp2.compute import contributions, features
 from sibylapp2.compute.context import get_term
 from sibylapp2.view.utils import filtering, helpers
 from sibylapp2.view.utils.helpers import show_legend
@@ -34,10 +34,7 @@ def view(eids, model_id):
         global_contributions["negative"], global_contributions["positive"]
     )
 
-    all_contributions = contributions.get_dataset_contributions(model_id)
-    feature_info = all_contributions[next(iter(all_contributions))][
-        ["category", "Feature"]
-    ].rename(columns={"category": "Category"})
+    feature_info = features.get_features().rename(columns={"category": "Category"})
     to_show = pd.concat([feature_info, bars, global_contributions], axis="columns")
 
     if sort_by == "Total":
@@ -63,7 +60,7 @@ def view_instructions():
             " model prediction overall across the training dataset. Each row shows the average"
             " positive and negative contribution for that {feature}.".format(
                 feature_contributions=get_term("Feature Contributions"),
-                feature=get_term("Feature", lower=True),
+                feature=get_term("feature"),
             )
         )
         st.markdown(
@@ -71,12 +68,10 @@ def view_instructions():
             " {feature} often greatly increases the model prediction, and never decreases it. A"
             " large **{pos}** bar and a large **{neg}** bar means this {feature} can both"
             " increase and decrease the model prediction, depending on its value and the context."
-            .format(feature=get_term("Feature", lower=True), pos=positive, neg=negative)
+            .format(feature=get_term("feature"), pos=positive, neg=negative)
         )
         st.markdown(
             "You can **filter** and **search** the {feature} table or adjust the **sort order**."
             " You can also use the selector to visualize the contributions for rows in the dataset"
-            " with only a select subset of predictions.".format(
-                feature=get_term("Feature", lower=True)
-            )
+            " with only a select subset of predictions.".format(feature=get_term("feature"))
         )

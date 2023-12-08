@@ -12,13 +12,9 @@ from sibylapp2.view import feature_contribution
 
 @st.cache_data(show_spinner="Generating distribution plot...")
 def generate_feature_distribution_plot(eids, feature, model_id):
-    contribution_dict = contributions.get_contributions(eids, model_id=model_id)
-    data = pd.DataFrame(
-        [
-            contribution_dict[eid][contribution_dict[eid]["Feature"] == feature]["Feature Value"]
-            for eid in contribution_dict
-        ]
-    ).squeeze()
+    _, value_dict = contributions.get_contributions(eids, model_id=model_id)
+    data = pd.Series(value_dict[feature])
+
     if pd.api.types.is_numeric_dtype(pd.to_numeric(data, errors="ignore")):
         trace1 = go.Box(x=data, boxpoints="all", name="", marker_color="rgb(84, 31, 63)")
         fig = go.Figure(data=[trace1])
@@ -36,25 +32,22 @@ def generate_feature_distribution_plot(eids, feature, model_id):
 
 @st.cache_data(show_spinner="Generating feature plot...")
 def generate_feature_plot_data(eids, predictions, feature, model_id):
-    contributions_to_show = contributions.get_contributions(eids, model_id=model_id)
-    data = {
-        i: contributions_to_show[i][contributions_to_show[i]["Feature"] == feature][
-            ["Contribution", "Feature Value"]
-        ].squeeze()
-        for i in contributions_to_show
-    }
+    contributions_df, values = contributions.get_contributions(eids, model_id=model_id)
+    contributions_for_feature = contributions_df[feature]
+    values_for_feature = values[feature]
+
     formatted_pred = {i: config.pred_format_func(predictions[i]) for i in predictions}
     # Adding the space after prediction as a hack to allow two columns with the same displayed name
     df = pd.concat(
         [
-            pd.DataFrame(data).T,
             pd.Series(predictions, name="Prediction "),
             pd.Series(formatted_pred, name="Prediction"),
         ],
         axis=1,
     )
+    df["Value"] = values_for_feature
+    df["Contribution"] = contributions_for_feature
     df["ID"] = df.index
-    df = df.rename(columns={"Feature Value": "Value"})
     return df
 
 
@@ -110,14 +103,14 @@ def view_instructions():
             " specific {feature} in more detail. The plot on the left shows how much each value"
             " for the chosen {feature} contributes to the model's prediction across the training"
             " set, as well as the corresponding model predictions.".format(
-                feature_up=get_term("Feature"), feature=get_term("Feature", lower=True)
+                feature_up=get_term("Feature"), feature=get_term("feature")
             )
         )
         st.markdown(
             "The plot on the right shows how the values for the chosen {feature} varied across the"
             " training dataset. For numeric features, you will see a box-and-whiskers plot"
             " with some notable distribution values (hover for specifics). For categorical"
-            " features, you will see a pie chart.".format(feature=get_term("Feature", lower=True))
+            " features, you will see a pie chart.".format(feature=get_term("feature"))
         )
         st.markdown(
             "You can use the selector to visualize only rows in the training set with a"

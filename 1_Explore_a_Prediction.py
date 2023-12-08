@@ -26,12 +26,9 @@ tab = stx.tab_bar(
 )
 
 if tab == "1":
-    if st.session_state["use_rows"]:
-        feature_contribution.view(
-            st.session_state["row_id"],
-            st.session_state["model_id"],
-            use_row_id=True,
-            eid_for_rows=st.session_state["eid"],
-        )
-    else:
-        feature_contribution.view(st.session_state["eid"], st.session_state["model_id"])
+    row_id = None
+    if "row_id" in st.session_state:
+        row_id = st.session_state["row_id"]
+    feature_contribution.view(
+        st.session_state["eid"], st.session_state["model_id"], st.session_state["row_id"]
+    )

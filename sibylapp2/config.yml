@@ -2,14 +2,15 @@
 BASE_URL: "http://ec2-18-191-40-90.us-east-2.compute.amazonaws.com:3000/api/v1/"
 CERT:
 
-# GENERAL CONFIGURATIONS ============================================================================
-BAR_LENGTH: 8 # Number of squares to use for contribution/importance bars
+# GENERAL CONFIGURATIONS ==========================================================================
+BAR_LENGTH: 8  # Number of squares to use for contribution/importance bars
 MAX_ENTITIES: 11 # Maximum number of entities to select from. Set this to None to use all
 DATASET_SIZE: 1000 # Max number of entities to use for dataset-wide visualizations
-LOAD_UPFRONT: True # If true, run heavy computations on initial load, else greedily run as needed
+LOAD_UPFRONT: true # If true, run heavy computations on initial load, else greedily run as needed
 
-# APPLICATION-SPECIFIC CONFIGURATIONS (overrides API context) ========================================
-FLIP_COLORS: # If true, positive contributions will be red
+# APPLICATION-SPECIFIC CONFIGURATIONS (overrides API context) =====================================
+FLIP_COLORS: false # deprecated (use COLOR_SCHEME) keeping for api support
+COLOR_SCHEME: Standard # Standard: positive is blue. Reversed: positive is red. Neutral: Neither
 PREDICTION_TYPE: # One of "numeric", "boolean", "categorical"
 POSITIVE_TERM: # Term to use for a True prediction for boolean models
 NEGATIVE_TERM: # Term to use for a False prediction for boolean models
