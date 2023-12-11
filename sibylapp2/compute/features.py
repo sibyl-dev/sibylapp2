@@ -7,10 +7,12 @@ from sibylapp2.compute import api
 
 
 @st.cache_data(show_spinner="Fetching data...")
-def get_features(include_type=False) -> pd.DataFrame:
+def get_features(include_type=False, include_values=False) -> pd.DataFrame:
     columns = ["Category", "Feature"]
     if include_type:
         columns.append("Type")
+    if include_values:
+        columns.append("Values")
     features = api.fetch_features()[columns]
     return features
 
@@ -21,18 +23,9 @@ def get_entity(eid: str, row_id: str | None = None) -> pd.Series:
     return feature_values
 
 
-@st.cache_data(show_spinner="Fetching data...")
-def get_options_for_categories(entities: list[str]) -> dict[str, list[str | int | float]]:
-    """
-    This function should be replaced when API call for options of non-numeric
-    variables is implemented. This function currently iterates through all
-    entities in `dataset_eids` to generate options.
-    """
-    options = {}
-    # each column is an entity
-    dataset = pd.concat([get_entity(eid) for eid in entities], axis=1)
-    features = get_features(include_type=True)
-    for feature in dataset.index:
-        if feature in features.index and features.loc[feature, "Type"] != "numeric":
-            options[feature] = pd.unique(dataset.loc[feature, :]).tolist()
-    return options
+@st.cache_data(show_spinner="Fetching categorical values...")
+def get_categorical_values():
+    features_df = get_features(include_type=True, include_values=True)
+    features_df = features_df[features_df["Type"] == "categorical"]
+    feature_value_dict = dict(zip(features_df.index, features_df["Values"]))
+    return feature_value_dict

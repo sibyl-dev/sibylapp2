@@ -70,12 +70,11 @@ def show_text_input_side_by_side(
                 **input_params,
             )
         else:
-            if default_input not in options:
-                options.append(default_input)
+            index = options.index(default_input) if default_input in options else None
             return col2.selectbox(
                 "hidden",
                 options=options,
-                index=options.index(default_input),
+                index=index,
                 label_visibility="collapsed",
                 key=label,
                 **input_params,
