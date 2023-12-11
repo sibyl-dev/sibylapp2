@@ -4,6 +4,7 @@ import pandas as pd
 import requests
 import streamlit as st
 import yaml
+import json as json_encoder
 
 with open(path.join(path.dirname(path.dirname(path.abspath(__file__))), "config.yml"), "r") as f:
     cfg = yaml.safe_load(f)
@@ -18,8 +19,8 @@ def api_get(url):
     fetch_url = cfg["BASE_URL"] + url
     try:
         response = session.get(fetch_url)
-    except requests.exceptions.RequestException:
-        st.error("Connection error. Please check your connection and refresh the page")
+    except requests.exceptions.RequestException as e:
+        st.error(f"Connection error. Please check your connection and refresh the page ({e})")
         st.stop()
     if response.status_code != 200:
         st.error(
@@ -29,12 +30,17 @@ def api_get(url):
     return response.json()
 
 
-def api_post(url, json):
+def api_post(url, json=None, data=None):
     fetch_url = cfg["BASE_URL"] + url
     try:
-        response = session.post(fetch_url, json=json)
-    except requests.exceptions.RequestException:
-        st.error("Connection error. Please check your connection and refresh the page")
+        if data:
+            response = session.post(
+                fetch_url, data=data, headers={"Content-Type": "application/json"}
+            )
+        else:
+            response = session.post(fetch_url, json=json)
+    except requests.exceptions.RequestException as e:
+        st.error(f"Connection error. Please check your connection and refresh the page ({e})")
         st.stop()
     if response.status_code != 200:
         st.error(
@@ -83,7 +89,7 @@ def fetch_modified_prediction(
         "changes": changes,
         "return_proba": return_proba,
     }
-    prediction = api_post("modified_prediction/", json)["prediction"]
+    prediction = api_post("modified_prediction/", data=json_encoder.dumps(json))["prediction"]
     return prediction
 
 
@@ -133,7 +139,7 @@ def fetch_contributions(eids, row_ids=None, model_id=fetch_model_id()):
 
 def fetch_contribution_for_modified_data(eid, changes, row_id=None, model_id=fetch_model_id()):
     json = {"eid": eid, "row_id": row_id, "model_id": model_id, "changes": changes}
-    result = api_post("modified_contribution/", json)
+    result = api_post("modified_contribution/", data=json_encoder.dumps(json))
     contributions = pd.DataFrame.from_dict(result["contributions"], orient="index")
     values = pd.DataFrame.from_dict(result["values"], orient="index")
     return contributions, values
