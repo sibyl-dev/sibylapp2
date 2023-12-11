@@ -8,7 +8,6 @@ from sibylapp2.view import customized_entity
 from sibylapp2.view.utils import display, filtering, setup
 
 setup.setup_page(return_row_ids=True)
-setup.generate_options_for_features(st.session_state["dataset_eids"])
 # Sidebar ------------------------------------
 display.show_probability_select_box()
 filtering.view_model_select()
@@ -20,14 +19,12 @@ eid = st.session_state["eid"]
 if "use_rows" in st.session_state and st.session_state["use_rows"]:
     changes = customized_entity.view_feature_boxes(
         st.session_state["row_id"],
-        st.session_state["options_dict"],
         use_row_id=True,
         eid_for_rows=eid,
     )
 else:
     changes = customized_entity.view_feature_boxes(
         eid,
-        st.session_state["options_dict"],
     )
 
 # Update displayed table after user presses the button

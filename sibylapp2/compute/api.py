@@ -101,7 +101,12 @@ def fetch_predictions(eids, row_ids=None, model_id=fetch_model_id(), return_prob
 def fetch_features():
     features = api_get("features/")["features"]
     features_df = pd.DataFrame(features).rename(
-        columns={"description": "Feature", "category": "Category", "type": "Type"}
+        columns={
+            "description": "Feature",
+            "category": "Category",
+            "type": "Type",
+            "values": "Values",
+        }
     )
     features_df = features_df.set_index("name")
     return features_df
