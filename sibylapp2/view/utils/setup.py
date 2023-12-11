@@ -42,7 +42,3 @@ def setup_page(return_row_ids=False):
         model.get_dataset_predictions()
         contributions.get_dataset_contributions()
         importance.compute_importance()
-
-
-def generate_options_for_features(eids: list[str]):
-    st.session_state["options_dict"] = features.get_options_for_categories(eids)

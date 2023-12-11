@@ -14,10 +14,11 @@ from sibylapp2.view.utils.helpers import show_text_input_side_by_side
 
 def view_feature_boxes(
     eid: str,
-    options_dict: dict[str, list[str | int | float]],
     use_row_id: bool = False,
     eid_for_rows: str | None = None,
 ):
+    if "options_dict" not in st.session_state:
+        st.session_state["categorical_values_dict"] = features.get_categorical_values()
     if "changes" not in st.session_state:
         st.session_state["changes"] = {}
     if use_row_id:
@@ -44,7 +45,7 @@ def view_feature_boxes(
         options = None
         if features_df.loc[feature, "Type"] != "numeric":
             numeric = False
-            options = options_dict[feature]
+            options = st.session_state["categorical_values_dict"][feature]
 
         changes[feature] = show_text_input_side_by_side(
             f"New value for **{features_df.loc[feature, 'Feature'].strip()}**",
