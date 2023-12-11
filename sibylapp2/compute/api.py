@@ -1,10 +1,10 @@
+import json as json_encoder
 from os import path
 
 import pandas as pd
 import requests
 import streamlit as st
 import yaml
-import json as json_encoder
 
 with open(path.join(path.dirname(path.dirname(path.abspath(__file__))), "config.yml"), "r") as f:
     cfg = yaml.safe_load(f)
@@ -19,8 +19,8 @@ def api_get(url):
     fetch_url = cfg["BASE_URL"] + url
     try:
         response = session.get(fetch_url)
-    except requests.exceptions.RequestException as e:
-        st.error(f"Connection error. Please check your connection and refresh the page ({e})")
+    except requests.exceptions.RequestException as err:
+        st.error(f"Connection error. Please check your connection and refresh the page ({err})")
         st.stop()
     if response.status_code != 200:
         st.error(
@@ -39,8 +39,8 @@ def api_post(url, json=None, data=None):
             )
         else:
             response = session.post(fetch_url, json=json)
-    except requests.exceptions.RequestException as e:
-        st.error(f"Connection error. Please check your connection and refresh the page ({e})")
+    except requests.exceptions.RequestException as err:
+        st.error(f"Connection error. Please check your connection and refresh the page ({err})")
         st.stop()
     if response.status_code != 200:
         st.error(

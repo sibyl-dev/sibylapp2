@@ -4,7 +4,6 @@ import math
 
 import pandas as pd
 import streamlit as st
-import numpy as np
 
 from sibylapp2.compute.context import get_term
 from sibylapp2.config import (

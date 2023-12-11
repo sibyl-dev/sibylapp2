@@ -1,7 +1,5 @@
 # pylint: disable=invalid-name
 
-import copy
-
 import streamlit as st
 
 from sibylapp2.view import customized_entity
