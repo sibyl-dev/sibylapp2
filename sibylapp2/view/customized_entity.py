@@ -108,11 +108,11 @@ def filter_different_rows(eid, to_show):
     return to_show_filtered
 
 
-def view(eid, changes, model_id, row_id=None, save_space=False):
+def view(eid, changes, model_id, row_id=None):
     """
     eid is used as `row_id` when use_row_id is True
     """
-    sort_by, show_number, show_contribution = view_compare_cases_helper(save_space=save_space)
+    sort_by, show_number, show_contribution = view_compare_cases_helper()
     if row_id is not None:
         original_contribution_df, original_values_df = contributions.get_contributions_for_rows(
             eid, [row_id], model_id=model_id

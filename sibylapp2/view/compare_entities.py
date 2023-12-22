@@ -71,46 +71,39 @@ def view_prediction_difference(
         )
 
 
-def view_compare_cases_helper(save_space=False):
-    show_number = False
-    show_contribution = False
-    if not save_space:
-        cols = st.columns(2)
-        with cols[0]:
-            sort_by = helpers.show_sort_options(
-                ["Absolute Difference", "Positive Difference", "Negative Difference"]
-            )
-        with cols[1]:
-            show_number = st.checkbox(
-                "Show numeric contributions?",
-                help="Show the exact amount this feature contributes to the model prediction",
-            )
-            show_contribution = st.checkbox(
-                "Show original contributions?",
-                help="Show the original %s contributions for both %s"
-                % (get_term("Feature"), get_term("Entity", plural=True)),
-            )
-    else:
-        cols = st.columns(1)
-        with cols[0]:
-            sort_by = helpers.show_sort_options(
-                ["Absolute Difference", "Positive Difference", "Negative Difference"]
-            )
+def view_compare_cases_helper():
+    cols = st.columns(2)
+    with cols[0]:
+        sort_by = helpers.show_sort_options(
+            ["Absolute Change", f"More {get_term('Positive')}", f"More {get_term('Negative')}"]
+        )
+    with cols[1]:
+        show_number = st.checkbox(
+            "Show numeric contributions?",
+            help="Show the exact amount this feature contributes to the model prediction",
+        )
+        show_contribution = st.checkbox(
+            "Show original contributions?",
+            help="Show the original %s contributions for both %s"
+            % (get_term("Feature"), get_term("Entity", plural=True)),
+        )
     return sort_by, show_number, show_contribution
 
 
 def sort_contributions(to_show, sort_by):
     helpers.show_legend(similar_entities=True)
-    if sort_by == "Absolute Difference":
+    if sort_by == "Absolute Change":
         to_show = to_show.reindex(
             to_show["Contribution Change Value"].abs().sort_values(ascending=False).index
         )
-    if sort_by == "Positive Difference":
+    if sort_by == f"More {get_term('Positive')}":
         to_show = to_show.sort_values(
             by="Contribution Change Value", axis="index", ascending=False
         )
-    if sort_by == "Negative Difference":
+        to_show = to_show[to_show["Contribution Change Value"] > 0]
+    if sort_by == f"More {get_term('Negative')}":
         to_show = to_show.sort_values(by="Contribution Change Value", axis="index")
+        to_show = to_show[to_show["Contribution Change Value"] < 0]
 
     to_show = filtering.process_options(to_show)
     return to_show
@@ -141,13 +134,13 @@ def filter_rows(to_show, same, use_row_ids=False):
     return to_show_filtered
 
 
-def view(model_id, eid, eid_comp=None, row_id=None, row_id_comp=None, save_space=False):
+def view(model_id, eid, eid_comp=None, row_id=None, row_id_comp=None):
     """
     Either `eid_comp` or `row_id`/`row_id_comp` must be given. If `eid_comp` is given,
     compare entity `eid` to entity `eid_comp`. If the row_ids are given, compare entity `eid`'s
     `row_id` to its `row_id_comp`.
     """
-    sort_by, show_number, show_contribution = view_compare_cases_helper(save_space)
+    sort_by, show_number, show_contribution = view_compare_cases_helper()
 
     if eid_comp is None:
         if row_id is None or row_id_comp is None:
