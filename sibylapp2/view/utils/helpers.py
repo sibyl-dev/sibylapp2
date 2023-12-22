@@ -43,7 +43,7 @@ def neg_em(color_scheme=None):
 
 
 def show_sort_options(options):
-    return st.radio("Sort by", options, horizontal=True)
+    return st.radio("Sort/Filter by", options, horizontal=True)
 
 
 def show_text_input_side_by_side(

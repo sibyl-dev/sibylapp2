@@ -34,10 +34,12 @@ def show_sorted_contributions(to_show, sort_by, key=None):
             to_show = to_show.reindex(
                 to_show["Contribution Value"].abs().sort_values(ascending=False).index
             )
-        if sort_by == "Ascending":
-            to_show = to_show.sort_values(by="Contribution Value", axis="index")
-        if sort_by == "Descending":
+        if sort_by == get_term("Positive"):
             to_show = to_show.sort_values(by="Contribution Value", axis="index", ascending=False)
+            to_show = to_show[to_show["Contribution Value"] > 0]
+        if sort_by == get_term("Negative"):
+            to_show = to_show.sort_values(by="Contribution Value", axis="index")
+            to_show = to_show[to_show["Contribution Value"] < 0]
         to_show = filtering.process_options(to_show)
         helpers.show_table(to_show.drop("Contribution Value", axis="columns"), key=key)
 
@@ -72,7 +74,7 @@ def view(eid, model_id, row_id=None, save_space=False, key=None):
         cols = st.columns(2)
         with cols[0]:
             sort_by = helpers.show_sort_options(
-                ["Absolute", "Ascending", "Descending", "Side-by-side"]
+                ["Absolute", get_term("Positive"), get_term("Negative"), "Side-by-side"]
             )
         with cols[1]:
             show_number = st.checkbox(
@@ -80,7 +82,9 @@ def view(eid, model_id, row_id=None, save_space=False, key=None):
                 help="Show the exact amount this feature contributes to the model prediction",
             )
     else:
-        sort_by = helpers.show_sort_options(["Absolute", "Ascending", "Descending"])
+        sort_by = helpers.show_sort_options(
+            ["Absolute", get_term("Positive"), get_term("Negative")]
+        )
 
     to_show = format_contributions_to_view(eid, model_id, row_id=row_id, show_number=show_number)
 
