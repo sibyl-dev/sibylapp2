@@ -14,6 +14,7 @@ from sibylapp2.config import (
     get_bar_length,
     get_color_scheme,
 )
+from sibylapp2.compute.api import modify_features, format_feature_df_for_modify
 
 NEUT_EM = "🟪"
 BLANK_EM = "⬜"
@@ -90,7 +91,7 @@ def get_pos_neg_names():
         return "purple", "yellow"
 
 
-def show_table(df, key, style_function=None, enable_editing=True, column_config="default"):
+def show_table(df, key, style_function=None, enable_editing=True):
     """
     Show a table with pagination and editing capabilities.
 
@@ -99,10 +100,7 @@ def show_table(df, key, style_function=None, enable_editing=True, column_config=
         key (string): Key to use for the table
         style_function (function): Function to apply to the dataframe before showing
         enable_editing (bool): Whether to enable any editing of the table.
-                To selectively disable editing by column, use column_configs
-        column_config (dict): Dictionary of column names to column config.
-                If set to default, Feature and Category columns will be editable and
-                the category column will be a selectbox.
+            Supports editing features and categories.
 
     Returns:
         None
@@ -112,21 +110,18 @@ def show_table(df, key, style_function=None, enable_editing=True, column_config=
         st.session_state["edited_table_%s" % key] = df.copy()
     df = st.session_state["edited_table_%s" % key]
 
-    if enable_editing and column_config is "default":
-        column_config = {}
-        for column in df:
-            if column == "Category":
-                column_config[column] = st.column_config.SelectboxColumn(
-                    options=df[column].unique(), disabled=False, label=get_term(column)
-                )
-            elif column == "Feature":
-                column_config[column] = st.column_config.TextColumn(
-                    disabled=False, label=get_term(column)
-                )
-            else:
-                column_config[column] = st.column_config.Column(
-                    disabled=True, label=get_term(column)
-                )
+    column_config = {}
+    for column in df:
+        if column == "Category":
+            column_config[column] = st.column_config.SelectboxColumn(
+                options=df[column].unique(), disabled=not enable_editing, label=get_term(column)
+            )
+        elif column == "Feature":
+            column_config[column] = st.column_config.TextColumn(
+                disabled=not enable_editing, label=get_term(column)
+            )
+        else:
+            column_config[column] = st.column_config.Column(disabled=True, label=get_term(column))
 
     table = st.container()
     _, col1, col2 = st.columns((4, 1, 1))
@@ -162,6 +157,7 @@ def show_table(df, key, style_function=None, enable_editing=True, column_config=
             for row in changes:
                 for col in changes[row]:
                     st.session_state["edited_table_%s" % key].iloc[row][col] = changes[row][col]
+                    st.session_state["changes_made"] = True
 
     table.data_editor(
         df,
@@ -169,18 +165,30 @@ def show_table(df, key, style_function=None, enable_editing=True, column_config=
         use_container_width=True,
         num_rows="fixed",
         column_config=column_config,
-        disabled=not enable_editing,
         key="changes_to_table",
         on_change=update_table_with_changes,
     )
 
-    """if enable_editing:
-        changes_made = len(st.session_state["changed_table"]["edited_rows"]) > 0
-        reset_changes_container.button("Reset changes", disabled=not changes_made)
+    def reset_changes():
+        st.session_state["edited_table_%s" % key] = st.session_state["original_table_%s" % key]
+        st.session_state["changes_made"] = False
+
+    def save_changes():
+        st.session_state["original_table_%s" % key] = st.session_state["edited_table_%s" % key]
+        modify_features(format_feature_df_for_modify(st.session_state["edited_table_%s" % key]))
+        st.session_state["changes_made"] = False
+
+    if enable_editing:
+        if "changes_made" not in st.session_state:
+            st.session_state["changes_made"] = False
+        reset_changes_container.button(
+            "Reset changes", disabled=not st.session_state["changes_made"], on_click=reset_changes
+        )
         save_changes_container.button(
             "Save changes to database",
-            disabled=not changes_made,
-        )"""
+            disabled=not st.session_state["changes_made"],
+            on_click=save_changes,
+        )
 
 
 def generate_bars(values, neutral=False, show_number=False):
