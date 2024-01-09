@@ -5,6 +5,8 @@ import math
 import pandas as pd
 import streamlit as st
 
+from sibylapp2.compute import features, importance
+from sibylapp2.compute.api import format_feature_df_for_modify, modify_features
 from sibylapp2.compute.context import get_term
 from sibylapp2.config import (
     NEGATIVE_TERM,
@@ -14,8 +16,6 @@ from sibylapp2.config import (
     get_bar_length,
     get_color_scheme,
 )
-from sibylapp2.compute.api import modify_features, format_feature_df_for_modify
-from sibylapp2.compute import features, importance
 
 NEUT_EM = "🟪"
 BLANK_EM = "⬜"
