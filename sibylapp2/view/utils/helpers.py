@@ -15,7 +15,7 @@ from sibylapp2.config import (
     get_color_scheme,
 )
 from sibylapp2.compute.api import modify_features, format_feature_df_for_modify
-from sibylapp2.compute import features
+from sibylapp2.compute import features, importance
 
 NEUT_EM = "🟪"
 BLANK_EM = "⬜"
@@ -115,7 +115,9 @@ def show_table(df, key, style_function=None, enable_editing=True):
     for column in df:
         if column == "Category":
             column_config[column] = st.column_config.SelectboxColumn(
-                options=df[column].unique(), disabled=not enable_editing, label=get_term(column)
+                options=features.get_categories(),
+                disabled=not enable_editing,
+                label=get_term(column),
             )
         elif column == "Feature":
             column_config[column] = st.column_config.TextColumn(
@@ -163,6 +165,7 @@ def show_table(df, key, style_function=None, enable_editing=True):
                     ]
                     st.session_state["changes_made"] = True
 
+    st.write(column_config)
     table.data_editor(
         df,
         hide_index=True,
@@ -185,6 +188,7 @@ def show_table(df, key, style_function=None, enable_editing=True):
         st.session_state["changes_made"] = False
         del st.session_state["changes_to_table_%s" % key]
         features.get_features.clear()
+        importance.compute_importance.clear()  # Should refactor to avoid having to do this
 
     if enable_editing:
         if "changes_made" not in st.session_state:
