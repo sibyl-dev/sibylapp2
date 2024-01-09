@@ -2,7 +2,6 @@
 
 import streamlit as st
 
-from sibylapp2.compute.context import get_term
 from sibylapp2.view import temporal_change
 from sibylapp2.view.utils import display, filtering, setup
 

@@ -4,7 +4,8 @@ import streamlit as st
 from sibylapp2.compute import contributions, model
 from sibylapp2.compute.context import get_term
 from sibylapp2.config import POSITIVE_TERM, PREDICTION_TYPE, PredType, pred_format_func
-from sibylapp2.view.utils import display, filtering, helpers
+from sibylapp2.view.plots import charts
+from sibylapp2.view.utils import filtering, helpers
 
 
 def view_prediction_variation(
@@ -16,7 +17,10 @@ def view_prediction_variation(
     This function displays the prediction change over time(different models).
     """
     # store model predictions in the same order of the given models
-    predictions_dict = {}
+    timeindex = []
+    probs = []
+    predictions = []
+
     for model_id in model_ids:
         prediction_value = model.get_predictions_for_rows(
             eid, [row_id], model_id=model_id, return_proba=st.session_state["display_proba"]
@@ -31,9 +35,16 @@ def view_prediction_variation(
             if not prediction:
                 prediction_value = 1 - prediction_value
 
-        predictions_dict[int(model_id[:-1])] = prediction_value
+            predictions.append(pred_format_func(prediction))
+        else:
+            predictions.append(pred_format_func(prediction_value))
 
-    st.scatter_chart(predictions_dict, size=400)
+        timeindex.append(int(model_id[:-1]))
+        probs.append(prediction_value)
+
+    df = pd.DataFrame({"time": timeindex, "value": probs, "labels": predictions})
+    fig = charts.plot_scatter_chart(df)
+    st.plotly_chart(fig, use_container_width=True)
 
 
 def get_contributions_variation(
@@ -85,7 +96,8 @@ def view(eid, row_id, model_ids):
     wide_df = get_contributions_variation(eid, row_id, model_ids)
     wide_df = filter_contributions(wide_df, sort_by)
 
-    display.plot_temporal_line_charts(wide_df)
+    fig = charts.plot_temporal_line_charts(wide_df)
+    st.plotly_chart(fig, use_container_width=True)
     # helpers.show_table(wide_df)
 
 
