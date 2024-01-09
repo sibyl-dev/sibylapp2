@@ -153,8 +153,8 @@ def show_table(df, key, style_function=None, enable_editing=True):
         df = style_function(df)
 
     def update_table_with_changes():
-        if "changes_to_table_%s" in st.session_state:
-            changes = st.session_state["changes_to_table_%s"]["edited_rows"]
+        if "changes_to_table_%s" % key in st.session_state:
+            changes = st.session_state["changes_to_table_%s" % key]["edited_rows"]
             for row in changes:
                 for col in changes[row]:
                     row_offset = row + ((page - 1) * page_size)
