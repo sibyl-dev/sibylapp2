@@ -153,8 +153,8 @@ def show_table(df, key, style_function=None, enable_editing=True):
         df = style_function(df)
 
     def update_table_with_changes():
-        if "changes_to_table" in st.session_state:
-            changes = st.session_state["changes_to_table"]["edited_rows"]
+        if "changes_to_table_%s" in st.session_state:
+            changes = st.session_state["changes_to_table_%s"]["edited_rows"]
             for row in changes:
                 for col in changes[row]:
                     row_offset = row + ((page - 1) * page_size)
@@ -169,7 +169,7 @@ def show_table(df, key, style_function=None, enable_editing=True):
         use_container_width=True,
         num_rows="fixed",
         column_config=column_config,
-        key="changes_to_table",
+        key="changes_to_table_%s" % key,
         on_change=update_table_with_changes,
     )
 
@@ -183,7 +183,7 @@ def show_table(df, key, style_function=None, enable_editing=True):
             format_feature_df_for_modify(st.session_state["edited_table_%s" % key].copy())
         )
         st.session_state["changes_made"] = False
-        del st.session_state["changes_to_table"]
+        del st.session_state["changes_to_table_%s" % key]
         features.get_features.clear()
 
     if enable_editing:

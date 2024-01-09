@@ -45,7 +45,6 @@ def view(eid, model_id):
         pass
     else:
         to_show = filter_different_rows(to_show, show_different, selected_col_name)
-
     helpers.show_table(to_show, "similar_entities")
 
 
