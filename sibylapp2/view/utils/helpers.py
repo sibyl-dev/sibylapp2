@@ -157,7 +157,10 @@ def show_table(df, key, style_function=None, enable_editing=True):
             changes = st.session_state["changes_to_table"]["edited_rows"]
             for row in changes:
                 for col in changes[row]:
-                    st.session_state["edited_table_%s" % key].iloc[row][col] = changes[row][col]
+                    row_offset = row + ((page - 1) * page_size)
+                    st.session_state["edited_table_%s" % key].iloc[row_offset][col] = changes[row][
+                        col
+                    ]
                     st.session_state["changes_made"] = True
 
     table.data_editor(
@@ -189,7 +192,7 @@ def show_table(df, key, style_function=None, enable_editing=True):
         reset_changes_container.button(
             "Reset changes", disabled=not st.session_state["changes_made"], on_click=reset_changes
         )
-        save = save_changes_container.button(
+        save_changes_container.button(
             "Save changes to database",
             disabled=not st.session_state["changes_made"],
             on_click=save_changes,
