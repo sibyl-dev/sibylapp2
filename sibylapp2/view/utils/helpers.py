@@ -15,6 +15,7 @@ from sibylapp2.config import (
     get_color_scheme,
 )
 from sibylapp2.compute.api import modify_features, format_feature_df_for_modify
+from sibylapp2.compute import features
 
 NEUT_EM = "🟪"
 BLANK_EM = "⬜"
@@ -175,8 +176,12 @@ def show_table(df, key, style_function=None, enable_editing=True):
 
     def save_changes():
         st.session_state["original_table_%s" % key] = st.session_state["edited_table_%s" % key]
-        modify_features(format_feature_df_for_modify(st.session_state["edited_table_%s" % key]))
+        modify_features(
+            format_feature_df_for_modify(st.session_state["edited_table_%s" % key].copy())
+        )
         st.session_state["changes_made"] = False
+        del st.session_state["changes_to_table"]
+        features.get_features.clear()
 
     if enable_editing:
         if "changes_made" not in st.session_state:
@@ -184,7 +189,7 @@ def show_table(df, key, style_function=None, enable_editing=True):
         reset_changes_container.button(
             "Reset changes", disabled=not st.session_state["changes_made"], on_click=reset_changes
         )
-        save_changes_container.button(
+        save = save_changes_container.button(
             "Save changes to database",
             disabled=not st.session_state["changes_made"],
             on_click=save_changes,
