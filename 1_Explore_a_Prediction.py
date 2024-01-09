@@ -30,5 +30,8 @@ if tab == "1":
     if "row_id" in st.session_state:
         row_id = st.session_state["row_id"]
     feature_contribution.view(
-        st.session_state["eid"], st.session_state["model_id"], st.session_state["row_id"]
+        st.session_state["eid"],
+        st.session_state["model_id"],
+        key="feature_contributions",
+        row_id=st.session_state["row_id"],
     )

@@ -90,7 +90,44 @@ def get_pos_neg_names():
         return "purple", "yellow"
 
 
-def show_table(df, key=None, style_function=None):
+def show_table(df, key, style_function=None, enable_editing=True, column_config="default"):
+    """
+    Show a table with pagination and editing capabilities.
+
+    Args:
+        df (DataFrame): Dataframe to show
+        key (string): Key to use for the table
+        style_function (function): Function to apply to the dataframe before showing
+        enable_editing (bool): Whether to enable any editing of the table.
+                To selectively disable editing by column, use column_configs
+        column_config (dict): Dictionary of column names to column config.
+                If set to default, Feature and Category columns will be editable and
+                the category column will be a selectbox.
+
+    Returns:
+        None
+    """
+    st.session_state["original_table_%s" % key] = df.copy()
+    if ("edited_table_%s" % key) not in st.session_state:
+        st.session_state["edited_table_%s" % key] = df.copy()
+    df = st.session_state["edited_table_%s" % key]
+
+    if enable_editing and column_config is "default":
+        column_config = {}
+        for column in df:
+            if column == "Category":
+                column_config[column] = st.column_config.SelectboxColumn(
+                    options=df[column].unique(), disabled=False, label=get_term(column)
+                )
+            elif column == "Feature":
+                column_config[column] = st.column_config.TextColumn(
+                    disabled=False, label=get_term(column)
+                )
+            else:
+                column_config[column] = st.column_config.Column(
+                    disabled=True, label=get_term(column)
+                )
+
     table = st.container()
     _, col1, col2 = st.columns((4, 1, 1))
     with col2:
@@ -98,6 +135,7 @@ def show_table(df, key=None, style_function=None):
         if key is not None:
             page_size_key = "%s%s" % (key, "_per_page")
         page_size = st.selectbox("Rows per page", [10, 25, 50], key=page_size_key)
+        reset_changes_container = st.empty()
     with col1:
         page_key = "page_key"
         if key is not None:
@@ -110,22 +148,39 @@ def show_table(df, key=None, style_function=None):
             max_value=int(df.shape[0] / page_size) + 1,
             key=page_key,
         )
-    renames = {}
-    for column in df:
-        renames[column] = get_term(column)
-    df = df.rename(columns=renames)
+        save_changes_container = st.empty()
+
     df = df[(page - 1) * page_size : page * page_size]
 
     # pandas styler must be display in whole
     if style_function is not None:
         df = style_function(df)
+
+    def update_table_with_changes():
+        if "changes_to_table" in st.session_state:
+            changes = st.session_state["changes_to_table"]["edited_rows"]
+            for row in changes:
+                for col in changes[row]:
+                    st.session_state["edited_table_%s" % key].iloc[row][col] = changes[row][col]
+
     table.data_editor(
         df,
         hide_index=True,
         use_container_width=True,
         num_rows="fixed",
-        disabled=True,
+        column_config=column_config,
+        disabled=not enable_editing,
+        key="changes_to_table",
+        on_change=update_table_with_changes,
     )
+
+    """if enable_editing:
+        changes_made = len(st.session_state["changed_table"]["edited_rows"]) > 0
+        reset_changes_container.button("Reset changes", disabled=not changes_made)
+        save_changes_container.button(
+            "Save changes to database",
+            disabled=not changes_made,
+        )"""
 
 
 def generate_bars(values, neutral=False, show_number=False):
