@@ -185,6 +185,6 @@ def fetch_categories():
 
 
 def fetch_context():
-    context_id = api_get("contexts/")["contexts"][0]["id"]
+    context_id = api_get("contexts/")["contexts"][0]["context_id"]
     url = "context/" + context_id
     return api_get(url)["context"]
