@@ -2,7 +2,7 @@ import pandas as pd
 import plotly.express as px
 
 
-def plot_temporal_line_charts(df: pd.DataFrame, y_max=1.0, y_min=-1.0):
+def plot_temporal_line_charts(df: pd.DataFrame, y_max=1.0, y_min=-1.0, x_max=30, x_min=0):
     """
     Transform dataframe from wide form to long form for streamlit visualizations.
 
@@ -35,13 +35,20 @@ def plot_temporal_line_charts(df: pd.DataFrame, y_max=1.0, y_min=-1.0):
             "titlefont": {"size": 20},
         },
         yaxis={"tickfont": {"size": 20}, "titlefont": {"size": 20}},
+        xaxis_range=[x_min, x_max],
         yaxis_range=[y_min, y_max],
     )
     return fig
 
 
 def plot_scatter_chart(
-    df: pd.DataFrame = None, x: list = None, y: list = None, y_max=1.0, y_min=0.0
+    df: pd.DataFrame = None,
+    x: list = None,
+    y: list = None,
+    y_max=1.0,
+    y_min=0.0,
+    x_max=30,
+    x_min=0,
 ):
     """
     Plot scatter plot for the given dataframe
@@ -75,6 +82,7 @@ def plot_scatter_chart(
             "titlefont": {"size": 20},
         },
         yaxis={"tickfont": {"size": 20}, "titlefont": {"size": 20}},
+        xaxis_range=[x_min, x_max],
         yaxis_range=[y_min, y_max],
     )
     fig.update_traces(marker_size=30)
