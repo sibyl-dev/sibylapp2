@@ -1,15 +1,16 @@
 import streamlit as st
-from sibylapp2.view.utils import setup
-from sibylapp2.compute.context import get_term
+
 from sibylapp2 import config
+from sibylapp2.compute.context import get_term
 from sibylapp2.pages import (
-    Similar_Entities,
-    Explore_a_Prediction,
     Compare_Entities,
-    Understand_the_Model,
     Experiment_with_Changes,
+    Explore_a_Prediction,
     Settings,
+    Similar_Entities,
+    Understand_the_Model,
 )
+from sibylapp2.view.utils import setup
 
 setup.setup_page(return_row_ids=True)
 
