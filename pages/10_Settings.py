@@ -97,7 +97,6 @@ def view():
             min_value=4,
             max_value=10,
             value=config.get_bar_length(),
-            on_change=format_importance_to_view.clear,  # force reload with new settings
         )
         config_data["MAX_ENTITIES"] = st.number_input(
             "Number of entities to include:",
