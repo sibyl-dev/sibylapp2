@@ -4,7 +4,7 @@ import streamlit as st
 
 from sibylapp2.compute.context import get_term
 from sibylapp2.view import compare_entities
-from sibylapp2.view.utils import display, filtering, setup
+from sibylapp2.view.utils import display, filtering
 
 
 def main():

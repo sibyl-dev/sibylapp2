@@ -5,7 +5,7 @@ import streamlit as st
 
 from sibylapp2.compute.context import get_term
 from sibylapp2.view import feature_contribution
-from sibylapp2.view.utils import display, filtering, setup
+from sibylapp2.view.utils import display, filtering
 
 
 def main():
@@ -26,9 +26,6 @@ def main():
     )
 
     if tab == "1":
-        row_id = None
-        if "row_id" in st.session_state:
-            row_id = st.session_state["row_id"]
         feature_contribution.view(
             st.session_state["eid"], st.session_state["model_id"], st.session_state["row_id"]
         )

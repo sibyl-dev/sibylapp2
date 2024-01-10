@@ -3,7 +3,7 @@
 import streamlit as st
 
 from sibylapp2.view import similar_entities
-from sibylapp2.view.utils import filtering, setup
+from sibylapp2.view.utils import filtering
 
 
 def main():

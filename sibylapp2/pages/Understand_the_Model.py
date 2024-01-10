@@ -7,7 +7,7 @@ from sibylapp2 import config
 from sibylapp2.compute import contributions, features, model
 from sibylapp2.compute.context import get_term
 from sibylapp2.view import explore_feature, feature_importance, global_contributions
-from sibylapp2.view.utils import filtering, setup
+from sibylapp2.view.utils import filtering
 
 
 def main():
@@ -19,9 +19,7 @@ def main():
     predictions = model.get_dataset_predictions(st.session_state["model_id"])
     discrete = config.PREDICTION_TYPE in (config.PredType.BOOLEAN, config.PredType.CATEGORICAL)
 
-    all_contributions, all_values = contributions.get_dataset_contributions(
-        st.session_state["model_id"]
-    )
+    contributions.get_dataset_contributions(st.session_state["model_id"])
 
     # Setup tabs ----------------------------------
     pred_filter_container = st.container()
