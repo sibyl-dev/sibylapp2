@@ -8,7 +8,6 @@ from ruamel import yaml
 from sibylapp2 import config
 from sibylapp2.compute.contributions import get_dataset_contributions
 from sibylapp2.compute.model import get_dataset_predictions
-from sibylapp2.view.feature_importance import format_importance_to_view
 from sibylapp2.view.utils.helpers import neg_em, pos_em
 
 UP_ARROW = "⬆"
