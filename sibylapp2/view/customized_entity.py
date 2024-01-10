@@ -166,6 +166,7 @@ def view(eid, changes, model_id, row_id=None):
             changes,
             columns=["%s Value for modified %s" % (get_term("Feature"), get_term("Entity"))],
         ),
+        key="experiment_with_changes",
     )
 
 

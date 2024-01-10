@@ -195,7 +195,9 @@ def view(model_id, eid, eid_comp=None, row_id=None, row_id_comp=None):
         to_show = filter_rows(to_show, same=False, use_row_ids=eid_comp is None)
 
     to_show = sort_contributions(to_show, sort_by)
-    helpers.show_table(to_show.drop("Contribution Change Value", axis="columns"))
+    helpers.show_table(
+        to_show.drop("Contribution Change Value", axis="columns"), "compare_entities"
+    )
 
 
 def view_instructions(use_row_ids=False):

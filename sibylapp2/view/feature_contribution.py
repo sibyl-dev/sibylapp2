@@ -6,7 +6,7 @@ from sibylapp2.view.utils import filtering, helpers
 from sibylapp2.view.utils.helpers import show_legend
 
 
-def show_sorted_contributions(to_show, sort_by, key=None):
+def show_sorted_contributions(to_show, sort_by, key):
     show_legend()
 
     if sort_by == "Side-by-side":
@@ -64,7 +64,7 @@ def format_contributions_to_view(eid, model_id, row_id=None, show_number=False):
     return full_df
 
 
-def view(eid, model_id, row_id=None, save_space=False, key=None):
+def view(eid, model_id, key, row_id=None, save_space=False):
     """
     `eid_for_rows` is only used when `use_row_id` == True.
     `eid` are used as row_id when `use_row_id` == True
