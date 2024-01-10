@@ -38,6 +38,7 @@ def save_config(loader, config_data, existing_config):
         loader.dump(existing_config, yaml_file)
     if old_config != existing_config:
         st.toast("Configuration saved successfully!", icon="✅")
+        st.toast("Refresh the page to see the changes.", icon="🔄")
 
 
 def generate_color_scheme_caption(color_scheme, description):
