@@ -15,9 +15,7 @@ UP_ARROW = "⬆"
 DOWN_ARROW = "⬇"
 DIVIDING_BAR = "|"
 
-CONFIG_FILEPATH = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "..", "sibylapp2", "config.yml"
-)
+CONFIG_FILEPATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "config.yml")
 
 
 def load_existing_config(loader):
@@ -47,7 +45,7 @@ def generate_color_scheme_caption(color_scheme, description):
     )
 
 
-def view():
+def main():
     def _clear_eid_data():
         if "eids" in st.session_state:
             del st.session_state["eids"]
@@ -116,6 +114,3 @@ def view():
 
     save_config(loader, config_data, existing_config)
     config.load_config.clear()  # clear cache to force config reload
-
-
-view()
