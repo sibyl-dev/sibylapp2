@@ -1,7 +1,7 @@
 import streamlit as st
 
-from sibylapp2.config import get_pages_to_show
 from sibylapp2.compute.context import get_term
+from sibylapp2.config import get_pages_to_show
 from sibylapp2.pages import (
     Compare_Entities,
     Experiment_with_Changes,
