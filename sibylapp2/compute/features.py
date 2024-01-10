@@ -29,3 +29,7 @@ def get_categorical_values():
     features_df = features_df[features_df["Type"] == "categorical"]
     feature_value_dict = dict(zip(features_df.index, features_df["Values"]))
     return feature_value_dict
+
+
+def get_categories():
+    return api.fetch_categories()["name"].tolist()

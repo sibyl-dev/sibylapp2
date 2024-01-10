@@ -6,7 +6,6 @@ from sibylapp2.compute.context import get_term
 from sibylapp2.view.utils import helpers
 
 
-@st.cache_data
 def format_importance_to_view(importance_df):
     importance_df = importance_df.rename(
         columns={
