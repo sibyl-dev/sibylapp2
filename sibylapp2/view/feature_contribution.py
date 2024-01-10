@@ -1,6 +1,6 @@
 import streamlit as st
 
-from sibylapp2.compute import contributions
+from sibylapp2.compute import contributions, features
 from sibylapp2.compute.context import get_term
 from sibylapp2.view.utils import filtering, helpers
 from sibylapp2.view.utils.helpers import show_legend
@@ -34,73 +34,59 @@ def show_sorted_contributions(to_show, sort_by, key=None):
             to_show = to_show.reindex(
                 to_show["Contribution Value"].abs().sort_values(ascending=False).index
             )
-        if sort_by == "Ascending":
-            to_show = to_show.sort_values(by="Contribution Value", axis="index")
-        if sort_by == "Descending":
+        if sort_by == get_term("Positive"):
             to_show = to_show.sort_values(by="Contribution Value", axis="index", ascending=False)
+            to_show = to_show[to_show["Contribution Value"] > 0]
+        if sort_by == get_term("Negative"):
+            to_show = to_show.sort_values(by="Contribution Value", axis="index")
+            to_show = to_show[to_show["Contribution Value"] < 0]
         to_show = filtering.process_options(to_show)
         helpers.show_table(to_show.drop("Contribution Value", axis="columns"), key=key)
 
 
-def format_contributions_to_view(contribution_df, show_number=False):
-    contribution_df = contribution_df.rename(
-        columns={
-            "category": "Category",
-            "Feature Value": "Value",
-            "Average/Mode": "Average/Mode Value",
-        }
+def format_contributions_to_view(eid, model_id, row_id=None, show_number=False):
+    if row_id is not None:
+        contribution_df, value_df = contributions.get_contributions_for_rows(
+            eid, [row_id], model_id=model_id
+        )
+    else:
+        contribution_df, value_df = contributions.get_contributions([eid], model_id=model_id)
+    full_df = features.get_features()
+    full_df["Value"] = value_df.T
+    full_df["Contribution"] = contribution_df.T
+    full_df = full_df.rename(columns={"category": "Category"})
+
+    full_df = full_df[["Category", "Feature", "Value", "Contribution"]]  # reorder
+    full_df["Contribution Value"] = full_df["Contribution"].copy()
+    full_df["Contribution"] = helpers.generate_bars(
+        full_df["Contribution"], show_number=show_number
     )
-    contribution_df = contribution_df[
-        ["Category", "Feature", "Value", "Average/Mode Value", "Contribution"]
-    ]  # reorder
-    contribution_df["Contribution Value"] = contribution_df["Contribution"].copy()
-    contribution_df["Contribution"] = helpers.generate_bars(
-        contribution_df["Contribution"], show_number=show_number
-    )
-    return contribution_df
+    return full_df
 
 
-def view(eid, model_id, save_space=False, use_row_id=False, eid_for_rows=None, key=None):
+def view(eid, model_id, row_id=None, save_space=False, key=None):
     """
     `eid_for_rows` is only used when `use_row_id` == True.
     `eid` are used as row_id when `use_row_id` == True
     """
     show_number = False
-    show_average = False
     if not save_space:
         cols = st.columns(2)
         with cols[0]:
             sort_by = helpers.show_sort_options(
-                ["Absolute", "Ascending", "Descending", "Side-by-side"]
+                ["Absolute", get_term("Positive"), get_term("Negative"), "Side-by-side"]
             )
         with cols[1]:
-            show_average = st.checkbox(
-                "Show average values?",
-                help=(
-                    "Contributions are based on the difference from the average value in the"
-                    " training set"
-                ),
-            )
             show_number = st.checkbox(
                 "Show numeric contributions?",
                 help="Show the exact amount this feature contributes to the model prediction",
             )
     else:
-        cols = st.columns(1)
-        with cols[0]:
-            sort_by = helpers.show_sort_options(["Absolute", "Ascending", "Descending"])
+        sort_by = helpers.show_sort_options(
+            ["Absolute", get_term("Positive"), get_term("Negative")]
+        )
 
-    if use_row_id:
-        to_show = format_contributions_to_view(
-            contributions.get_contributions_for_rows(eid_for_rows, [eid], model_id=model_id)[eid],
-            show_number=show_number,
-        )
-    else:
-        to_show = format_contributions_to_view(
-            contributions.get_contributions([eid], model_id=model_id)[eid], show_number=show_number
-        )
-    if not show_average:
-        to_show = to_show.drop("Average/Mode Value", axis="columns")
+    to_show = format_contributions_to_view(eid, model_id, row_id=row_id, show_number=show_number)
 
     show_sorted_contributions(to_show, sort_by, key=key)
 
@@ -123,15 +109,15 @@ def view_instructions():
             " case.".format(
                 positive=positive,
                 negative=negative,
-                feature=get_term("Feature", lower=True),
-                entity=get_term("Entity", lower=True),
+                feature=get_term("feature"),
+                entity=get_term("entity"),
             )
         )
         st.markdown(
             "You can select {a_entity} from the dropdown above, and see the {feature}"
             " contributions. You can also **filter** and **search** the {feature} table or adjust"
             " the **sort order**.".format(
-                a_entity=get_term("Entity", with_a=True, lower=True),
-                feature=get_term("Feature", lower=True),
+                a_entity=get_term("entity", with_a=True),
+                feature=get_term("feature"),
             )
         )

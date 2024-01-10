@@ -1,3 +1,4 @@
+import json as json_encoder
 from os import path
 
 import pandas as pd
@@ -16,19 +17,34 @@ if cfg.get("CERT") is not None:
 
 def api_get(url):
     fetch_url = cfg["BASE_URL"] + url
-    response = session.get(fetch_url)
+    try:
+        response = session.get(fetch_url)
+    except requests.exceptions.RequestException as err:
+        st.error(f"Connection error. Please check your connection and refresh the page ({err})")
+        st.stop()
     if response.status_code != 200:
-        st.error("Error with GET(%s). %s: %s" % (fetch_url, response.status_code, response.reason))
+        st.error(
+            "Error with request (%s) %s: %s" % (fetch_url, response.status_code, response.reason)
+        )
         st.stop()
     return response.json()
 
 
-def api_post(url, json):
+def api_post(url, json=None, data=None):
     fetch_url = cfg["BASE_URL"] + url
-    response = session.post(fetch_url, json=json)
+    try:
+        if data:
+            response = session.post(
+                fetch_url, data=data, headers={"Content-Type": "application/json"}
+            )
+        else:
+            response = session.post(fetch_url, json=json)
+    except requests.exceptions.RequestException as err:
+        st.error(f"Connection error. Please check your connection and refresh the page ({err})")
+        st.stop()
     if response.status_code != 200:
         st.error(
-            "Error with POST(%s). %s: %s" % (fetch_url, response.status_code, response.reason)
+            "Error with request (%s) %s: %s" % (fetch_url, response.status_code, response.reason)
         )
         st.stop()
     return response.json()
@@ -44,12 +60,17 @@ def fetch_model_id():
     return model_id
 
 
-def fetch_eids(return_row_ids=False):
+def fetch_eids(
+    max_entities=None,
+    return_row_ids=False,
+):
     """
     Return corresponding row_ids in the form of a dictionary where the keys are the eids
     and the values are the lists of row_ids for each eid, when specified.
     """
     entities = api_get("entities/")["entities"]
+    if max_entities is not None:
+        entities = entities[:max_entities]
     if return_row_ids:
         return [entry["eid"] for entry in entities], {
             entry["eid"]: entry["row_ids"] for entry in entities
@@ -68,7 +89,7 @@ def fetch_modified_prediction(
         "changes": changes,
         "return_proba": return_proba,
     }
-    prediction = api_post("modified_prediction/", json)["prediction"]
+    prediction = api_post("modified_prediction/", data=json_encoder.dumps(json))["prediction"]
     return prediction
 
 
@@ -87,7 +108,14 @@ def fetch_predictions(
 
 def fetch_features():
     features = api_get("features/")["features"]
-    features_df = pd.DataFrame(features).rename(columns={"description": "Feature"})
+    features_df = pd.DataFrame(features).rename(
+        columns={
+            "description": "Feature",
+            "category": "Category",
+            "type": "Type",
+            "values": "Values",
+        }
+    )
     features_df = features_df.set_index("name")
     return features_df
 
@@ -104,22 +132,19 @@ def fetch_entity(eid, row_id=None) -> pd.Series:
 
 
 def fetch_contributions(eids, row_ids=None, model_id=fetch_model_id()):
-    features_df = fetch_features()
     json = {"eids": eids, "model_id": model_id, "row_ids": row_ids}
-    result = api_post("multi_contributions/", json)["contributions"]
-    contributions = {}
-    for eid in result:
-        contributions[eid] = pd.concat(
-            [features_df, pd.DataFrame.from_dict(result[eid], orient="index")], axis=1
-        )
-    return contributions
+    result = api_post("multi_contributions/", json)
+    contributions = pd.DataFrame.from_dict(result["contributions"], orient="index")
+    values = pd.DataFrame.from_dict(result["values"], orient="index")
+    return contributions, values
 
 
 def fetch_contribution_for_modified_data(eid, changes, row_id=None, model_id=fetch_model_id()):
-    features_df = fetch_features()
     json = {"eid": eid, "row_id": row_id, "model_id": model_id, "changes": changes}
-    result = api_post("modified_contribution/", json)["contribution"]
-    return pd.concat([features_df, pd.DataFrame.from_dict(result, orient="index")], axis=1)
+    result = api_post("modified_contribution/", data=json_encoder.dumps(json))
+    contributions = pd.DataFrame.from_dict(result["contributions"], orient="index")
+    values = pd.DataFrame.from_dict(result["values"], orient="index")
+    return contributions, values
 
 
 def fetch_importance(model_id=fetch_model_id()):
@@ -139,7 +164,7 @@ def fetch_similar_examples(eids, model_id=fetch_model_id()):
         y = pd.Series(result[eid]["y"]).to_frame().T
         X = pd.concat(
             [
-                features_df[["Feature", "category"]],
+                features_df,
                 pd.DataFrame.from_dict(result[eid]["X"], orient="index").T,
             ],
             axis=1,
@@ -162,6 +187,6 @@ def fetch_categories():
 
 
 def fetch_context():
-    context_id = api_get("contexts/")["contexts"][0]["id"]
+    context_id = api_get("contexts/")["contexts"][0]["context_id"]
     url = "context/" + context_id
     return api_get(url)["context"]

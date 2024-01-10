@@ -4,12 +4,12 @@ import extra_streamlit_components as stx
 import streamlit as st
 
 from sibylapp2 import config
-from sibylapp2.compute import contributions, model
+from sibylapp2.compute import contributions, features, model
 from sibylapp2.compute.context import get_term
 from sibylapp2.view import explore_feature, feature_importance, global_contributions
 from sibylapp2.view.utils import filtering, setup
 
-setup.setup_page()
+setup.setup_page(return_row_ids=True)
 
 # Global options ------------------------------
 filtering.view_model_select()
@@ -19,18 +19,23 @@ filtering.view_filtering()
 predictions = model.get_dataset_predictions(st.session_state["model_id"])
 discrete = config.PREDICTION_TYPE in (config.PredType.BOOLEAN, config.PredType.CATEGORICAL)
 
-all_contributions = contributions.get_dataset_contributions(st.session_state["model_id"])
+all_contributions, all_values = contributions.get_dataset_contributions(
+    st.session_state["model_id"]
+)
 
 # Setup tabs ----------------------------------
 pred_filter_container = st.container()
 
 tab = stx.tab_bar(
     data=[
-        stx.TabBarItemData(id=1, title=get_term("Feature Importance"), description=""),
         stx.TabBarItemData(
-            id=2, title="Global %s" % get_term("Feature Contributions"), description=""
+            id=1, title=get_term(f"{get_term('Feature')} Importance"), description=""
         ),
-        stx.TabBarItemData(id=3, title="Summary Plot", description=""),
+        stx.TabBarItemData(
+            id=2,
+            title="Global %s" % get_term(f"{get_term('Feature')} Contributions"),
+            description="",
+        ),
         stx.TabBarItemData(id=4, title="Explore a %s" % get_term("Feature"), description=""),
     ],
     default=1,
@@ -55,7 +60,7 @@ with pred_filter_container:
     eids = filtering.view_prediction_selection(predictions, disabled=st.session_state["disabled"])
 
 placeholder = st.container()
-features = all_contributions[next(iter(all_contributions))]["Feature"]
+features = features.get_features()
 
 if tab == "1":
     with placeholder:
@@ -67,12 +72,6 @@ if tab == "2":
             st.warning("Select predictions above to see explanation!")
         else:
             global_contributions.view(eids, st.session_state["model_id"])
-
-if tab == "3":
-    if len(eids) == 0:
-        st.warning("Select predictions above to see explanation!")
-    else:
-        global_contributions.view_summary_plot(eids, st.session_state["model_id"])
 
 if tab == "4":
     with placeholder:
