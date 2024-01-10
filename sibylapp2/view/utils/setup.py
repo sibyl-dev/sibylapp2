@@ -45,10 +45,6 @@ def setup_page(return_row_ids=False):
         importance.compute_importance()
 
 
-def generate_options_for_features(eids: list[str], features_df: pd.DataFrame):
-    st.session_state["options_dict"] = features.get_options_for_categories(eids, features_df)
-
-
 def sort_model_ids(unsorted_model_ids: list[str]):
     """
     Designed for temporal models where model name is an integer followed by d. E.g. "10d"
