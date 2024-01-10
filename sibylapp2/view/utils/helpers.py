@@ -165,7 +165,6 @@ def show_table(df, key, style_function=None, enable_editing=True):
                     ]
                     st.session_state["changes_made"] = True
 
-    st.write(column_config)
     table.data_editor(
         df,
         hide_index=True,
