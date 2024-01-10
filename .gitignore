@@ -147,7 +147,14 @@ cython_debug/
 # PyCharm
 .idea/
 
+# vscode
+.vscode/
+
 # Data
 data.csv
 model.pkl
 features.csv
+certs/
+
+# DS_store
+*.DS_Store
