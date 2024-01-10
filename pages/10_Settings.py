@@ -8,7 +8,6 @@ from ruamel import yaml
 from sibylapp2 import config
 from sibylapp2.compute.contributions import get_dataset_contributions
 from sibylapp2.compute.model import get_dataset_predictions
-from sibylapp2.view.feature_importance import format_importance_to_view
 from sibylapp2.view.utils.helpers import neg_em, pos_em
 
 UP_ARROW = "⬆"
@@ -38,6 +37,7 @@ def save_config(loader, config_data, existing_config):
         loader.dump(existing_config, yaml_file)
     if old_config != existing_config:
         st.toast("Configuration saved successfully!", icon="✅")
+        st.toast("Refresh the page to see the changes.", icon="🔄")
 
 
 def generate_color_scheme_caption(color_scheme, description):
@@ -97,7 +97,6 @@ def view():
             min_value=4,
             max_value=10,
             value=config.get_bar_length(),
-            on_change=format_importance_to_view.clear,  # force reload with new settings
         )
         config_data["MAX_ENTITIES"] = st.number_input(
             "Number of entities to include:",
