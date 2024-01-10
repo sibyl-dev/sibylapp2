@@ -1,4 +1,7 @@
 import streamlit as st
+from sibylapp2.view.utils import setup
+from sibylapp2.compute.context import get_term
+from sibylapp2 import config
 from sibylapp2.pages import (
     Similar_Entities,
     Explore_a_Prediction,
@@ -7,13 +10,10 @@ from sibylapp2.pages import (
     Experiment_with_Changes,
     Settings,
 )
-from sibylapp2.view.utils import setup
-from sibylapp2.compute.context import get_term
-from sibylapp2 import config
 
 setup.setup_page(return_row_ids=True)
 
-pages = {
+ALL_PAGES = {
     "Explore a Prediction": Explore_a_Prediction,
     "Similar Entities": Similar_Entities,
     "Compare Entities": Compare_Entities,
@@ -23,8 +23,8 @@ pages = {
 }
 
 pages_to_show = config.get_pages_to_show()
-if pages_to_show is "all":
-    pages_to_show = pages.keys()
+if pages_to_show == "all":
+    pages_to_show = ALL_PAGES.keys()
 
 
 def rename_page(key):
@@ -38,7 +38,9 @@ def rename_page(key):
 # Select and rename pages from config
 pages = {
     rename_page(key): (
-        pages[key] if key in pages else st.sidebar.warning("Requested non-existent page %s" % key)
+        ALL_PAGES[key]
+        if key in ALL_PAGES
+        else st.sidebar.warning("Requested non-existent page %s" % key)
     )
     for key in pages_to_show
 }
@@ -47,6 +49,3 @@ page_select = st.sidebar.radio("Select an explanation", pages.keys())
 st.sidebar.divider()
 
 pages[page_select].main()
-
-# "Similar %s" % get_term("Entity", plural=True): Similar_Cases,
-# "Compare %s" % get_term("Entity", plural=True): Compare_Cases,

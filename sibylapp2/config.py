@@ -71,6 +71,7 @@ POSITIVE_TERM = select_config("POSITIVE_TERM", "output_pos_label", "True")
 NEGATIVE_TERM = select_config("NEGATIVE_TERM", "output_neg_label", "False")
 PRED_FORMAT_STRING = select_config("PRED_FORMAT_STRING", "output_format_string", "{}")
 SUPPORT_PROBABILITY = select_config("SUPPORT_PROBABILITY", "show_probs", False)
+ALLOW_PAGE_SELECTION = select_config("ALLOW_PAGE_SELECTION", "allow_page_selection", False)
 
 
 def pred_format_func(pred, display_proba=False):

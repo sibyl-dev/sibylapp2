@@ -10,6 +10,7 @@ from sibylapp2.compute.contributions import get_dataset_contributions
 from sibylapp2.compute.model import get_dataset_predictions
 from sibylapp2.view.feature_importance import format_importance_to_view
 from sibylapp2.view.utils.helpers import neg_em, pos_em
+from sibylapp2.compute import context
 
 UP_ARROW = "⬆"
 DOWN_ARROW = "⬇"
@@ -111,6 +112,30 @@ def main():
             help="High values will slow down the application",
             on_change=_clear_dataset_data(),
         )
+        if config.ALLOW_PAGE_SELECTION:
+            with st.form("page_selection"):
+                st.write("Select pages to enable:")
+                all_pages = [
+                    "Explore a Prediction",
+                    "Similar Entities",
+                    "Compare Entities",
+                    "Experiment with Changes",
+                    "Understand the Model",
+                    "Settings",
+                ]
+                show_pages_bools = []
+                for page in all_pages:
+                    show_pages_bools.append(
+                        st.toggle(page, value=page in config.get_pages_to_show())
+                    )
+                submitted = st.form_submit_button("Save page selections")
+                if submitted:
+                    config_data["PAGES_TO_SHOW"] = [
+                        page for page, show in zip(all_pages, show_pages_bools) if show
+                    ]
+                    save_config(loader, config_data, existing_config)
+                    config.load_config.clear()  # clear cache to force config reload
+                    st.rerun()
 
     save_config(loader, config_data, existing_config)
     config.load_config.clear()  # clear cache to force config reload
