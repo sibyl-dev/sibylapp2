@@ -1,5 +1,3 @@
-import altair as alt
-import pandas as pd
 import streamlit as st
 
 from sibylapp2.compute import context, model

@@ -3,7 +3,7 @@ import streamlit as st
 
 from sibylapp2.compute import contributions, model
 from sibylapp2.compute.context import get_term
-from sibylapp2.config import POSITIVE_TERM, PREDICTION_TYPE, PredType, pred_format_func
+from sibylapp2.config import pred_format_func
 from sibylapp2.view.plots import charts
 from sibylapp2.view.utils import filtering, helpers
 
@@ -98,7 +98,6 @@ def view(eid, row_id, model_ids):
 
     fig = charts.plot_temporal_line_charts(wide_df)
     st.plotly_chart(fig, use_container_width=True)
-    # helpers.show_table(wide_df)
 
 
 def view_instructions():
@@ -112,33 +111,3 @@ def view_instructions():
                 feature=get_term("Feature", lower=True),
             )
         )
-
-        positive, negative = helpers.get_pos_neg_names()
-
-        entity = "prediction time"
-        entities = "prediction times"
-
-        # st.markdown(
-        #     "The **Contribution Change** column refers to the difference between the {feature}"
-        #     " contribution of the two {entities}. A large **{positive}** bar means that this"
-        #     " {feature}'s value has a much more positive contribution to the model's"
-        #     " prediction on the second {entity} than on the first {entity}. A large **{negative}**"
-        #     " bar means that this {feature}'s value has a much more negative contribution to"
-        #     " the model's prediction on the second {entity} than on the first {entity}. A lack of"
-        #     " a bar suggests this {feature} has a similar effect on the model's"
-        #     " prediction for both cases.".format(
-        #         positive=positive,
-        #         negative=negative,
-        #         feature=get_term("Feature", lower=True),
-        #         entity=entity,
-        #         entities=entities,
-        #     )
-        # )
-        # st.markdown(
-        #     "You can **filter** and **search** the {feature} table or adjust"
-        #     " the **sort order**. You can also look at {features} with identical"
-        #     " {feature} values.".format(
-        #         feature=get_term("Feature", lower=True),
-        #         features=get_term("Feature", plural=True, lower=True),
-        #     )
-        # )
