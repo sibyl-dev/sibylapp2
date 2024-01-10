@@ -2,6 +2,15 @@
 BASE_URL: http://localhost:3000/api/v1/
 CERT:
 
+# PAGES TO SHOW ==================================================================================
+PAGES_TO_SHOW:  # Set to a list of pages or "all" to show all
+  - "Explore a Prediction"
+  - "Similar Entities"
+  - "Compare Entities"
+  - "Experiment with Changes"
+  - "Understand the Model"
+  - "Settings"
+
 # GENERAL CONFIGURATIONS ==========================================================================
 BAR_LENGTH: 8  # Number of squares to use for contribution/importance bars
 MAX_ENTITIES: 11 # Maximum number of entities to select from. Set this to None to use all
