@@ -1,6 +1,6 @@
 import streamlit as st
 
-from sibylapp2 import config
+from sibylapp2.config import get_pages_to_show
 from sibylapp2.compute.context import get_term
 from sibylapp2.pages import (
     Compare_Entities,
@@ -23,7 +23,7 @@ ALL_PAGES = {
     "Settings": Settings,
 }
 
-pages_to_show = config.get_pages_to_show()
+pages_to_show = get_pages_to_show()
 if pages_to_show == "all":
     pages_to_show = ALL_PAGES.keys()
 

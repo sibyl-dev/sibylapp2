@@ -31,13 +31,13 @@ def get_load_upfront():
     return load_config().get("LOAD_UPFRONT", True)
 
 
-def get_pages_to_show():
-    return load_config().get("PAGES_TO_SHOW", "all")
-
-
 def get_color_scheme():
     flip_colors = load_config().get("FLIP_COLORS", False)
     return load_config().get("COLOR_SCHEME", "Reversed" if flip_colors else "Standard")
+
+
+def get_pages_to_show():
+    return select_config("PAGES_TO_SHOW", "pages_to_show", "all")
 
 
 # APPLICATION-SPECIFIC CONFIGURATIONS =============================================================
