@@ -62,25 +62,27 @@ def get_contributions_variation(
     contributions_list = []
     feature_name = None
     for model_id in model_ids:
-        df = contributions.get_contributions_for_rows(eid, [row_id], model_id=model_id)[row_id]
+        contribution_df, _ = contributions.get_contributions_for_rows(
+            eid, [row_id], model_id=model_id
+        )
         if feature_name is None:
-            feature_name = df["Feature"]
+            feature_name = contribution_df.columns
 
-        contributions_list.append(df["Contribution"].rename(int(model_id[:-1])))
+        contributions_list.append(contribution_df.iloc[0].rename(int(model_id[:-1])))
     contributions_table = pd.concat(contributions_list, axis=1)
-
     contributions_table["Feature"] = feature_name
 
     return contributions_table
 
 
-def filter_contributions(to_show, sort_by, num_options=5):
+def filter_contributions(to_show, sort_by, lead=0, num_options=5):
+    # filter by the contribution values at 0 lead
     if sort_by == "Absolute":
-        to_show = to_show.reindex(to_show[0].abs().sort_values(ascending=False).index)
-    if sort_by == "Ascending":
-        to_show = to_show.sort_values(by=0, axis="index")
-    if sort_by == "Descending":
-        to_show = to_show.sort_values(by=0, axis="index", ascending=False)
+        to_show = to_show.reindex(to_show[lead].abs().sort_values(ascending=False).index, axis=0)
+    if sort_by == get_term("Positive"):
+        to_show = to_show.sort_values(by=lead, axis=0, ascending=False)
+    if sort_by == get_term("Negative"):
+        to_show = to_show.sort_values(by=lead, axis=0)
     to_show = filtering.process_options(to_show)
     return to_show.iloc[0:num_options, :]
 
@@ -90,7 +92,7 @@ def view(eid, row_id, model_ids):
     `row_ids` and `eid_for_rows` are only used when `use_row_ids` == True.
     `eid` and `eid_comp` are used as row_id when `use_row_ids` == True
     """
-    sort_by = helpers.show_filter_options(["Absolute", "Ascending", "Descending"])
+    sort_by = helpers.show_filter_options(["Absolute", get_term("Positive"), get_term("Negative")])
 
     view_prediction_variation(eid, row_id, model_ids)
     wide_df = get_contributions_variation(eid, row_id, model_ids)
@@ -107,7 +109,7 @@ def view_instructions():
             "This page compares the **{feature} values**, **{feature} contributions**, "
             "and model predictions of the selected {entity} at different time horizons."
             " You can select the {entity} from the dropdown above.".format(
-                entity=get_term("Entity", lower=True),
-                feature=get_term("Feature", lower=True),
+                entity=get_term("entity"),
+                feature=get_term("feature"),
             )
         )

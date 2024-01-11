@@ -85,6 +85,6 @@ def plot_scatter_chart(
         xaxis_range=[x_min, x_max],
         yaxis_range=[y_min, y_max],
     )
-    fig.update_traces(marker_size=30)
+    fig.update_traces(marker_size=10)
 
     return fig
