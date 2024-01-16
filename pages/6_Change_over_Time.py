@@ -16,7 +16,6 @@ row_ids = st.session_state["row_id_dict"][eid]
 
 # Global options ------------------------------
 if len(row_ids) == 1:
-    st.warning("This page is not supported for your dataset.")
+    st.warning(f"This page is only supported for datasets with multiple observations per entity.")
 else:
-    filtering.view_filtering()
     temporal_change.view(eid, st.session_state["row_id"], model_ids=st.session_state["model_ids"])

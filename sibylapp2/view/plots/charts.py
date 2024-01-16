@@ -2,7 +2,16 @@ import pandas as pd
 import plotly.express as px
 
 
-def plot_temporal_line_charts(df: pd.DataFrame, y_max=1.0, y_min=-1.0, x_max=30, x_min=0):
+def plot_temporal_line_charts(
+    df: pd.DataFrame,
+    width=800,
+    height=800,
+    y_max=1.0,
+    y_min=-1.0,
+    x_max=30,
+    x_min=0,
+    chart_labels={},
+):
     """
     Transform dataframe from wide form to long form for streamlit visualizations.
 
@@ -22,68 +31,64 @@ def plot_temporal_line_charts(df: pd.DataFrame, y_max=1.0, y_min=-1.0, x_max=30,
         y="contribution",
         color="feature",
         symbol="feature",
-        labels={"contribution": "Feature contribution", "time": "Lead time (days)"},
+        labels=chart_labels,
         title="Feature contribution for predictions at different lead time",
     )
     fig.update_layout(
-        showlegend=False,
+        width=width,
+        height=height,
+        xaxis_range=[x_min, x_max],
+        yaxis_range=[y_min, y_max],
         xaxis={
-            "tickmode": "linear",
-            "tick0": 0,
+            "tickmode": "array",
+            "tickvals": df["time"],
             "dtick": 1,
             "tickfont": {"size": 20},
             "titlefont": {"size": 20},
         },
         yaxis={"tickfont": {"size": 20}, "titlefont": {"size": 20}},
-        xaxis_range=[x_min, x_max],
-        yaxis_range=[y_min, y_max],
     )
     return fig
 
 
 def plot_scatter_chart(
-    df: pd.DataFrame = None,
-    x: list = None,
-    y: list = None,
+    df: pd.DataFrame,
+    width=800,
+    height=800,
     y_max=1.0,
     y_min=0.0,
     x_max=30,
     x_min=0,
+    y_margin=0.2,
+    chart_labels={},
 ):
     """
-    Plot scatter plot for the given dataframe
+    Plot scatter plot for the given dataframe. The dataframe must have the following columns:
+        - time
+        - value
+        - labels
     """
-    # Validate input arguments
-    if df is None and (x is None or y is None):
-        raise ValueError("Must provide a dataframe or lists for x and y axis to this function")
-
-    if df is None:
-        fig = px.scatter(x=x, y=y)
-    else:
-        fig = px.scatter(
-            df,
-            x="time",
-            y="value",
-            color="labels",
-            labels={
-                "time": "Lead time (days)",
-                "value": "Prediction value",
-                "labels": "Prediction outcome",
-            },
-            title="Prediction at different lead time",
-        )
+    fig = px.scatter(
+        df,
+        x="time",
+        y="value",
+        color="labels",
+        labels=chart_labels,
+        title="Prediction at different lead time",
+    )
     fig.update_layout(
-        showlegend=False,
+        width=width,
+        height=height,
+        xaxis_range=[x_min, x_max],
+        yaxis_range=[y_min - y_margin, y_max + y_margin],
         xaxis={
-            "tickmode": "linear",
-            "tick0": 0,
+            "tickmode": "array",
+            "tickvals": df["time"],
             "dtick": 1,
             "tickfont": {"size": 20},
             "titlefont": {"size": 20},
         },
-        yaxis={"tickfont": {"size": 20}, "titlefont": {"size": 20}},
-        xaxis_range=[x_min, x_max],
-        yaxis_range=[y_min, y_max],
+        yaxis={"tick0": y_min, "tickfont": {"size": 20}, "titlefont": {"size": 20}},
     )
     fig.update_traces(marker_size=10)
 
