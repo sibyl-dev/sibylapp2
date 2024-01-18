@@ -3,7 +3,7 @@ import streamlit as st
 
 from sibylapp2.compute import contributions, model
 from sibylapp2.compute.context import get_term
-from sibylapp2.config import pred_format_func, MAX_FEATURES, TIME_UNIT
+from sibylapp2.config import MAX_FEATURES, POSITIVE_TERM, TIME_UNIT, pred_format_func
 from sibylapp2.view.plots import charts
 from sibylapp2.view.utils import filtering, helpers
 
@@ -83,12 +83,15 @@ def view_prediction_variation(
         probs.append(prediction_value)
 
     df = pd.DataFrame({"time": timeindex, "value": probs, "labels": predictions})
+    output_label = get_term("Prediction")
+    if st.session_state["display_proba"]:
+        output_label = f"{POSITIVE_TERM} probability"
     fig = charts.plot_scatter_chart(
         df,
         chart_labels={
             "time": f"Lead time ({TIME_UNIT})",
-            "value": "Prediction value",
-            "labels": "Prediction outcome",
+            "value": output_label,
+            "labels": get_term("Prediction"),
         },
     )
     st.plotly_chart(fig, use_container_width=True)
