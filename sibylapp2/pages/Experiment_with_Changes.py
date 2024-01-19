@@ -2,8 +2,8 @@
 
 import streamlit as st
 
-from sibylapp2.view import customized_entity
-from sibylapp2.view.utils import display, filtering
+from sibylapp2.view import customized_entity, filtering
+from sibylapp2.view.utils import display
 
 
 def main():

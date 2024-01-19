@@ -6,8 +6,7 @@ import streamlit as st
 from sibylapp2 import config
 from sibylapp2.compute import contributions, features, model
 from sibylapp2.compute.context import get_term
-from sibylapp2.view import explore_feature, feature_importance, global_contributions
-from sibylapp2.view.utils import filtering
+from sibylapp2.view import explore_feature, feature_importance, global_contributions, filtering
 
 
 def main():

@@ -2,8 +2,8 @@ import streamlit as st
 
 from sibylapp2.compute import contributions, features
 from sibylapp2.compute.context import get_term
-from sibylapp2.view.utils import filtering, helpers
-from sibylapp2.view.utils.helpers import show_legend
+from sibylapp2.view import filtering, helpers
+from sibylapp2.view.helpers import show_legend
 
 
 def show_sorted_contributions(to_show, sort_by, key):
@@ -89,35 +89,3 @@ def view(eid, model_id, key, row_id=None, save_space=False):
     to_show = format_contributions_to_view(eid, model_id, row_id=row_id, show_number=show_number)
 
     show_sorted_contributions(to_show, sort_by, key=key)
-
-
-def view_instructions():
-    expander = st.sidebar.expander("How to Use")
-    with expander:
-        st.markdown(
-            "**{feature_contributions}** refer to the positive or negative affect a specific"
-            " feature value had on the model's prediction.".format(
-                feature_contributions=get_term("Feature Contributions")
-            )
-        )
-        positive, negative = helpers.get_pos_neg_names()
-        st.markdown(
-            "A large **{positive}** bar means that this {feature}'s value significantly increased"
-            " the model's prediction on this {entity}. A large **{negative}** bar means that this"
-            " {feature}'s value significantly decreased the model's prediction. A lack of a"
-            " bar suggests this {feature} had little effect on the model's prediction in this"
-            " case.".format(
-                positive=positive,
-                negative=negative,
-                feature=get_term("feature"),
-                entity=get_term("entity"),
-            )
-        )
-        st.markdown(
-            "You can select {a_entity} from the dropdown above, and see the {feature}"
-            " contributions. You can also **filter** and **search** the {feature} table or adjust"
-            " the **sort order**.".format(
-                a_entity=get_term("entity", with_a=True),
-                feature=get_term("feature"),
-            )
-        )

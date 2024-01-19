@@ -2,8 +2,7 @@
 
 import streamlit as st
 
-from sibylapp2.view import similar_entities
-from sibylapp2.view.utils import filtering
+from sibylapp2.view import similar_entities, filtering
 
 
 def main():

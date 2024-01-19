@@ -1,6 +1,6 @@
 import pandas as pd
 
-from sibylapp2.view.utils import helpers
+from sibylapp2.view import helpers
 
 
 def format_single_contributions_df(df, show_number=False):

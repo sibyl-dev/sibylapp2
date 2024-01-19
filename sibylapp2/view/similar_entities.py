@@ -3,8 +3,8 @@ import streamlit as st
 
 from sibylapp2.compute import example_based
 from sibylapp2.compute.context import get_term
-from sibylapp2.view.utils import helpers
-from sibylapp2.view.utils.filtering import process_options
+from sibylapp2.view import helpers
+from sibylapp2.view.filtering import process_options
 
 
 def format_similar_entities(x, y):
