@@ -12,7 +12,9 @@ with open(path.join(path.dirname(path.dirname(path.abspath(__file__))), "config.
 session = requests.Session()
 session.headers.update({"Access-Control-Allow-Origin": "*"})
 if cfg.get("CERT") is not None:
-    session.cert = cfg.get("CERT")
+    cert_string = cfg.get("CERT")
+    cert = cert_string.split(",")
+    session.cert = cert
 
 
 def api_get(url):
