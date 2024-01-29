@@ -41,25 +41,24 @@ def view_instructions():
 
 def main():
     # Sidebar ------------------------------------
-    sidebar.show_probability_select_box()
-    sidebar.view_model_select()
-    sidebar.view_entity_and_row_select()
+    sidebar.set_up_sidebar(
+        model_select=True,
+        entity_select=True,
+        row_select=True,
+        prediction=True,
+        probability_select=True,
+    )
+    # sidebar.show_probability_select_box()
+    # sidebar.view_model_select()
+    # sidebar.view_entity_and_row_select()
     view_instructions()
 
     # Global options ------------------------------
     filtering.view_filtering()
 
-    tab = stx.tab_bar(
-        data=[
-            stx.TabBarItemData(id=1, title=get_term("Feature Contributions"), description=""),
-        ],
-        default=1,
+    feature_contribution.view(
+        st.session_state["eid"],
+        st.session_state["model_id"],
+        key="feature_contributions",
+        row_id=st.session_state["row_id"],
     )
-
-    if tab == "1":
-        feature_contribution.view(
-            st.session_state["eid"],
-            st.session_state["model_id"],
-            key="feature_contributions",
-            row_id=st.session_state["row_id"],
-        )

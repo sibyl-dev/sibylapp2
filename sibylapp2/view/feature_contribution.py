@@ -6,7 +6,7 @@ from sibylapp2.view import filtering, helpers
 from sibylapp2.view.helpers import show_legend
 
 
-def show_sorted_contributions(to_show, sort_by, key):
+def sort_and_show_contributions(to_show, sort_by, key):
     show_legend()
 
     if sort_by == "Side-by-side":
@@ -44,7 +44,7 @@ def show_sorted_contributions(to_show, sort_by, key):
         helpers.show_table(to_show.drop("Contribution Value", axis="columns"), key=key)
 
 
-def format_contributions_to_view(eid, model_id, row_id=None, show_number=False):
+def create_contribution_table(eid, model_id, row_id=None, show_number=False):
     if row_id is not None:
         contribution_df, value_df = contributions.get_contributions_for_rows(
             eid, [row_id], model_id=model_id
@@ -66,10 +66,18 @@ def format_contributions_to_view(eid, model_id, row_id=None, show_number=False):
 
 def view(eid, model_id, key, row_id=None, save_space=False):
     """
-    `eid_for_rows` is only used when `use_row_id` == True.
-    `eid` are used as row_id when `use_row_id` == True
+    Show the feature contributions for a given entity and model.
+
+    Args:
+        eid (str): ID of entity to show
+        model_id (str): ID of model to show
+        key (str): key to use for the table
+        row_id (str): ID of row to show
+        save_space (bool): If True, show a simplified version of the table for smaller environments
+
+    Returns:
+
     """
-    show_number = False
     if not save_space:
         cols = st.columns(2)
         with cols[0]:
@@ -82,10 +90,11 @@ def view(eid, model_id, key, row_id=None, save_space=False):
                 help="Show the exact amount this feature contributes to the model prediction",
             )
     else:
+        show_number = False
         sort_by = helpers.show_sort_options(
             ["Absolute", get_term("Positive"), get_term("Negative")]
         )
 
-    to_show = format_contributions_to_view(eid, model_id, row_id=row_id, show_number=show_number)
+    to_show = create_contribution_table(eid, model_id, row_id=row_id, show_number=show_number)
 
-    show_sorted_contributions(to_show, sort_by, key=key)
+    sort_and_show_contributions(to_show, sort_by, key=key)

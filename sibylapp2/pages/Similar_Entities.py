@@ -2,13 +2,13 @@
 
 import streamlit as st
 
-from sibylapp2.view import similar_entities, filtering
+from sibylapp2.view import similar_entities, filtering, sidebar
 
 
 def main():
     # Sidebar ------------------------------------
-    filtering.view_model_select()
-    filtering.view_entity_select()
+    sidebar.view_model_select()
+    sidebar.view_entity_select()
     filtering.view_filtering()
     similar_entities.view_instructions()
 

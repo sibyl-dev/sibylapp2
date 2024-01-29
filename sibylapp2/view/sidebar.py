@@ -1,11 +1,11 @@
 import streamlit as st
 
 from sibylapp2.compute import context, model
-from sibylapp2.config import SUPPORT_PROBABILITY, pred_format_func
+from sibylapp2 import config
 
 
 def show_probability_select_box():
-    if SUPPORT_PROBABILITY:
+    if config.SUPPORT_PROBABILITY:
         st.sidebar.checkbox(
             "Show probability",
             value=st.session_state["display_proba"],
@@ -14,24 +14,48 @@ def show_probability_select_box():
         )
 
 
-def view_prediction(eid):
-    pred = model.get_predictions(st.session_state["eids"], model_id=st.session_state["model_id"])[
-        eid
-    ]
+def set_up_sidebar(
+    model_select=False,
+    entity_select=False,
+    row_select=False,
+    prediction=False,
+    probability_select=False,
+):
+    if model_select:
+        view_model_select()
+    if entity_select:
+        view_entity_select()
+    if row_select:
+        view_row_select()
+    if prediction:
+        if row_select:
+            view_prediction(st.session_state["eid"], st.session_state["row_id"])
+        else:
+            view_prediction(st.session_state["eid"])
+    if probability_select:
+        show_probability_select_box()
+
+
+def view_prediction(eid, row_id=None):
+    if row_id is None:
+        pass
+    pred = model.get_predictions([eid], [row_id], model_id=st.session_state["model_id"])
     if st.session_state["display_proba"]:
         pred_proba = model.get_predictions(
-            st.session_state["eids"], model_id=st.session_state["model_id"], return_proba=True
-        )[eid]
+            [eid], model_id=st.session_state["model_id"], return_proba=True
+        )
         pred_display = (
-            f"{pred_format_func(pred)} ({pred_format_func(pred_proba, display_proba=True)})"
+            f"{config.pred_format_func(pred)} ({config.pred_format_func(pred_proba, display_proba=True)})"
         )
     else:
-        pred_display = pred_format_func(pred)
+        pred_display = config.pred_format_func(pred)
 
     st.sidebar.metric(context.get_term("Prediction"), pred_display)
 
 
 def view_model_select(default=0):
+    if config.DISABLE_MODEL_SELECTION:
+        return
     if "model_id" in st.session_state:
         st.session_state["select_model_index"] = st.session_state["model_ids"].index(
             st.session_state["model_id"]
@@ -51,7 +75,7 @@ def view_model_select(default=0):
 
 def view_entity_select(eid_text="eid", prefix=None, default=0):
     def format_func(eid):
-        return f"{context.get_term('Entity')} {eid} ({pred_format_func(predictions[eid])})"
+        return f"{context.get_term('Entity')} {eid} ({config.pred_format_func(predictions[eid])})"
 
     predictions = model.get_predictions(
         st.session_state["eids"], model_id=st.session_state["model_id"]
@@ -76,10 +100,13 @@ def view_entity_select(eid_text="eid", prefix=None, default=0):
     )
 
 
-def view_row_select(eid, row_ids, row_id_text="row_id", prefix=None, default=0):
-    def format_rowid_select(row_id):
-        return str(row_id)
-
+def view_row_select(eid=None, row_ids=None, row_id_text="row_id", prefix=None, default=0):
+    if eid is None:
+        eid = st.session_state["eid"]
+    if row_ids is None:
+        row_ids = st.session_state["row_id_dict"][eid]
+    if config.DISABLE_ROW_SELECTION:
+        return
     if row_id_text not in st.session_state:
         st.session_state[f"select_{row_id_text}_index"] = default
 
@@ -91,38 +118,6 @@ def view_row_select(eid, row_ids, row_id_text="row_id", prefix=None, default=0):
     st.sidebar.selectbox(
         select_text,
         row_ids,
-        format_func=format_rowid_select,
         index=st.session_state[f"select_{row_id_text}_index"],
         key=row_id_text,
     )
-    predictions = model.get_predictions_for_rows(
-        eid, row_ids, model_id=st.session_state["model_id"]
-    )
-    pred = predictions[st.session_state[row_id_text]]
-
-    if st.session_state["display_proba"]:
-        predictions_proba = model.get_predictions_for_rows(
-            eid, row_ids, model_id=st.session_state["model_id"], return_proba=True
-        )
-        pred_proba = predictions_proba[st.session_state[row_id_text]]
-        pred_display = (
-            pred_format_func(pred) + " (" + pred_format_func(pred_proba, display_proba=True) + ")"
-        )
-    else:
-        pred_display = pred_format_func(pred)
-    st.sidebar.metric(context.get_term("Prediction"), pred_display)
-
-
-def view_entity_and_row_select():
-    """
-    This function handles the display of entities selection.
-    """
-    view_entity_select()
-    eid = st.session_state["eid"]
-    row_ids = st.session_state["row_id_dict"][eid]
-    if len(row_ids) > 1:
-        view_row_select(eid, row_ids, row_id_text="row_id")
-        st.session_state["use_rows"] = True
-    else:
-        st.session_state["row_id"] = None
-        view_prediction(eid)

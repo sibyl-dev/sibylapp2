@@ -19,4 +19,7 @@ OVERRIDE_PRED_FORMAT: # If True, use "config.manual_pred_format_func" to format 
 SUPPORT_PROBABILITY: # Only set this to True when model supports `predict_proba`
 PAGES_TO_SHOW:
 - Explore a Prediction # Set to a list of pages or "all" to show all pages
+- Similar Entities
 ALLOW_PAGE_SELECTION:  # If true, allow user to select which pages to show (requires settings page)
+DISABLE_ROW_SELECTION: false # If true, disable the row selection box
+DISABLE_MODEL_SELECTION: false # If true, disable the model selection box
