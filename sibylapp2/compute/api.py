@@ -117,9 +117,10 @@ def fetch_predictions(eids, row_ids=None, model_id=fetch_model_id(), return_prob
     json = {
         "eids": eids,
         "model_id": model_id,
-        "row_ids": row_ids,
         "return_proba": return_proba,
     }
+    if row_ids is not None:
+        json["row_ids"] = row_ids
     predictions = api_post("multi_prediction/", json)["predictions"]
     return predictions
 

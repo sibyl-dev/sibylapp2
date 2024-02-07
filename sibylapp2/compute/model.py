@@ -21,17 +21,13 @@ def get_predictions(eids, row_ids=None, model_id=api.fetch_model_id(), return_pr
         return_proba (bool): whether to return probabilities or not
 
     Returns:
-        dict: dictionary of predictions given as {eid: {row_id: prediction}} if row_ids is given,
-            otherwise {eid: prediction}
+        dict: dictionary of predictions given as {eid: {row_id: prediction}}
     """
-    if row_ids is None:
-        predictions = api.fetch_predictions(eids, model_id=model_id, return_proba=return_proba)
-    else:
-        predictions = {}
-        for eid in eids:
-            predictions[eid] = api.fetch_predictions(
-                [eid], row_ids, model_id=model_id, return_proba=return_proba
-            )
+    predictions = {}
+    for eid in eids:
+        predictions[eid] = api.fetch_predictions(
+            [eid], row_ids, model_id=model_id, return_proba=return_proba
+        )
     return predictions
 
 
