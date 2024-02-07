@@ -3,7 +3,7 @@ import streamlit as st
 
 from sibylapp2.compute import contributions, model
 from sibylapp2.compute.context import get_term
-from sibylapp2.config import MAX_FEATURES, POSITIVE_TERM, TIME_UNIT, pred_format_func
+from sibylapp2.config import MAX_FEATURES, TIME_UNIT, pred_format_func
 from sibylapp2.view.plots import charts
 from sibylapp2.view.utils import filtering, helpers
 
@@ -48,7 +48,7 @@ def get_contributions_variation(
     return contributions_table
 
 
-def view_prediction_variation(
+def plot_prediction_variation(
     eid,
     row_id,
     model_ids,
@@ -83,21 +83,14 @@ def view_prediction_variation(
         probs.append(prediction_value)
 
     df = pd.DataFrame({"time": timeindex, "value": probs, "labels": predictions})
-    output_label = get_term("Prediction")
-    if st.session_state["display_proba"]:
-        output_label = f"{POSITIVE_TERM} probability"
-    fig = charts.plot_scatter_chart(
-        df,
-        chart_labels={
-            "time": f"Lead time ({TIME_UNIT})",
-            "value": output_label,
-            "labels": get_term("Prediction"),
-        },
-    )
-    st.plotly_chart(fig, use_container_width=True)
+    # output_label = get_term("Prediction")
+    # if st.session_state["display_proba"]:
+    #     output_label = f"{POSITIVE_TERM} probability"
+    fig = charts.plot_scatter_chart(df)
+    return fig
 
 
-def view_contributions_variation(eid, row_id, model_ids):
+def plot_contributions_variation(eid, row_id, model_ids, figure=None):
     """
     This function displays the feature contributions over time (different models).
     """
@@ -108,11 +101,8 @@ def view_contributions_variation(eid, row_id, model_ids):
     wide_df = get_contributions_variation(eid, row_id, model_ids)
     wide_df = filter_contributions(wide_df, sort_by)
 
-    fig = charts.plot_temporal_line_charts(
-        wide_df,
-        chart_labels={"contribution": "Feature contribution", "time": f"Lead time ({TIME_UNIT})"},
-    )
-    st.plotly_chart(fig, use_container_width=True)
+    fig = charts.plot_temporal_line_charts(wide_df, figure)
+    return fig
 
 
 def view(eid, row_id, model_ids):
@@ -120,8 +110,17 @@ def view(eid, row_id, model_ids):
     `row_ids` and `eid_for_rows` are only used when `use_row_ids` == True.
     `eid` and `eid_comp` are used as row_id when `use_row_ids` == True
     """
-    view_prediction_variation(eid, row_id, model_ids)
-    view_contributions_variation(eid, row_id, model_ids)
+    figure = plot_prediction_variation(eid, row_id, model_ids)
+    contribution_figure = plot_contributions_variation(eid, row_id, model_ids, figure)
+    # combine two figures
+    final_figure = charts.update_figure(
+        contribution_figure,
+        xaxis_label=f"Lead time ({TIME_UNIT})",
+        yaxis_label=get_term("Prediction"),
+        yaxis2_label="Feature contribution",
+    )
+
+    st.plotly_chart(final_figure, use_container_width=True)
 
 
 def view_instructions():

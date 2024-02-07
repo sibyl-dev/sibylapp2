@@ -1,16 +1,11 @@
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 
 
 def plot_temporal_line_charts(
     df: pd.DataFrame,
-    width=800,
-    height=800,
-    y_max=1.0,
-    y_min=-1.0,
-    x_max=30,
-    x_min=0,
-    chart_labels={},
+    fig: go.Figure | None = None,
 ):
     """
     Transform dataframe from wide form to long form for streamlit visualizations.
@@ -25,42 +20,34 @@ def plot_temporal_line_charts(
         var_name="feature",
         value_name="contribution",
     )
-    fig = px.line(
-        df,
-        x="time",
-        y="contribution",
-        color="feature",
-        symbol="feature",
-        labels=chart_labels,
-        title="Feature contribution for predictions at different lead time",
-    )
+    if fig is None:
+        fig = go.Figure()
+
+    for feature in df["feature"].unique():
+        df_feature = df[df["feature"] == feature]
+        fig.add_trace(
+            go.Scatter(
+                x=df_feature["time"],
+                y=df_feature["contribution"],
+                mode="lines+markers",
+                name=feature,
+                yaxis="y2",
+            )
+        )
+
     fig.update_layout(
-        width=width,
-        height=height,
-        xaxis_range=[x_min, x_max],
-        yaxis_range=[y_min, y_max],
-        xaxis={
-            "tickmode": "array",
-            "tickvals": df["time"],
-            "dtick": 1,
-            "tickfont": {"size": 20},
-            "titlefont": {"size": 20},
-        },
-        yaxis={"tickfont": {"size": 20}, "titlefont": {"size": 20}},
+        xaxis=dict(
+            tickmode="array",
+            tickvals=df["time"],
+            dtick=1,
+        ),
     )
     return fig
 
 
 def plot_scatter_chart(
     df: pd.DataFrame,
-    width=800,
-    height=800,
-    y_max=1.0,
-    y_min=0.0,
-    x_max=30,
-    x_min=0,
-    y_margin=0.2,
-    chart_labels={},
+    fig: go.Figure | None = None,
 ):
     """
     Plot scatter plot for the given dataframe. The dataframe must have the following columns:
@@ -68,28 +55,69 @@ def plot_scatter_chart(
         - value
         - labels
     """
-    fig = px.scatter(
-        df,
-        x="time",
-        y="value",
-        color="labels",
-        labels=chart_labels,
-        title="Prediction at different lead time",
+    if fig is None:
+        fig = go.Figure()
+
+    for label in df["labels"].unique():
+        df_label = df[df["labels"] == label]
+        fig.add_trace(
+            go.Scatter(
+                x=df_label["time"],
+                y=df_label["value"],
+                mode="markers",
+                name=label,
+                marker_size=20,
+                yaxis="y1",
+            )
+        )
+
+    fig.update_layout(
+        xaxis=dict(
+            tickmode="array",
+            tickvals=df["time"],
+            dtick=1,
+        ),
     )
+
+    return fig
+
+
+def update_figure(
+    fig: go.Figure,
+    width=800,
+    height=800,
+    y_min=-1.0,
+    y_max=1.0,
+    y_margin=0.1,
+    xaxis_label="",
+    yaxis_label="",
+    yaxis2_label="",
+):
     fig.update_layout(
         width=width,
         height=height,
-        xaxis_range=[x_min, x_max],
-        yaxis_range=[y_min - y_margin, y_max + y_margin],
-        xaxis={
-            "tickmode": "array",
-            "tickvals": df["time"],
-            "dtick": 1,
-            "tickfont": {"size": 20},
-            "titlefont": {"size": 20},
-        },
-        yaxis={"tick0": y_min, "tickfont": {"size": 20}, "titlefont": {"size": 20}},
+        title="Feature contribution for predictions at different lead time",
+        xaxis=dict(
+            title=xaxis_label,
+            tickfont=dict(size=20),
+            titlefont=dict(size=20),
+        ),
+        yaxis=dict(
+            title=yaxis_label,
+            tickfont=dict(size=20),
+            titlefont=dict(size=20),
+            anchor="x",
+            range=[y_min - y_margin, y_max + y_margin],
+        ),
+        yaxis2=dict(
+            title=yaxis2_label,
+            tickfont=dict(size=20),
+            titlefont=dict(size=20),
+            overlaying="y",
+            side="right",
+            anchor="x",
+            range=[y_min - y_margin, y_max + y_margin],
+        ),
+        legend=dict(x=0, y=-0.2, traceorder="normal", orientation="h"),
     )
-    fig.update_traces(marker_size=10)
-
     return fig

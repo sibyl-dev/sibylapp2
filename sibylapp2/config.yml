@@ -20,4 +20,4 @@ SUPPORT_PROBABILITY: # Only set this to True when model supports `predict_proba`
 
 # TIME-SERIES-SPECIFIC CONFIGUREATIONS ============================================================
 MAX_FEATURES: 10 # Maximum number of features to show on time-series explanation plots
-TIME_UNIT: "days" # unit of time used in application and plots
+TIME_UNIT: days # unit of time used in application and plots
