@@ -1,7 +1,7 @@
 import pandas as pd
 import plotly.graph_objects as go
 
-from sibylapp2.config import POSITIVE_TERM, NEGATIVE_TERM
+from sibylapp2.config import NEGATIVE_TERM, POSITIVE_TERM
 
 
 def plot_temporal_line_charts(
