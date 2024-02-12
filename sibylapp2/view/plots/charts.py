@@ -1,6 +1,7 @@
 import pandas as pd
-import plotly.express as px
 import plotly.graph_objects as go
+
+from sibylapp2.config import POSITIVE_TERM, NEGATIVE_TERM
 
 
 def plot_temporal_line_charts(
@@ -55,18 +56,21 @@ def plot_scatter_chart(
         - value
         - labels
     """
+    # Change this when positive and negative colors are defined
+    color_map = {POSITIVE_TERM: "blue", NEGATIVE_TERM: "red"}
     if fig is None:
         fig = go.Figure()
 
     for label in df["labels"].unique():
         df_label = df[df["labels"] == label]
+        colors = [color_map[lab] for lab in df_label["labels"]]
         fig.add_trace(
             go.Scatter(
                 x=df_label["time"],
                 y=df_label["value"],
                 mode="markers",
                 name=label,
-                marker_size=20,
+                marker=dict(color=colors, size=20),
                 yaxis="y1",
             )
         )
