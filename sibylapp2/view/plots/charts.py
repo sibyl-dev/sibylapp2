@@ -2,6 +2,7 @@ import pandas as pd
 import plotly.graph_objects as go
 
 from sibylapp2.config import NEGATIVE_TERM, POSITIVE_TERM
+from sibylapp2.view.utils.helpers import get_pos_neg_names
 
 
 def plot_temporal_line_charts(
@@ -56,8 +57,7 @@ def plot_scatter_chart(
         - value
         - labels
     """
-    # Change this when positive and negative colors are defined
-    color_map = {POSITIVE_TERM: "blue", NEGATIVE_TERM: "red"}
+    color_map = {POSITIVE_TERM: get_pos_neg_names()[0], NEGATIVE_TERM: get_pos_neg_names()[1]}
     if fig is None:
         fig = go.Figure()
 
