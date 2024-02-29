@@ -19,10 +19,15 @@ def fetch_context():
 
 @st.cache_data(show_spinner=False)
 def fetch_terms():
+    def lower_if_not_none(value):
+        if value:
+            return value.lower()
+        return value
+
     context = fetch_context()
     if "terms" not in context:
         return {}
-    return {key.lower(): value.lower() for key, value in context["terms"].items()}
+    return {key.lower(): lower_if_not_none(value) for key, value in context["terms"].items()}
 
 
 @st.cache_data(show_spinner=False)
@@ -37,13 +42,13 @@ def get_term(term, plural=False, with_a=False):
     Args:
         term (string): Term to translate
         plural (boolean): If True, pluralize the input
-        with_a (boolean): If True, add a or an before the output, as appropriate
+        with_a (boolean): If True, add "a" or "an" before the output, as appropriate
 
     Returns:
         The translated term, with the same case as the input term
     """
     terms = fetch_terms()
-    if term.lower() not in terms:
+    if term.lower() not in terms or not terms[term.lower()]:
         new_term = term
     elif term.islower():
         new_term = terms[term]
