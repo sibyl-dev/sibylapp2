@@ -59,7 +59,7 @@ poetry run sibyl run -v
 configurations specific to your application here.
 3. From the root project folder, run:
 ```bash
-poetry run streamlit run 1_Explore_a_Prediction.py
+poetry run streamlit run main.py
 ```
 
 # Contributing Guide
@@ -73,7 +73,7 @@ poetry run invoke fix-lint
 # Ensure no linting errors remain
 poetry run invoke lint
 ```
-4. Run the app using the instructions above to confirm that all changes work as expeted.
+4. Run the app using the instructions above to confirm that all changes work as expected.
 5. Once you are done making and testing changes, and linting passes, push all code and make a pull request. One all checks pass and the PR has been approved, merge your code and delete the branch.
 
 

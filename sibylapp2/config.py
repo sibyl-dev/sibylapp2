@@ -36,6 +36,10 @@ def get_color_scheme():
     return load_config().get("COLOR_SCHEME", "Reversed" if flip_colors else "Standard")
 
 
+def get_pages_to_show():
+    return select_config("PAGES_TO_SHOW", "pages_to_show", "all")
+
+
 # APPLICATION-SPECIFIC CONFIGURATIONS =============================================================
 def select_config(name, api_name, default):
     if load_config().get(name) is not None:
@@ -67,6 +71,7 @@ POSITIVE_TERM = select_config("POSITIVE_TERM", "output_pos_label", "True")
 NEGATIVE_TERM = select_config("NEGATIVE_TERM", "output_neg_label", "False")
 PRED_FORMAT_STRING = select_config("PRED_FORMAT_STRING", "output_format_string", "{}")
 SUPPORT_PROBABILITY = select_config("SUPPORT_PROBABILITY", "show_probs", False)
+ALLOW_PAGE_SELECTION = select_config("ALLOW_PAGE_SELECTION", "allow_page_selection", False)
 
 MAX_FEATURES = select_config("MAX_FEATURES", "num_plot_features", 10)
 TIME_UNIT = select_config("TIME_UNIT", "time_unit", "days")

@@ -14,9 +14,7 @@ UP_ARROW = "⬆"
 DOWN_ARROW = "⬇"
 DIVIDING_BAR = "|"
 
-CONFIG_FILEPATH = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "..", "sibylapp2", "config.yml"
-)
+CONFIG_FILEPATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "config.yml")
 
 
 def load_existing_config(loader):
@@ -47,7 +45,7 @@ def generate_color_scheme_caption(color_scheme, description):
     )
 
 
-def view():
+def main():
     def _clear_eid_data():
         if "eids" in st.session_state:
             del st.session_state["eids"]
@@ -112,9 +110,31 @@ def view():
             help="High values will slow down the application",
             on_change=_clear_dataset_data(),
         )
+        if config.ALLOW_PAGE_SELECTION:
+            with st.form("page_selection"):
+                st.write("Select pages to enable:")
+                all_pages = [
+                    "Explore a Prediction",
+                    "Similar Entities",
+                    "Compare Entities",
+                    "Experiment with Changes",
+                    "Change over Time",
+                    "Understand the Model",
+                    "Settings",
+                ]
+                show_pages_bools = []
+                for page in all_pages:
+                    show_pages_bools.append(
+                        st.toggle(page, value=page in config.get_pages_to_show())
+                    )
+                submitted = st.form_submit_button("Save page selections")
+                if submitted:
+                    config_data["PAGES_TO_SHOW"] = [
+                        page for page, show in zip(all_pages, show_pages_bools) if show
+                    ]
+                    save_config(loader, config_data, existing_config)
+                    config.load_config.clear()  # clear cache to force config reload
+                    st.rerun()
 
     save_config(loader, config_data, existing_config)
     config.load_config.clear()  # clear cache to force config reload
-
-
-view()
