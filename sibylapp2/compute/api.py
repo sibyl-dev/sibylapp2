@@ -115,7 +115,9 @@ def fetch_modified_prediction(
     return prediction
 
 
-def fetch_predictions(eids, row_ids=None, model_id=fetch_model_id(), return_proba=False):
+def fetch_predictions(
+    eids, row_ids=None, model_id=fetch_model_id(), return_proba=False
+) -> dict[str, list[int | float]]:
     json = {
         "eids": eids,
         "model_id": model_id,
