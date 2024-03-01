@@ -8,6 +8,7 @@ from sibylapp2.pages import (
     Explore_a_Prediction,
     Settings,
     Similar_Entities,
+    Change_over_Time,
     Understand_the_Model,
 )
 from sibylapp2.view.utils import setup
@@ -19,6 +20,7 @@ ALL_PAGES = {
     "Similar Entities": Similar_Entities,
     "Compare Entities": Compare_Entities,
     "Experiment with Changes": Experiment_with_Changes,
+    "Change over Time": Change_over_Time,
     "Understand the Model": Understand_the_Model,
     "Settings": Settings,
 }
