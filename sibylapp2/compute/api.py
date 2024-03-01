@@ -12,7 +12,9 @@ with open(path.join(path.dirname(path.dirname(path.abspath(__file__))), "config.
 session = requests.Session()
 session.headers.update({"Access-Control-Allow-Origin": "*"})
 if cfg.get("CERT") is not None:
-    session.cert = cfg.get("CERT")
+    cert_string = cfg.get("CERT")
+    cert = cert_string.split(",")
+    session.cert = cert
 
 
 def api_get(url):
@@ -113,7 +115,9 @@ def fetch_modified_prediction(
     return prediction
 
 
-def fetch_predictions(eids, row_ids=None, model_id=fetch_model_id(), return_proba=False):
+def fetch_predictions(
+    eids, row_ids=None, model_id=fetch_model_id(), return_proba=False
+) -> dict[str, list[int | float]]:
     json = {
         "eids": eids,
         "model_id": model_id,
