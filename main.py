@@ -3,12 +3,12 @@ import streamlit as st
 from sibylapp2.compute.context import get_term
 from sibylapp2.config import get_pages_to_show
 from sibylapp2.pages import (
+    Change_over_Time,
     Compare_Entities,
     Experiment_with_Changes,
     Explore_a_Prediction,
     Settings,
     Similar_Entities,
-    Change_over_Time,
     Understand_the_Model,
 )
 from sibylapp2.view.utils import setup
