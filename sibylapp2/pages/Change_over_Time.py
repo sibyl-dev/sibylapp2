@@ -16,10 +16,7 @@ def main():
     model_ids = st.session_state["model_ids"]
 
     # Global options ------------------------------
-    if len(row_ids) == 1 and len(model_ids) < 1:
-        st.warning(
-            "This page is only supported for datasets with multiple observations per entity and"
-            " multiple models."
-        )
+    if len(row_ids) <= 1 or len(model_ids) <= 1:
+        st.warning("Your application does not support predicting over time.")
     else:
         temporal_change.view(eid, st.session_state["row_id"], model_ids=model_ids)
