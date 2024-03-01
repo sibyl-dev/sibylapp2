@@ -32,7 +32,9 @@ def get_predictions(eids, row_ids=None, model_id=api.fetch_model_id(), return_pr
 
 
 @st.cache_data(show_spinner="Getting model predictions...")
-def get_predictions_for_rows(eid, row_ids, model_id=api.fetch_model_id(), return_proba=False):
+def get_predictions_for_rows(
+    eid, row_ids, model_id=api.fetch_model_id(), return_proba=False
+) -> dict[str, list[int | float]]:
     predictions = api.fetch_predictions(
         [eid], row_ids, model_id=model_id, return_proba=return_proba
     )
@@ -40,7 +42,9 @@ def get_predictions_for_rows(eid, row_ids, model_id=api.fetch_model_id(), return
 
 
 @st.cache_data(show_spinner="Getting model predictions...")
-def get_dataset_predictions(model_id=api.fetch_model_id(), return_proba=False):
+def get_dataset_predictions(
+    model_id=api.fetch_model_id(), return_proba=False
+) -> dict[str, list[int | float]]:
     if "dataset_eids" not in st.session_state:
         st.session_state["dataset_eids"] = entities.get_eids(get_dataset_size())
     return get_predictions(

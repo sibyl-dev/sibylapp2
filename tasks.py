@@ -1,5 +1,6 @@
-from invoke import task
 import subprocess
+
+from invoke import task
 
 
 @task

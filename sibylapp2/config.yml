@@ -2,8 +2,8 @@
 BASE_URL: http://localhost:3000/api/v1/
 CERT:
 
-# PAGES TO SHOW ==================================================================================
-BAR_LENGTH: 8  # Number of squares to use for contribution/importance bars
+# GENERAL CONFIGURATIONS ==========================================================================
+BAR_LENGTH: 8 # Number of squares to use for contribution/importance bars
 MAX_ENTITIES: 11 # Maximum number of entities to select from. Set this to None to use all
 DATASET_SIZE: 1000 # Max number of entities to use for dataset-wide visualizations
 LOAD_UPFRONT: true # If true, run heavy computations on initial load, else greedily run as needed
@@ -23,3 +23,7 @@ PAGES_TO_SHOW:
 ALLOW_PAGE_SELECTION:  # If true, allow user to select which pages to show (requires settings page)
 DISABLE_ROW_SELECTION: false # If true, disable the row selection box
 DISABLE_MODEL_SELECTION: false # If true, disable the model selection box
+
+# TIME-SERIES-SPECIFIC CONFIGUREATIONS ============================================================
+MAX_FEATURES: 10 # Maximum number of features to show on time-series explanation plots
+TIME_UNIT: days # unit of time used in application and plots

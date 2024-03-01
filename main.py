@@ -5,6 +5,7 @@ from sibylapp2.config import get_pages_to_show
 from sibylapp2.pages import (
     # Compare_Entities,
     # Experiment_with_Changes,
+    # Change_over_Time,
     Explore_a_Prediction,
     # Settings,
     Similar_Entities,
@@ -20,6 +21,7 @@ ALL_PAGES = {
     # "Compare Entities": Compare_Entities,
     # "Experiment with Changes": Experiment_with_Changes,
     # "Understand the Model": Understand_the_Model,
+    # "Change over Time": Change_over_Time,
     # "Settings": Settings,
 }
 

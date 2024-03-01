@@ -118,6 +118,7 @@ def main():
                     "Similar Entities",
                     "Compare Entities",
                     "Experiment with Changes",
+                    "Change over Time",
                     "Understand the Model",
                     "Settings",
                 ]
