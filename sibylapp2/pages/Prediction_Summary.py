@@ -39,27 +39,22 @@ def single_row_plot(predictions):
 
 def multi_row_plot(predictions, proba_predictions=None):
     if proba_predictions:
-        df = pd.DataFrame.from_dict({
-            (i, j): [
-                proba_predictions[i][j]
-                if predictions[i][j] == 1
-                else (1 - proba_predictions[i][j])
-            ]
-            for i in proba_predictions.keys()
-            for j in proba_predictions[i].keys()
-        }).T.reset_index()
+        vals = proba_predictions
+        label = "Probability"
     else:
-        df = pd.DataFrame.from_dict({
-            (i, j): [predictions[i][j]] for i in predictions.keys() for j in predictions[i].keys()
-        }).T.reset_index()
-    df.columns = ["EID", config.ROW_LABEL, "Value"]
+        vals = predictions
+        label = get_term("Prediction")
+    df = pd.DataFrame.from_dict(
+        {(i, j): [vals[i][j]] for i in vals.keys() for j in vals[i].keys()}
+    ).T.reset_index()
+    df.columns = ["EID", config.ROW_LABEL, label]
     df[config.ROW_LABEL] = pd.to_datetime(df[config.ROW_LABEL])  # Convert time to datetime format
 
     # Create the line plot
     fig = px.line(
         df,
         x=config.ROW_LABEL,
-        y="Value",
+        y=label,
         color="EID",
         markers=True,
         color_discrete_sequence=px.colors.qualitative.G10,
@@ -67,20 +62,34 @@ def multi_row_plot(predictions, proba_predictions=None):
 
     # Update layout for better readability
     fig.update_layout(
-        title="Values Over Time by EID",
         xaxis_title=config.ROW_LABEL,
-        yaxis_title=get_term("Prediction"),
         legend_title="EID",
     )
     if proba_predictions:
-        fig.update_layout(yaxis_range=[0, 1], yaxis_title="Probability")
+        fig.update_layout(yaxis_range=[0, 1])
     st.plotly_chart(fig, use_container_width=True)
 
 
-def prediction_table(predictions):
-    df = pd.DataFrame(predictions.items(), columns=["EID", "Prediction"])
-    df["%s Visualized" % get_term("Prediction")] = generate_bars(df["Prediction"], neutral=True)
+def prediction_table(predictions, proba_predictions=None, multirow=False):
+    if multirow:
+        eid = st.selectbox("Select %s" % get_term("Entity", with_a=True), list(predictions.keys()))
+        predictions = predictions[eid]
+        if proba_predictions:
+            proba_predictions = proba_predictions[eid]
+        df = pd.DataFrame(predictions.items(), columns=[config.ROW_LABEL, "Prediction"])
+    else:
+        df = pd.DataFrame(predictions.items(), columns=["EID", "Prediction"])
+    if proba_predictions:
+        df["Probability"] = proba_predictions.values()
+    df["Prediction"] = df["Prediction"].apply(config.pred_format_func)
+    bar_col = "Probability" if proba_predictions else "Prediction"
+    df["%s Visualized" % get_term(bar_col)] = generate_bars(df[bar_col], neutral=True)
     show_table(df, key="prediction_table", enable_editing=False)
+
+
+def pred_prob_to_raw_prob(pred_prob, pred):
+    # Returns pred_prob if pred==1, 1-pred_prob otherwise
+    return (1 - pred) + (-1 + 2 * pred) * pred_prob
 
 
 def main():
@@ -109,12 +118,22 @@ def main():
                 item[0]: model.get_predictions_for_rows(item[0], item[1], return_proba=True)
                 for item in st.session_state["row_id_dict"].items()
             }
+            # Convert the outcome probability to raw probability
+            proba_predictions = {
+                eid: {
+                    row_id: pred_prob_to_raw_prob(
+                        proba_predictions[eid][row_id], predictions[eid][row_id]
+                    )
+                    for row_id in proba_predictions[eid]
+                }
+                for eid in proba_predictions
+            }
         if tab == "1":
             col1, col2 = st.columns((2, 1))
             with col1:
                 multi_row_plot(predictions, proba_predictions)
         if tab == "2":
-            st.warning("not implemented")
+            prediction_table(predictions, proba_predictions, multirow=True)
     else:
         predictions = model.get_predictions(eids)
         predictions = {eid: predictions[eid] for eid in eids}
