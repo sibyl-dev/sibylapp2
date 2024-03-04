@@ -43,7 +43,7 @@ def multi_row_plot(predictions, proba_predictions=None):
     with col1:
         if proba_predictions:
             vals = proba_predictions
-            label = "Probability"
+            label = "Probability of %s" % config.pred_format_func(1)
         else:
             vals = predictions
             label = get_term("Prediction")
@@ -96,9 +96,11 @@ def prediction_table(
         df = pd.DataFrame(predictions.items(), columns=[config.ROW_LABEL, "Prediction"])
     else:
         df = pd.DataFrame(predictions.items(), columns=["EID", "Prediction"])
+    bar_col = "Prediction"
     if proba_predictions:
-        df["Probability"] = proba_predictions.values()
-    bar_col = "Probability" if proba_predictions else "Prediction"
+        label = "Probability of %s" % config.pred_format_func(1)
+        df[label] = proba_predictions.values()
+        bar_col = label
     df["%s Visualized" % get_term(bar_col)] = generate_bars(df[bar_col], neutral=True)
     df["Prediction"] = df["Prediction"].apply(config.pred_format_func)
     if save_space:
