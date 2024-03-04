@@ -1,13 +1,16 @@
-import streamlit as st
-from sibylapp2.compute import model
-from sibylapp2.view.utils import display, filtering
-from sibylapp2.view.utils.helpers import show_table, generate_bars
-import plotly.express as px
-from sibylapp2.compute.context import get_term
-import pandas as pd
+# pylint: disable=invalid-name
+
 import extra_streamlit_components as stx
-from sibylapp2 import config
+import pandas as pd
+import plotly.express as px
+import streamlit as st
 from streamlit_plotly_events import plotly_events
+
+from sibylapp2 import config
+from sibylapp2.compute import model
+from sibylapp2.compute.context import get_term
+from sibylapp2.view.utils import display
+from sibylapp2.view.utils.helpers import generate_bars, show_table
 
 
 def single_row_plot(predictions):
@@ -121,7 +124,7 @@ def main():
 
     tab = stx.tab_bar(
         data=[
-            stx.TabBarItemData(id=1, title=get_term(f"Summary"), description=""),
+            stx.TabBarItemData(id=1, title=get_term("Summary"), description=""),
             stx.TabBarItemData(
                 id=2,
                 title="Interactive Table",
