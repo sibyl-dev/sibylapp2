@@ -104,7 +104,7 @@ def prediction_table(
         label = "Probability of %s" % config.pred_format_func(1)
         df[label] = proba_predictions.values()
         bar_col = label
-    df["%s Visualized" % get_term(bar_col)] = generate_bars(df[bar_col], neutral=True)
+    df["%s visualized" % get_term(bar_col)] = generate_bars(df[bar_col], neutral=True)
     df["Prediction"] = df["Prediction"].apply(config.pred_format_func)
     if save_space:
         button_size_mod = 2
@@ -119,7 +119,6 @@ def pred_prob_to_raw_prob(pred_prob, pred):
 
 
 def main():
-    display.show_probability_select_box(sidebar=False)
     eids = st.session_state["eids"]
 
     tab = stx.tab_bar(
@@ -139,7 +138,7 @@ def main():
             for item in st.session_state["row_id_dict"].items()
         }
         proba_predictions = None
-        if "display_proba" in st.session_state and st.session_state["display_proba"]:
+        if config.SUPPORT_PROBABILITY:
             proba_predictions = {
                 item[0]: model.get_predictions_for_rows(item[0], item[1], return_proba=True)
                 for item in st.session_state["row_id_dict"].items()
