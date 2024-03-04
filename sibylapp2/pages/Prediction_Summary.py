@@ -23,7 +23,7 @@ def single_row_plot(predictions):
     fig.update_layout(
         xaxis_title=get_term("Prediction"),
         xaxis_title_font_size=20,
-        yaxis_title="EID",
+        yaxis_title=get_term("Entity"),
         yaxis_title_font_size=20,
         yaxis=dict(
             autorange="reversed",  # This reverses the Y-axis so that it's in ascending order
@@ -35,7 +35,8 @@ def single_row_plot(predictions):
         xaxis=dict(tickfont_size=16),
     )
     fig.update_traces(
-        hovertemplate="EID: %{y}<br>Prediction: %{x}<extra></extra>",  # Customize hover text
+        hovertemplate=get_term("Entity")
+        + ": %{y}<br>Prediction: %{x}<extra></extra>",  # Customize hover text
         marker_color="#b57ae6",
     )
     st.plotly_chart(fig, use_container_width=True)
@@ -53,7 +54,7 @@ def multi_row_plot(predictions, proba_predictions=None):
         df = pd.DataFrame.from_dict(
             {(i, j): [vals[i][j]] for i in vals.keys() for j in vals[i].keys()}
         ).T.reset_index()
-        df.columns = ["EID", config.ROW_LABEL, label]
+        df.columns = [get_term("Entity"), config.ROW_LABEL, label]
         df[config.ROW_LABEL] = pd.to_datetime(
             df[config.ROW_LABEL]
         )  # Convert time to datetime format
@@ -63,13 +64,15 @@ def multi_row_plot(predictions, proba_predictions=None):
             df,
             x=config.ROW_LABEL,
             y=label,
-            color="EID",
+            color=get_term("Entity"),
             markers=True,
             color_discrete_sequence=px.colors.qualitative.G10,
         )
 
         # Update layout for better readability
-        fig.update_layout(xaxis_title=config.ROW_LABEL, legend_title="EID", hovermode="closest")
+        fig.update_layout(
+            xaxis_title=config.ROW_LABEL, legend_title=get_term("Entity"), hovermode="closest"
+        )
         if proba_predictions:
             fig.update_layout(yaxis_range=[0, 1])
         # st.plotly_chart(fig, use_container_width=True)
@@ -98,7 +101,7 @@ def prediction_table(
             proba_predictions = proba_predictions[eid]
         df = pd.DataFrame(predictions.items(), columns=[config.ROW_LABEL, "Prediction"])
     else:
-        df = pd.DataFrame(predictions.items(), columns=["EID", "Prediction"])
+        df = pd.DataFrame(predictions.items(), columns=[get_term("Entity"), "Prediction"])
     bar_col = "Prediction"
     if proba_predictions:
         label = "Probability of %s" % config.pred_format_func(1)
