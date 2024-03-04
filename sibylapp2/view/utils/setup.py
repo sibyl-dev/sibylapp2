@@ -20,7 +20,6 @@ def setup_page(return_row_ids=False):
         if "eids" not in st.session_state:
             st.session_state["eids"] = entities.get_eids(max_entities=config.get_max_entities())
 
-    # st.session_state["eids"] = sorted(st.session_state["eids"])
     if "model_ids" not in st.session_state:
         # sort models in temporal order
         st.session_state["model_ids"] = sort_model_ids(model.get_models())
