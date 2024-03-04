@@ -96,7 +96,7 @@ def get_pos_neg_names():
         return "purple", "yellow"
 
 
-def show_table(df, key, style_function=None, enable_editing=True):
+def show_table(df, key, style_function=None, enable_editing=True, button_size_mod=4):
     """
     Show a table with pagination and editing capabilities.
 
@@ -106,14 +106,17 @@ def show_table(df, key, style_function=None, enable_editing=True):
         style_function (function): Function to apply to the dataframe before showing
         enable_editing (bool): Whether to enable any editing of the table.
             Supports editing features and categories.
+        button_size_mod (int): Manually modify the amount of space taken by buttons.
+            Lower numbers = more space for buttons
 
     Returns:
         None
     """
-    st.session_state["original_table_%s" % key] = df.copy()
-    if ("edited_table_%s" % key) not in st.session_state:
-        st.session_state["edited_table_%s" % key] = df.copy()
-    df = st.session_state["edited_table_%s" % key]
+    if enable_editing:
+        st.session_state["original_table_%s" % key] = df.copy()
+        if ("edited_table_%s" % key) not in st.session_state:
+            st.session_state["edited_table_%s" % key] = df.copy()
+        df = st.session_state["edited_table_%s" % key]
 
     column_config = {}
     for column in df:
@@ -131,7 +134,7 @@ def show_table(df, key, style_function=None, enable_editing=True):
             column_config[column] = st.column_config.Column(disabled=True, label=get_term(column))
 
     table = st.container()
-    _, col1, col2 = st.columns((4, 1, 1))
+    _, col1, col2 = st.columns((button_size_mod, 1, 1))
     with col2:
         page_size_key = "per_page_key"
         if key is not None:
