@@ -4,9 +4,13 @@ from sibylapp2.compute import context, model
 from sibylapp2.config import SUPPORT_PROBABILITY, pred_format_func
 
 
-def show_probability_select_box():
+def show_probability_select_box(sidebar=True):
+    if sidebar:
+        location = st.sidebar
+    else:
+        location = st
     if SUPPORT_PROBABILITY:
-        st.sidebar.checkbox(
+        location.checkbox(
             "Show probability",
             value=st.session_state["display_proba"],
             help="Display prediction in terms of probability",

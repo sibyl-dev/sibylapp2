@@ -7,6 +7,7 @@ from sibylapp2.pages import (
     Compare_Entities,
     Experiment_with_Changes,
     Explore_a_Prediction,
+    Prediction_Summary,
     Settings,
     Similar_Entities,
     Understand_the_Model,
@@ -16,6 +17,7 @@ from sibylapp2.view.utils import setup
 setup.setup_page(return_row_ids=True)
 
 ALL_PAGES = {
+    "Prediction Summary": Prediction_Summary,
     "Explore a Prediction": Explore_a_Prediction,
     "Similar Entities": Similar_Entities,
     "Compare Entities": Compare_Entities,

@@ -114,6 +114,7 @@ def main():
             with st.form("page_selection"):
                 st.write("Select pages to enable:")
                 all_pages = [
+                    "Prediction Summary",
                     "Explore a Prediction",
                     "Similar Entities",
                     "Compare Entities",
