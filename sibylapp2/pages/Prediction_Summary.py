@@ -9,7 +9,6 @@ from streamlit_plotly_events import plotly_events
 from sibylapp2 import config
 from sibylapp2.compute import model
 from sibylapp2.compute.context import get_term
-from sibylapp2.view.utils import display
 from sibylapp2.view.utils.helpers import generate_bars, show_table
 
 
