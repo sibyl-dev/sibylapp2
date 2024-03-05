@@ -96,7 +96,7 @@ def get_pos_neg_names():
         return "purple", "yellow"
 
 
-def show_table(df, key, style_function=None, enable_editing=True, button_size_mod=4):
+def show_table(df, key, style_function=None, enable_editing=False, button_size_mod=4):
     """
     Show a table with pagination and editing capabilities.
 
