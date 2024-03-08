@@ -7,6 +7,12 @@ from sibylapp2.compute.context import get_term
 from sibylapp2.view import feature_contribution
 from sibylapp2.view.utils import display, filtering
 
+from sibylapp2.view import explore_feature
+from sibylapp2.compute import entities, model
+from sibylapp2.compute.features import get_feature_description
+
+from sibylapp2.config import get_dataset_size
+
 import pandas as pd
 
 
@@ -51,6 +57,18 @@ def main():
             key="feature_contributions",
             row_id=st.session_state["row_id"],
         )
-        st.write(selected_features)
-    if tab == "2":
-        st.write(st.session_state["changes_to_table_feature_contributions"])
+        if selected_features:
+            if "dataset_eids" not in st.session_state:
+                st.session_state["dataset_eids"] = entities.get_eids(
+                    max_entities=get_dataset_size()
+                )
+            predictions = model.get_dataset_predictions(st.session_state["model_id"])
+            for selected_feature in selected_features:
+                st.subheader(get_feature_description(selected_feature))
+                explore_feature.view(
+                    st.session_state["dataset_eids"],
+                    predictions,
+                    selected_feature,
+                    st.session_state["model_id"],
+                    one_line=True,
+                )

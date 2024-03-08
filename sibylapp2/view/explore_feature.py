@@ -77,22 +77,27 @@ def generate_feature_plot(eids, predictions, feature, model_id, discrete=False):
     return fig
 
 
-def view(eids, predictions, feature, model_id, discrete=False):
+def view(eids, predictions, feature, model_id, discrete=False, one_line=False):
     col1, col2 = st.columns(2)
     with col1:
         fig1 = generate_feature_plot(eids, predictions, feature, model_id, discrete)
         selected_index = plotly_events(fig1)
-        fig2 = generate_feature_distribution_plot(eids, feature, model_id=model_id)
-        st.plotly_chart(fig2)
+        if not one_line:
+            fig2 = generate_feature_distribution_plot(eids, feature, model_id=model_id)
+            st.plotly_chart(fig2)
     with col2:
-        if len(selected_index) > 0:
-            eid = eids[selected_index[0]["pointIndex"]]
-            st.subheader(
-                "Contributions for {entity} {eid}".format(entity=get_term("Entity"), eid=eid)
-            )
-            feature_contribution.view(eid, model_id, save_space=True, key="explore_feature")
+        if one_line:
+            fig2 = generate_feature_distribution_plot(eids, feature, model_id=model_id)
+            st.plotly_chart(fig2)
         else:
-            st.warning("Select a point in the plot to see all contributions!")
+            if len(selected_index) > 0:
+                eid = eids[selected_index[0]["pointIndex"]]
+                st.subheader(
+                    "Contributions for {entity} {eid}".format(entity=get_term("Entity"), eid=eid)
+                )
+                feature_contribution.view(eid, model_id, save_space=True, key="explore_feature")
+            else:
+                st.warning("Select a point in the plot to see all contributions!")
 
 
 def view_instructions():
