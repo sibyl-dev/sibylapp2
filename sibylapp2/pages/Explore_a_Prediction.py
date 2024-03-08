@@ -7,6 +7,8 @@ from sibylapp2.compute.context import get_term
 from sibylapp2.view import feature_contribution
 from sibylapp2.view.utils import display, filtering
 
+import pandas as pd
+
 
 def main():
     # Sidebar ------------------------------------
@@ -18,17 +20,9 @@ def main():
     # Global options ------------------------------
     filtering.view_filtering()
 
-    tab = stx.tab_bar(
-        data=[
-            stx.TabBarItemData(id=1, title=get_term("Feature Contributions"), description=""),
-        ],
-        default=1,
+    feature_contribution.view(
+        st.session_state["eid"],
+        st.session_state["model_id"],
+        key="feature_contributions",
+        row_id=st.session_state["row_id"],
     )
-
-    if tab == "1":
-        feature_contribution.view(
-            st.session_state["eid"],
-            st.session_state["model_id"],
-            key="feature_contributions",
-            row_id=st.session_state["row_id"],
-        )

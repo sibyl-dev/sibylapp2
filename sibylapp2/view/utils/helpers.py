@@ -123,6 +123,8 @@ def show_table(df, key, style_function=None, button_size_mod=4):
             column_config[column] = st.column_config.TextColumn(
                 disabled=True, label=get_term(column)
             )
+        elif column == "Show feature plot?":
+            column_config[column] = st.column_config.CheckboxColumn(disabled=False)
         else:
             column_config[column] = st.column_config.Column(disabled=True, label=get_term(column))
 
