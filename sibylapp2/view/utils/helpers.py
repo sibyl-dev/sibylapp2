@@ -5,8 +5,7 @@ import math
 import pandas as pd
 import streamlit as st
 
-from sibylapp2.compute import features, importance
-from sibylapp2.compute.api import format_feature_df_for_modify, modify_features
+from sibylapp2.compute import features
 from sibylapp2.compute.context import get_term
 from sibylapp2.config import (
     NEGATIVE_TERM,

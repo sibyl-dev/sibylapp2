@@ -5,13 +5,13 @@ from sibylapp2.config import get_pages_to_show
 from sibylapp2.pages import (
     Change_over_Time,
     Compare_Entities,
+    Edit_Features,
     Experiment_with_Changes,
     Explore_a_Prediction,
     Prediction_Summary,
     Settings,
     Similar_Entities,
     Understand_the_Model,
-    Edit_Features,
 )
 from sibylapp2.view.utils import setup
 

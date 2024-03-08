@@ -1,8 +1,10 @@
+# pylint: disable=invalid-name
+
 import streamlit as st
-from sibylapp2.compute import features
-from sibylapp2.view.utils import filtering
+
+from sibylapp2.compute import context, features, importance
 from sibylapp2.compute.api import format_feature_df_for_modify, modify_features
-from sibylapp2.compute import importance, context
+from sibylapp2.view.utils import filtering
 
 
 def submit_new_category():
