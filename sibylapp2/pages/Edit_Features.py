@@ -7,6 +7,13 @@ from sibylapp2.compute.api import format_feature_df_for_modify, modify_features
 from sibylapp2.view.utils import filtering
 
 
+def view_instructions():
+    with st.sidebar.expander("How to Use"):
+        st.write(
+            "On this page you can add and edit feature categories, and modify feature descriptions"
+        )
+
+
 def submit_new_category():
     if st.session_state["new_category"] in st.session_state["categories"]:
         st.toast("Category already exists", icon="⚠️")
@@ -29,6 +36,8 @@ def apply_changes():
 
 
 def main():
+    view_instructions()
+
     if "changes_made" not in st.session_state:
         st.session_state["changes_made"] = False
     filtering.view_filtering()
