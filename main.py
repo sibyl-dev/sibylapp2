@@ -11,6 +11,7 @@ from sibylapp2.pages import (
     Settings,
     Similar_Entities,
     Understand_the_Model,
+    Edit_Features,
 )
 from sibylapp2.view.utils import setup
 
@@ -24,6 +25,7 @@ ALL_PAGES = {
     "Experiment with Changes": Experiment_with_Changes,
     "Change over Time": Change_over_Time,
     "Understand the Model": Understand_the_Model,
+    "Edit Features": Edit_Features,
     "Settings": Settings,
 }
 

@@ -23,6 +23,7 @@ PAGES_TO_SHOW: # Set to a list of pages or "all" to show all pages
 - Similar Entities
 - Experiment with Changes
 - Understand the Model
+- Edit Features
 - Settings
 ALLOW_PAGE_SELECTION:  # If true, allow user to select which pages to show (requires settings page)
 

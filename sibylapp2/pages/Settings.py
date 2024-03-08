@@ -121,6 +121,7 @@ def main():
                     "Experiment with Changes",
                     "Change over Time",
                     "Understand the Model",
+                    "Edit Features",
                     "Settings",
                 ]
                 show_pages_bools = []
