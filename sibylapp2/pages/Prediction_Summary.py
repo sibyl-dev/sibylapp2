@@ -13,7 +13,6 @@ from sibylapp2.view.utils.helpers import generate_bars, show_table
 
 
 def single_row_plot(predictions):
-    # predictions = dict(sorted(predictions.items(), key=lambda item: item[1]))
     fig = px.bar(
         x=list(predictions.values()),
         y=list(predictions.keys()),
@@ -74,7 +73,7 @@ def multi_row_plot(predictions, proba_predictions=None):
         )
         if proba_predictions:
             fig.update_layout(yaxis_range=[0, 1])
-        # st.plotly_chart(fig, use_container_width=True)
+
         selected = plotly_events(fig)
     with col2:
         if len(selected) > 0:
@@ -112,7 +111,7 @@ def prediction_table(
         button_size_mod = 2
     else:
         button_size_mod = 4
-    show_table(df, key="prediction_table", enable_editing=False, button_size_mod=button_size_mod)
+    show_table(df, key="prediction_table", button_size_mod=button_size_mod)
 
 
 def pred_prob_to_raw_prob(pred_prob, pred):
