@@ -154,7 +154,7 @@ def show_table(df, key, style_function=None, button_size_mod=4):
     if style_function is not None:
         df = style_function(df)
 
-    table.data_editor(
+    return table.data_editor(
         df,
         hide_index=True,
         use_container_width=True,
