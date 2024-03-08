@@ -18,7 +18,6 @@ def generate_feature_distribution_plot(eids, feature, model_id):
     if pd.api.types.is_numeric_dtype(pd.to_numeric(data, errors="ignore")):
         trace1 = go.Box(x=data, boxpoints="all", name="", marker_color="rgb(84, 31, 63)")
         fig = go.Figure(data=[trace1])
-        fig.update_layout(title="Distributions for '%s'" % feature)
         return fig
     else:
         fig = px.pie(

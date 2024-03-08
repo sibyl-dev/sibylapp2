@@ -1,19 +1,12 @@
 # pylint: disable=invalid-name
 
-import extra_streamlit_components as stx
 import streamlit as st
 
-from sibylapp2.compute.context import get_term
-from sibylapp2.view import feature_contribution
-from sibylapp2.view.utils import display, filtering
-
-from sibylapp2.view import explore_feature
+from sibylapp2 import config
 from sibylapp2.compute import entities, model
 from sibylapp2.compute.features import get_feature_description
-
-from sibylapp2.config import get_dataset_size
-
-import pandas as pd
+from sibylapp2.view import explore_feature, feature_contribution
+from sibylapp2.view.utils import display, filtering
 
 
 def get_selected_features(feature_names):
@@ -33,42 +26,32 @@ def main():
     filtering.view_selection()
     feature_contribution.view_instructions()
 
-    tab = stx.tab_bar(
-        data=[
-            stx.TabBarItemData(
-                id=1, title=get_term(f"{get_term('Feature')} Contributions"), description=""
-            ),
-            stx.TabBarItemData(
-                id=2,
-                title="Explore Selected %s" % get_term("Feature", plural=True),
-                description="",
-            ),
-        ],
-        default=1,
-    )
-
     # Global options ------------------------------
-    if tab == "1":
-        filtering.view_filtering()
+    filtering.view_filtering()
 
-        selected_features = feature_contribution.view(
-            st.session_state["eid"],
-            st.session_state["model_id"],
-            key="feature_contributions",
-            row_id=st.session_state["row_id"],
-        )
-        if selected_features:
-            if "dataset_eids" not in st.session_state:
-                st.session_state["dataset_eids"] = entities.get_eids(
-                    max_entities=get_dataset_size()
-                )
-            predictions = model.get_dataset_predictions(st.session_state["model_id"])
-            for selected_feature in selected_features:
-                st.subheader(get_feature_description(selected_feature))
-                explore_feature.view(
-                    st.session_state["dataset_eids"],
-                    predictions,
-                    selected_feature,
-                    st.session_state["model_id"],
-                    one_line=True,
-                )
+    selected_features = feature_contribution.view(
+        st.session_state["eid"],
+        st.session_state["model_id"],
+        key="feature_contributions",
+        row_id=st.session_state["row_id"],
+    )
+    if selected_features:
+        if "dataset_eids" not in st.session_state:
+            st.session_state["dataset_eids"] = entities.get_eids(
+                max_entities=config.get_dataset_size()
+            )
+        predictions = model.get_dataset_predictions(st.session_state["model_id"])
+        for selected_feature in selected_features:
+            discrete = config.PREDICTION_TYPE in (
+                config.PredType.BOOLEAN,
+                config.PredType.CATEGORICAL,
+            )
+            st.subheader(get_feature_description(selected_feature))
+            explore_feature.view(
+                st.session_state["dataset_eids"],
+                predictions,
+                selected_feature,
+                st.session_state["model_id"],
+                one_line=True,
+                discrete=discrete,
+            )
