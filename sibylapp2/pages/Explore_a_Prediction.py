@@ -34,6 +34,7 @@ def main():
         st.session_state["model_id"],
         key="feature_contributions",
         row_id=st.session_state["row_id"],
+        include_feature_plot=True,
     )
     if selected_features:
         if "dataset_eids" not in st.session_state:
