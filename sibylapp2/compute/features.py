@@ -18,6 +18,12 @@ def get_features(include_type=False, include_values=False) -> pd.DataFrame:
 
 
 @st.cache_data(show_spinner="Fetching data...")
+def get_feature_description(feature: str) -> str:
+    feature_description = get_features().loc[feature, "Feature"]
+    return feature_description
+
+
+@st.cache_data(show_spinner="Fetching data...")
 def get_entity(eid: str, row_id: str | None = None) -> pd.Series:
     feature_values = api.fetch_entity(eid, row_id)
     return feature_values

@@ -198,10 +198,12 @@ def process_search(to_show):
 
 def process_search_on_features(features):
     if st.session_state["search_term"] is not None:
-        features = features.index[
-            features.index.str.contains(st.session_state["search_term"], case=False, na=False)
+        features = features[
+            features["Feature"].str.contains(st.session_state["search_term"], case=False, na=False)
         ]
-    return features
+    if len(st.session_state["filters"]) > 0:
+        features = features[features["Category"].isin(st.session_state["filters"])]
+    return features.index
 
 
 def process_filter(to_show):
