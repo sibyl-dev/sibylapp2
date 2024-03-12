@@ -115,9 +115,7 @@ def fetch_modified_prediction(
     return prediction
 
 
-def fetch_predictions(
-    eids, row_ids=None, model_id=fetch_model_id(), return_proba=False
-) -> dict[str, list[int | float]]:
+def fetch_predictions(eids, row_ids=None, model_id=fetch_model_id(), return_proba=False):
     json = {
         "eids": eids,
         "model_id": model_id,
@@ -181,7 +179,7 @@ def modify_features(new_features):
     api_put("features/", json={"features": new_features})
 
 
-def fetch_entity(eid, row_id=None) -> pd.Series:
+def fetch_entity(eid, row_id=None):
     url = f"entities/{eid}"
     if row_id is not None:
         url += f"/?row_id={row_id}"

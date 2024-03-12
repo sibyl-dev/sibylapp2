@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-import pandas as pd
 import streamlit as st
 
 from sibylapp2.compute import api
 
 
 @st.cache_data(show_spinner="Fetching data...")
-def get_features(include_type=False, include_values=False) -> pd.DataFrame:
+def get_features(include_type=False, include_values=False):
     columns = ["Category", "Feature"]
     if include_type:
         columns.append("Type")
@@ -18,13 +17,13 @@ def get_features(include_type=False, include_values=False) -> pd.DataFrame:
 
 
 @st.cache_data(show_spinner="Fetching data...")
-def get_feature_description(feature: str) -> str:
+def get_feature_description(feature: str):
     feature_description = get_features().loc[feature, "Feature"]
     return feature_description
 
 
 @st.cache_data(show_spinner="Fetching data...")
-def get_entity(eid: str, row_id: str | None = None) -> pd.Series:
+def get_entity(eid: str, row_id: str | None = None):
     feature_values = api.fetch_entity(eid, row_id)
     return feature_values
 
