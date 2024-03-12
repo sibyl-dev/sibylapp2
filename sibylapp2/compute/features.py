@@ -23,7 +23,7 @@ def get_feature_description(feature: str):
 
 
 @st.cache_data(show_spinner="Fetching data...")
-def get_entity(eid: str, row_id: str | None = None):
+def get_entity(eid, row_id):
     feature_values = api.fetch_entity(eid, row_id)
     return feature_values
 

@@ -52,10 +52,10 @@ def show_filter_options(options):
 
 
 def show_text_input_side_by_side(
-    label: str,
-    options: list | None = None,
-    default_input: str | None = None,
-    numeric: bool = False,
+    label,
+    options,
+    default_input,
+    numeric,
     **input_params,
 ):
     col1, col2 = st.columns([2, 2])
