@@ -12,7 +12,11 @@ from sibylapp2.view.utils.formatting import format_two_contributions_to_view
 from sibylapp2.view.utils.helpers import show_text_input_side_by_side
 
 
-def view_feature_boxes(eid: str, use_row_id, eid_for_rows):
+def view_feature_boxes(
+    eid: str,
+    use_row_id: bool = False,
+    eid_for_rows: str | None = None,
+):
     if "options_dict" not in st.session_state:
         st.session_state["categorical_values_dict"] = features.get_categorical_values()
     if "changes" not in st.session_state:

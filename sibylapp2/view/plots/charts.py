@@ -5,7 +5,10 @@ from sibylapp2.config import NEGATIVE_TERM, POSITIVE_TERM
 from sibylapp2.view.utils.helpers import get_pos_neg_names
 
 
-def plot_temporal_line_charts(df, fig):
+def plot_temporal_line_charts(
+    df: pd.DataFrame,
+    fig: go.Figure | None = None,
+):
     """
     Transform dataframe from wide form to long form for streamlit visualizations.
 
@@ -44,7 +47,10 @@ def plot_temporal_line_charts(df, fig):
     return fig
 
 
-def plot_scatter_chart(df, fig):
+def plot_scatter_chart(
+    df: pd.DataFrame,
+    fig: go.Figure | None = None,
+):
     """
     Plot scatter plot for the given dataframe. The dataframe must have the following columns:
         - time
