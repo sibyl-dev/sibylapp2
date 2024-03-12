@@ -57,7 +57,7 @@ def show_text_input_side_by_side(
     default_input: str | None = None,
     numeric: bool = False,
     **input_params,
-) -> int | float | str:
+):
     col1, col2 = st.columns([2, 2])
     col1.markdown(label)
 
