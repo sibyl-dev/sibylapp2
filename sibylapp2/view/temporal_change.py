@@ -6,6 +6,7 @@ from sibylapp2.compute.context import get_term
 from sibylapp2.config import MAX_FEATURES, TIME_UNIT, pred_format_func
 from sibylapp2.view.plots import charts
 from sibylapp2.view.utils import filtering, helpers
+from plotly.subplots import make_subplots
 
 
 def filter_contributions(to_show, sort_by, lead=0):
@@ -49,6 +50,7 @@ def get_contributions_variation(
 
 
 def plot_prediction_variation(
+    fig,
     eid,
     row_id,
     model_ids,
@@ -75,22 +77,22 @@ def plot_prediction_variation(
             if not prediction:
                 prediction_value = 1 - prediction_value
 
-            predictions.append(pred_format_func(prediction))
+            predictions.append(prediction)
         else:
-            predictions.append(pred_format_func(prediction_value))
+            predictions.append(prediction_value)
 
         timeindex.append(int(model_id[:-1]))
         probs.append(prediction_value)
 
-    df = pd.DataFrame({"time": timeindex, "value": probs, "labels": predictions})
+    df = pd.DataFrame({"time": timeindex, "value": probs, "label": predictions})
     # output_label = get_term("Prediction")
     # if st.session_state["display_proba"]:
     #     output_label = f"{POSITIVE_TERM} probability"
-    fig = charts.plot_scatter_chart(df)
+    fig = charts.plot_scatter_chart(df, fig)
     return fig
 
 
-def plot_contributions_variation(eid, row_id, model_ids, figure=None):
+def plot_contributions_variation(eid, row_id, model_ids, fig=None):
     """
     This function displays the feature contributions over time (different models).
     """
@@ -101,7 +103,7 @@ def plot_contributions_variation(eid, row_id, model_ids, figure=None):
     wide_df = get_contributions_variation(eid, row_id, model_ids)
     wide_df = filter_contributions(wide_df, sort_by)
 
-    fig = charts.plot_temporal_line_charts(wide_df, figure)
+    fig = charts.plot_temporal_line_charts(wide_df, fig, secondary_y=True)
     return fig
 
 
@@ -110,8 +112,9 @@ def view(eid, row_id, model_ids):
     `row_ids` and `eid_for_rows` are only used when `use_row_ids` == True.
     `eid` and `eid_comp` are used as row_id when `use_row_ids` == True
     """
-    figure = plot_prediction_variation(eid, row_id, model_ids)
-    contribution_figure = plot_contributions_variation(eid, row_id, model_ids, figure)
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
+    fig = plot_prediction_variation(fig, eid, row_id, model_ids)
+    contribution_figure = plot_contributions_variation(eid, row_id, model_ids, fig)
     # combine two figures
     final_figure = charts.update_figure(
         contribution_figure,
