@@ -10,13 +10,24 @@ from plotly.subplots import make_subplots
 
 
 def filter_contributions(to_show, sort_by, lead=0):
+    sort_columns = to_show.drop(columns="Feature").columns
     # filter by the contribution values at 0 lead
     if sort_by == "Absolute":
-        to_show = to_show.reindex(to_show[lead].abs().sort_values(ascending=False).index, axis=0)
+        to_show["Average_Abs"] = to_show[sort_columns].abs().mean(axis=1)
+        to_show = to_show.sort_values(by="Average_Abs", axis=0, ascending=False)
+        to_show = to_show.drop(columns="Average_Abs")
     if sort_by == f"Most {get_term('Positive')}":
+        to_show["Average"] = to_show[sort_columns].mean(axis=1)
         to_show = to_show.sort_values(by=lead, axis=0, ascending=False)
+        to_show = to_show.drop(columns="Average")
     if sort_by == f"Most {get_term('Negative')}":
-        to_show = to_show.sort_values(by=lead, axis=0)
+        to_show["Average"] = to_show[sort_columns].mean(axis=1)
+        to_show = to_show.sort_values(by=lead, axis=0, ascending=True)
+        to_show = to_show.drop(columns="Average")
+    if sort_by == "Greatest Change":
+        to_show["Range"] = to_show[sort_columns].max(axis=1) - to_show[sort_columns].min(axis=1)
+        to_show = to_show.sort_values(by="Range", axis=0, ascending=False)
+        to_show = to_show.drop(columns="Range")
     to_show = filtering.process_options(to_show)
     return to_show.iloc[0:MAX_FEATURES, :]
 
@@ -97,9 +108,12 @@ def plot_contributions_variation(eid, row_id, model_ids, fig=None):
     This function displays the feature contributions over time (different models).
     """
     filtering.view_filtering()
-    sort_by = helpers.show_filter_options(
-        ["Absolute", f"Most {get_term('Positive')}", f"Most {get_term('Negative')}"]
-    )
+    sort_by = helpers.show_filter_options([
+        "Absolute",
+        f"Most {get_term('Positive')}",
+        f"Most {get_term('Negative')}",
+        "Greatest Change",
+    ])
     wide_df = get_contributions_variation(eid, row_id, model_ids)
     wide_df = filter_contributions(wide_df, sort_by)
 
