@@ -1,12 +1,12 @@
 import pandas as pd
 import streamlit as st
+from plotly.subplots import make_subplots
 
-from sibylapp2.compute import contributions, model, features
+from sibylapp2.compute import contributions, features, model
 from sibylapp2.compute.context import get_term
-from sibylapp2.config import TIME_UNIT, pred_format_func
+from sibylapp2.config import TIME_UNIT
 from sibylapp2.view.plots import charts
 from sibylapp2.view.utils import filtering, helpers
-from plotly.subplots import make_subplots
 
 
 def filter_contributions(to_show, sort_by, num_features=8):

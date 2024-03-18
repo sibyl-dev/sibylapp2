@@ -1,11 +1,10 @@
+import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
-
-from sibylapp2.config import pred_format_func, PREDICTION_TYPE, get_color_scheme, PredType
-from sibylapp2.compute.context import get_term
-import numpy as np
-
 import streamlit as st
+
+from sibylapp2.compute.context import get_term
+from sibylapp2.config import PREDICTION_TYPE, PredType, get_color_scheme, pred_format_func
 
 
 def plot_temporal_line_charts(
@@ -60,6 +59,7 @@ def plot_temporal_line_charts(
                     "<b>%{customdata[0]}</b><br>Lead time: %{x}<br>Contribution:"
                     " %{y}<br>Value:%{customdata[1]}<extra></extra>"
                 ),
+                legend="legend2",
             ),
             secondary_y=secondary_y,
         )
