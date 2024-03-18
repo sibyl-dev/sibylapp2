@@ -96,10 +96,11 @@ def plot_prediction_variation(
         probs.append(prediction_value)
 
     df = pd.DataFrame({"time": timeindex, "value": probs, "label": predictions})
-    # output_label = get_term("Prediction")
-    # if st.session_state["display_proba"]:
-    #     output_label = f"{POSITIVE_TERM} probability"
-    fig = charts.plot_scatter_chart(df, fig)
+
+    if st.session_state["display_proba"]:
+        fig = charts.plot_scatter_chart(df, fig, yaxis_range=[0, 1])
+    else:
+        fig = charts.plot_scatter_chart(df, fig)
     return fig
 
 

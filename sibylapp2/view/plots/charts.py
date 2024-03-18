@@ -37,6 +37,7 @@ def plot_temporal_line_charts(
         color_discrete_sequence=px.colors.sequential.gray,
     ).data
     for trace in traces:
+        trace.legend = "legend2"
         fig.add_trace(trace, secondary_y=secondary_y)
     fig.add_hline(y=0, secondary_y=secondary_y, line_color="purple", line_dash="dash")
     fig.update_layout(
@@ -50,7 +51,7 @@ def plot_temporal_line_charts(
     return fig
 
 
-def plot_scatter_chart(df, fig=None):
+def plot_scatter_chart(df, fig=None, yaxis_range=None):
     """
     Plot scatter plot for the given dataframe. The dataframe must have the following columns:
         - time
@@ -92,7 +93,7 @@ def plot_scatter_chart(df, fig=None):
                 color = pos_color
             else:
                 color = neg_color
-            name = f"{get_term('Prediction')}: {pred_format_func(label)}"
+            name = f"{pred_format_func(label)}"
             if label in shown_legends:
                 showlegend = False
             else:
@@ -109,6 +110,7 @@ def plot_scatter_chart(df, fig=None):
                 fillcolor=color,
                 mode="none",
                 showlegend=showlegend,
+                legend="legend1",
             ),
         )
 
@@ -119,6 +121,8 @@ def plot_scatter_chart(df, fig=None):
             dtick=1,
         ),
     )
+    if yaxis_range is not None:
+        fig.update_yaxes(range=yaxis_range, secondary_y=False)
 
     return fig
 
@@ -159,6 +163,15 @@ def update_figure(
             anchor="x",
             # range=[y_min - y_margin, y_max + y_margin],
         ),
-        legend=dict(x=0, y=-0.2, traceorder="normal", orientation="h"),
+        legend1=dict(
+            x=0, y=-0.2, traceorder="normal", orientation="h", title=get_term("Prediction")
+        ),
+        legend2=dict(
+            x=0,
+            y=-0.3,
+            traceorder="normal",
+            orientation="h",
+            title=get_term("Feature", plural=True),
+        ),
     )
     return fig
