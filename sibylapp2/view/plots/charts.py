@@ -28,20 +28,17 @@ def plot_temporal_line_charts(
     )
     if fig is None:
         fig = go.Figure()
-
-    fig.add_traces(
-        list(
-            px.line(
-                df,
-                x="time",
-                y="contribution",
-                color="feature",
-                markers=True,
-                color_discrete_sequence=px.colors.sequential.gray,
-            ).data
-        )
-    )
-
+    traces = px.line(
+        df,
+        x="time",
+        y="contribution",
+        color="feature",
+        markers=True,
+        color_discrete_sequence=px.colors.sequential.gray,
+    ).data
+    for trace in traces:
+        fig.add_trace(trace, secondary_y=secondary_y)
+    fig.add_hline(y=0, secondary_y=secondary_y, line_color="purple", line_dash="dash")
     fig.update_layout(
         xaxis=dict(
             tickmode="array",
@@ -157,9 +154,9 @@ def update_figure(
             title=yaxis2_label,
             tickfont=dict(size=20),
             titlefont=dict(size=20),
-            # overlaying="y",
-            # side="right",
-            # anchor="x",
+            overlaying="y",
+            side="right",
+            anchor="x",
             # range=[y_min - y_margin, y_max + y_margin],
         ),
         legend=dict(x=0, y=-0.2, traceorder="normal", orientation="h"),
