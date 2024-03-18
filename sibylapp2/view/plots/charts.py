@@ -1,15 +1,16 @@
 import pandas as pd
 import plotly.graph_objects as go
-import plotly.express as px
 
-from sibylapp2.config import NEGATIVE_TERM, POSITIVE_TERM
-from sibylapp2.view.utils.helpers import get_pos_neg_names
 from sibylapp2.config import pred_format_func, PREDICTION_TYPE, get_color_scheme, PredType
 from sibylapp2.compute.context import get_term
+import numpy as np
+
+import streamlit as st
 
 
 def plot_temporal_line_charts(
     df,
+    value_df,
     fig=None,
     secondary_y=False,
 ):
@@ -18,6 +19,15 @@ def plot_temporal_line_charts(
 
     Plot line charts for data.
     """
+    pos_color = (
+        "rgba(194, 17, 17, 1)" if get_color_scheme() == "Reversed" else "rgba(24, 74, 201, 1)"
+    )
+    neg_color = (
+        "rgba(24, 74, 201, 1)" if get_color_scheme() == "Reversed" else "rgba(194, 17, 17, 1)"
+    )
+
+    if "Category" in df.columns:
+        df = df.drop(columns="Category")
     df = df.set_index("Feature").transpose().reset_index(names=["time"])
 
     df = df.melt(
@@ -26,19 +36,45 @@ def plot_temporal_line_charts(
         var_name="feature",
         value_name="contribution",
     )
+
     if fig is None:
         fig = go.Figure()
-    traces = px.line(
-        df,
-        x="time",
-        y="contribution",
-        color="feature",
-        markers=True,
-        color_discrete_sequence=px.colors.sequential.gray,
-    ).data
-    for trace in traces:
-        trace.legend = "legend2"
-        fig.add_trace(trace, secondary_y=secondary_y)
+
+    for feature in df["feature"].unique():
+        df_feature = df[df["feature"] == feature]
+        values = value_df.loc[feature]
+        if df_feature["contribution"].mean() > 0:
+            color = pos_color
+        else:
+            color = neg_color
+        customdata = np.stack((df_feature["feature"], values), axis=-1)
+        fig.add_trace(
+            go.Scatter(
+                x=df_feature["time"],
+                y=df_feature["contribution"],
+                mode="lines+markers",
+                name=feature,
+                customdata=customdata,
+                line=dict(color=color),
+                hovertemplate=(
+                    "<b>%{customdata[0]}</b><br>Lead time: %{x}<br>Contribution:"
+                    " %{y}<br>Value:%{customdata[1]}<extra></extra>"
+                ),
+            ),
+            secondary_y=secondary_y,
+        )
+
+    # traces = px.line(
+    #     df,
+    #     x="time",
+    #     y="contribution",
+    #     color="feature",
+    #     markers=True,
+    #     color_discrete_sequence=px.colors.sequential.gray,
+    # ).data
+    # for trace in traces:
+    #     trace.legend = "legend2"
+    #     fig.add_trace(trace, secondary_y=secondary_y)
     fig.add_hline(y=0, secondary_y=secondary_y, line_color="purple", line_dash="dash")
     fig.update_layout(
         xaxis=dict(
@@ -131,9 +167,6 @@ def update_figure(
     fig: go.Figure,
     width=800,
     height=800,
-    y_min=-1.0,
-    y_max=1.0,
-    y_margin=0.1,
     xaxis_label="",
     yaxis_label="",
     yaxis2_label="",
@@ -152,7 +185,6 @@ def update_figure(
             tickfont=dict(size=20),
             titlefont=dict(size=20),
             anchor="x",
-            # range=[y_min - y_margin, y_max + y_margin],
         ),
         yaxis2=dict(
             title=yaxis2_label,
@@ -161,7 +193,6 @@ def update_figure(
             overlaying="y",
             side="right",
             anchor="x",
-            # range=[y_min - y_margin, y_max + y_margin],
         ),
         legend1=dict(
             x=0, y=-0.2, traceorder="normal", orientation="h", title=get_term("Prediction")

@@ -45,20 +45,26 @@ def get_contributions_variation(
     """
     # store model predictions in the same order of the given models
     contributions_list = []
+    values_list = []
     feature_name = None
     for model_id in model_ids:
-        contribution_df, _ = contributions.get_contributions_for_rows(
+        contribution_df, value_df = contributions.get_contributions_for_rows(
             eid, [row_id], model_id=model_id
         )
         if feature_name is None:
             feature_name = contribution_df.columns
 
         contributions_list.append(contribution_df.iloc[0].rename(int(model_id[:-1])))
+        values_list.append(value_df.iloc[0].rename(int(model_id[:-1])))
     contributions_table = pd.concat(contributions_list, axis=1)
+    values_table = pd.concat(values_list, axis=1)
     feature_table = features.get_features()
     contributions_table = pd.concat([feature_table, contributions_table], axis=1)
+    values_table = pd.concat([feature_table["Feature"], values_table], axis=1).set_index(
+        "Feature", drop=True
+    )
 
-    return contributions_table
+    return contributions_table, values_table
 
 
 def plot_prediction_variation(
@@ -116,10 +122,10 @@ def plot_contributions_variation(eid, row_id, model_ids, fig=None):
         f"Most {get_term('Negative')}",
         "Greatest Change",
     ])
-    wide_df = get_contributions_variation(eid, row_id, model_ids)
+    wide_df, value_df = get_contributions_variation(eid, row_id, model_ids)
     wide_df = filter_contributions(wide_df, sort_by, 10)
 
-    fig = charts.plot_temporal_line_charts(wide_df, fig, secondary_y=True)
+    fig = charts.plot_temporal_line_charts(wide_df, value_df, fig, secondary_y=True)
     return fig
 
 
