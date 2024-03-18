@@ -3,13 +3,13 @@ import streamlit as st
 
 from sibylapp2.compute import contributions, model
 from sibylapp2.compute.context import get_term
-from sibylapp2.config import MAX_FEATURES, TIME_UNIT, pred_format_func
+from sibylapp2.config import TIME_UNIT, pred_format_func
 from sibylapp2.view.plots import charts
 from sibylapp2.view.utils import filtering, helpers
 from plotly.subplots import make_subplots
 
 
-def filter_contributions(to_show, sort_by, lead=0):
+def filter_contributions(to_show, sort_by, num_features=8):
     sort_columns = to_show.drop(columns="Feature").columns
     # filter by the contribution values at 0 lead
     if sort_by == "Absolute":
@@ -18,18 +18,18 @@ def filter_contributions(to_show, sort_by, lead=0):
         to_show = to_show.drop(columns="Average_Abs")
     if sort_by == f"Most {get_term('Positive')}":
         to_show["Average"] = to_show[sort_columns].mean(axis=1)
-        to_show = to_show.sort_values(by=lead, axis=0, ascending=False)
+        to_show = to_show.sort_values(by="Average", axis=0, ascending=False)
         to_show = to_show.drop(columns="Average")
     if sort_by == f"Most {get_term('Negative')}":
         to_show["Average"] = to_show[sort_columns].mean(axis=1)
-        to_show = to_show.sort_values(by=lead, axis=0, ascending=True)
+        to_show = to_show.sort_values(by="Average", axis=0, ascending=True)
         to_show = to_show.drop(columns="Average")
     if sort_by == "Greatest Change":
         to_show["Range"] = to_show[sort_columns].max(axis=1) - to_show[sort_columns].min(axis=1)
         to_show = to_show.sort_values(by="Range", axis=0, ascending=False)
         to_show = to_show.drop(columns="Range")
     to_show = filtering.process_options(to_show)
-    return to_show.iloc[0:MAX_FEATURES, :]
+    return to_show.iloc[0:num_features, :]
 
 
 def get_contributions_variation(
@@ -116,7 +116,7 @@ def plot_contributions_variation(eid, row_id, model_ids, fig=None):
         "Greatest Change",
     ])
     wide_df = get_contributions_variation(eid, row_id, model_ids)
-    wide_df = filter_contributions(wide_df, sort_by)
+    wide_df = filter_contributions(wide_df, sort_by, 10)
 
     fig = charts.plot_temporal_line_charts(wide_df, fig, secondary_y=True)
     return fig

@@ -46,7 +46,7 @@ def plot_temporal_line_charts(
             tickvals=df["time"],
             dtick=1,
         ),
-        hoverdistance=20,
+        hoverdistance=50,
     )
     return fig
 
