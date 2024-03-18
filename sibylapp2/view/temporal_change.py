@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 
-from sibylapp2.compute import contributions, model
+from sibylapp2.compute import contributions, model, features
 from sibylapp2.compute.context import get_term
 from sibylapp2.config import TIME_UNIT, pred_format_func
 from sibylapp2.view.plots import charts
@@ -10,7 +10,7 @@ from plotly.subplots import make_subplots
 
 
 def filter_contributions(to_show, sort_by, num_features=8):
-    sort_columns = to_show.drop(columns="Feature").columns
+    sort_columns = to_show.drop(columns=["Feature", "Category"]).columns
     # filter by the contribution values at 0 lead
     if sort_by == "Absolute":
         to_show["Average_Abs"] = to_show[sort_columns].abs().mean(axis=1)
@@ -55,7 +55,8 @@ def get_contributions_variation(
 
         contributions_list.append(contribution_df.iloc[0].rename(int(model_id[:-1])))
     contributions_table = pd.concat(contributions_list, axis=1)
-    contributions_table["Feature"] = feature_name
+    feature_table = features.get_features()
+    contributions_table = pd.concat([feature_table, contributions_table], axis=1)
 
     return contributions_table
 
