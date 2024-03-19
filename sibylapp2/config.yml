@@ -10,7 +10,7 @@ LOAD_UPFRONT: true # If true, run heavy computations on initial load, else greed
 
 # APPLICATION-SPECIFIC CONFIGURATIONS (overrides API context) =====================================
 FLIP_COLORS: false # deprecated (use COLOR_SCHEME) keeping for api support
-COLOR_SCHEME: Reversed # Standard: positive is blue. Reversed: positive is red. Neutral: Neither
+COLOR_SCHEME: Standard # Standard: positive is blue. Reversed: positive is red. Neutral: Neither
 PREDICTION_TYPE: # One of "numeric", "boolean", "categorical"
 POSITIVE_TERM: # Term to use for a True prediction for boolean models
 NEGATIVE_TERM: # Term to use for a False prediction for boolean models
