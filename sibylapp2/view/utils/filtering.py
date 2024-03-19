@@ -158,11 +158,7 @@ def view_filtering(include_show_more=False):
     else:
         st.session_state["show_more"] = True
 
-    expanded = bool(
-        ("search_term" in st.session_state and len(st.session_state["search_term"]) > 0)
-        or ("filters" in st.session_state and len(st.session_state["filters"]) > 0)
-    )
-    exp = st.expander("Search and filter", expanded=expanded)
+    exp = st.expander("Search and filter", expanded=True)
 
     with exp:
         st.text_input(
