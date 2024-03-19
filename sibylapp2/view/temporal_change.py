@@ -105,9 +105,9 @@ def plot_prediction_variation(
     df = pd.DataFrame({"time": timeindex, "value": probs, "label": predictions})
 
     if st.session_state["display_proba"]:
-        fig = charts.plot_scatter_chart(df, fig, yaxis_range=[0, 1])
+        fig = charts.plot_prediction_regions(df, fig, yaxis_range=[0, 1])
     else:
-        fig = charts.plot_scatter_chart(df, fig)
+        fig = charts.plot_prediction_regions(df, fig)
     return fig
 
 

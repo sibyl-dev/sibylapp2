@@ -63,18 +63,6 @@ def plot_temporal_line_charts(
             ),
             secondary_y=secondary_y,
         )
-
-    # traces = px.line(
-    #     df,
-    #     x="time",
-    #     y="contribution",
-    #     color="feature",
-    #     markers=True,
-    #     color_discrete_sequence=px.colors.sequential.gray,
-    # ).data
-    # for trace in traces:
-    #     trace.legend = "legend2"
-    #     fig.add_trace(trace, secondary_y=secondary_y)
     fig.add_hline(y=0, secondary_y=secondary_y, line_color="purple", line_dash="dash")
     fig.update_layout(
         xaxis=dict(
@@ -87,9 +75,9 @@ def plot_temporal_line_charts(
     return fig
 
 
-def plot_scatter_chart(df, fig=None, yaxis_range=None):
+def plot_prediction_regions(df, fig=None, yaxis_range=None):
     """
-    Plot scatter plot for the given dataframe. The dataframe must have the following columns:
+    Plot predictions regions for the given dataframe. The dataframe must have these columns:
         - time
         - value
         - labels
@@ -107,47 +95,28 @@ def plot_scatter_chart(df, fig=None, yaxis_range=None):
     if fig is None:
         fig = go.Figure()
 
-    change_indices = df[df["label"] != df["label"].shift(1)].index.tolist()
-    change_indices.append(len(df))
-    shown_legends = []
-    for i in range(len(change_indices) - 1):
-        start_idx = change_indices[i]
-        end_idx = change_indices[i + 1]
-        section_df = df[start_idx:end_idx]
-        if i < len(change_indices) - 2:
-            next_section_start = df.iloc[[end_idx]]
-            section_df = pd.concat([section_df, next_section_start])
-
-        label = section_df["label"].iloc[0]
+    for label in df["label"].unique():
+        section_df = df[df["label"] == label]
 
         if PREDICTION_TYPE != PredType.BOOLEAN:
             color = "rgba(183, 149, 230, .5)"
             name = get_term("Prediction")
-            showlegend = i == 0
         else:
             if label > 0.5:
                 color = pos_color
             else:
                 color = neg_color
             name = f"{pred_format_func(label)}"
-            if label in shown_legends:
-                showlegend = False
-            else:
-                showlegend = True
-                shown_legends.append(label)
-        # color = "blue" if label == "normal" else "red"
 
         fig.add_trace(
-            go.Scatter(
+            go.Bar(
                 x=section_df["time"],
                 y=section_df["value"],
                 name=name,
-                fill="tozeroy",
-                fillcolor=color,
-                mode="none",
-                showlegend=showlegend,
+                showlegend=True,
                 legend="legend1",
-            ),
+                marker_color=color,
+            )
         )
 
     fig.update_layout(
@@ -156,6 +125,7 @@ def plot_scatter_chart(df, fig=None, yaxis_range=None):
             tickvals=df["time"],
             dtick=1,
         ),
+        bargap=0.03,
     )
     if yaxis_range is not None:
         fig.update_yaxes(range=yaxis_range, secondary_y=False)
