@@ -18,14 +18,6 @@ PRED_FORMAT_STRING: # fstring for formatting numeric model outputs
 OVERRIDE_PRED_FORMAT: # If True, use "config.manual_pred_format_func" to format preds, ignoring previous 3 configs
 SUPPORT_PROBABILITY: # Only set this to True when model supports `predict_proba`
 PAGES_TO_SHOW: # Set to a list of pages or "all" to show all pages
-- Prediction Summary
-- Explore a Prediction
-- Similar Entities
-- Experiment with Changes
-- Change over Time
-- Understand the Model
-- Edit Features
-- Settings
 ALLOW_PAGE_SELECTION:  # If true, allow user to select which pages to show (requires settings page)
 
 # TIME-SERIES-SPECIFIC CONFIGUREATIONS ============================================================
