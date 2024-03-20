@@ -12,7 +12,9 @@ with open(path.join(path.dirname(path.dirname(path.abspath(__file__))), "config.
 session = requests.Session()
 session.headers.update({"Access-Control-Allow-Origin": "*"})
 if cfg.get("CERT") is not None:
-    session.cert = cfg.get("CERT")
+    cert_string = cfg.get("CERT")
+    cert = cert_string.split(",")
+    session.cert = cert
 
 
 def api_get(url):
@@ -39,6 +41,26 @@ def api_post(url, json=None, data=None):
             )
         else:
             response = session.post(fetch_url, json=json)
+    except requests.exceptions.RequestException as err:
+        st.error(f"Connection error. Please check your connection and refresh the page ({err})")
+        st.stop()
+    if response.status_code != 200:
+        st.error(
+            "Error with request (%s) %s: %s" % (fetch_url, response.status_code, response.reason)
+        )
+        st.stop()
+    return response.json()
+
+
+def api_put(url, json=None, data=None):
+    fetch_url = cfg["BASE_URL"] + url
+    try:
+        if data:
+            response = session.put(
+                fetch_url, data=data, headers={"Content-Type": "application/json"}
+            )
+        else:
+            response = session.put(fetch_url, json=json)
     except requests.exceptions.RequestException as err:
         st.error(f"Connection error. Please check your connection and refresh the page ({err})")
         st.stop()
@@ -118,7 +140,46 @@ def fetch_features():
     return features_df
 
 
-def fetch_entity(eid, row_id=None) -> pd.Series:
+def format_feature_df_for_modify(features_df):
+    """
+    Formats a dataframe to for use in modify_features
+
+    Args:
+        features_df (DataFrame): Dataframe of features to be modified.
+            Includes the following columns (case-insensitive):
+            - [index]: Feature name
+            - Feature: Feature description
+            - Category: Feature category
+            - Type: Feature type
+    """
+    features_df["name"] = features_df.index
+    features_df.columns = features_df.columns.str.lower()
+    features_df["description"] = features_df["feature"]
+    features_df = features_df[
+        [col for col in ["name", "category", "description", "type"] if col in features_df.columns]
+    ]
+    return features_df.to_dict(orient="records")
+
+
+def modify_features(new_features):
+    """
+    Put new_features in the database.
+
+    Args:
+        new_features (dict): Dictionary of feature name to feature information, including:
+            - name (required): Feature name
+            - description: Feature description
+            - category: Feature category
+            - type: Feature type
+            - values: Feature values (if categorical)
+
+    Returns:
+        None
+    """
+    api_put("features/", json={"features": new_features})
+
+
+def fetch_entity(eid, row_id=None):
     url = f"entities/{eid}"
     if row_id is not None:
         url += f"/?row_id={row_id}"
@@ -185,6 +246,6 @@ def fetch_categories():
 
 
 def fetch_context():
-    context_id = api_get("contexts/")["contexts"][0]["id"]
+    context_id = api_get("contexts/")["contexts"][0]["context_id"]
     url = "context/" + context_id
     return api_get(url)["context"]

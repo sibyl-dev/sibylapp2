@@ -3,7 +3,7 @@ BASE_URL: "http://ec2-18-191-40-90.us-east-2.compute.amazonaws.com:3000/api/v1/"
 CERT:
 
 # GENERAL CONFIGURATIONS ==========================================================================
-BAR_LENGTH: 8  # Number of squares to use for contribution/importance bars
+BAR_LENGTH: 8 # Number of squares to use for contribution/importance bars
 MAX_ENTITIES: 11 # Maximum number of entities to select from. Set this to None to use all
 DATASET_SIZE: 1000 # Max number of entities to use for dataset-wide visualizations
 LOAD_UPFRONT: true # If true, run heavy computations on initial load, else greedily run as needed
@@ -17,3 +17,9 @@ NEGATIVE_TERM: # Term to use for a False prediction for boolean models
 PRED_FORMAT_STRING: # fstring for formatting numeric model outputs
 OVERRIDE_PRED_FORMAT: # If True, use "config.manual_pred_format_func" to format preds, ignoring previous 3 configs
 SUPPORT_PROBABILITY: # Only set this to True when model supports `predict_proba`
+PAGES_TO_SHOW: # Set to a list of pages or "all" to show all pages
+ALLOW_PAGE_SELECTION:  # If true, allow user to select which pages to show (requires settings page)
+
+# TIME-SERIES-SPECIFIC CONFIGUREATIONS ============================================================
+MAX_FEATURES: 10 # Maximum number of features to show on time-series explanation plots
+TIME_UNIT: days # unit of time used in application and plots

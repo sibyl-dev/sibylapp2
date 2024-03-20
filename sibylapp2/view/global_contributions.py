@@ -26,7 +26,7 @@ def view_summary_plot(eids, model_id):
 
 
 def view(eids, model_id):
-    sort_by = helpers.show_sort_options(["Total", "Most Increasing", "Most Decreasing"])
+    sort_by = helpers.show_sort_options(["Total", get_term("Positive"), get_term("Negative")])
     show_legend()
 
     global_contributions = contributions.compute_global_contributions(eids, model_id)
@@ -41,10 +41,12 @@ def view(eids, model_id):
         to_show = to_show.reindex(
             (to_show["negative"].abs() + to_show["positive"]).sort_values(ascending=False).index
         )
-    if sort_by == "Most Increasing":
+    if sort_by == get_term("Positive"):
         to_show = to_show.sort_values(by="positive", axis="index", ascending=False)
-    if sort_by == "Most Decreasing":
+        to_show = to_show[to_show["positive"] > 0]
+    if sort_by == get_term("Negative"):
         to_show = to_show.sort_values(by="negative", axis="index")
+        to_show = to_show[to_show["negative"] < 0]
 
     to_show = filtering.process_options(to_show).drop(["positive", "negative"], axis=1)
     helpers.show_table(to_show, key="global")

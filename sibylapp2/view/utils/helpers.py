@@ -5,6 +5,7 @@ import math
 import pandas as pd
 import streamlit as st
 
+from sibylapp2.compute import features
 from sibylapp2.compute.context import get_term
 from sibylapp2.config import (
     NEGATIVE_TERM,
@@ -43,16 +44,20 @@ def neg_em(color_scheme=None):
 
 
 def show_sort_options(options):
-    return st.radio("Sort by", options, horizontal=True)
+    return st.radio("Sort/Filter by", options, horizontal=True)
+
+
+def show_filter_options(options):
+    return st.radio("Filter by", options, horizontal=True)
 
 
 def show_text_input_side_by_side(
     label: str,
-    options: list | None = None,
-    default_input: str | None = None,
-    numeric: bool = False,
+    options=None,
+    default_input=None,
+    numeric=False,
     **input_params,
-) -> int | float | str:
+):
     col1, col2 = st.columns([2, 2])
     col1.markdown(label)
 
@@ -90,9 +95,41 @@ def get_pos_neg_names():
         return "purple", "yellow"
 
 
-def show_table(df, key=None, style_function=None):
+def show_table(df, key, style_function=None, button_size_mod=4):
+    """
+    Show a table with pagination and editing capabilities.
+
+    Args:
+        df (DataFrame): Dataframe to show
+        key (string): Key to use for the table
+        style_function (function): Function to apply to the dataframe before showing
+        enable_editing (bool): Whether to enable any editing of the table.
+            Supports editing features and categories.
+        button_size_mod (int): Manually modify the amount of space taken by buttons.
+            Lower numbers = more space for buttons
+
+    Returns:
+        None
+    """
+    column_config = {}
+    for column in df:
+        if column == "Category":
+            column_config[column] = st.column_config.SelectboxColumn(
+                options=features.get_categories(),
+                disabled=True,
+                label=get_term(column),
+            )
+        elif column == "Feature":
+            column_config[column] = st.column_config.TextColumn(
+                disabled=True, label=get_term(column)
+            )
+        elif column == "Show feature plot?":
+            column_config[column] = st.column_config.CheckboxColumn(disabled=False)
+        else:
+            column_config[column] = st.column_config.Column(disabled=True, label=get_term(column))
+
     table = st.container()
-    _, col1, col2 = st.columns((4, 1, 1))
+    _, col1, col2 = st.columns((button_size_mod, 1, 1))
     with col2:
         page_size_key = "per_page_key"
         if key is not None:
@@ -110,21 +147,20 @@ def show_table(df, key=None, style_function=None):
             max_value=int(df.shape[0] / page_size) + 1,
             key=page_key,
         )
-    renames = {}
-    for column in df:
-        renames[column] = get_term(column)
-    df = df.rename(columns=renames)
+
     df = df[(page - 1) * page_size : page * page_size]
 
     # pandas styler must be display in whole
     if style_function is not None:
         df = style_function(df)
-    table.data_editor(
+
+    return table.data_editor(
         df,
         hide_index=True,
         use_container_width=True,
         num_rows="fixed",
-        disabled=True,
+        column_config=column_config,
+        key="changes_to_table_%s" % key,
     )
 
 

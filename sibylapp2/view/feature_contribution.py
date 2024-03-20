@@ -6,8 +6,9 @@ from sibylapp2.view.utils import filtering, helpers
 from sibylapp2.view.utils.helpers import show_legend
 
 
-def show_sorted_contributions(to_show, sort_by, key=None):
+def show_sorted_contributions(to_show, sort_by, key):
     show_legend()
+    selected_features = []
 
     if sort_by == "Side-by-side":
         col1, col2 = st.columns(2)
@@ -17,29 +18,40 @@ def show_sorted_contributions(to_show, sort_by, key=None):
                 by="Contribution", axis="index", ascending=False
             )
             to_show_neg = filtering.process_options(to_show_neg)
-            helpers.show_table(
+            edited_table = helpers.show_table(
                 to_show_neg.drop("Contribution Value", axis="columns"), key="%s%s" % (key, "_neg")
             )
+            if "Show feature plot?" in edited_table.columns:
+                selected_features.extend(edited_table[edited_table["Show feature plot?"]].index)
         with col2:
             st.subheader(get_term("Positive"))
             to_show_pos = to_show[to_show["Contribution Value"] >= 0].sort_values(
                 by="Contribution", axis="index", ascending=False
             )
             to_show_pos = filtering.process_options(to_show_pos)
-            helpers.show_table(
+            edited_table = helpers.show_table(
                 to_show_pos.drop("Contribution Value", axis="columns"), key="%s%s" % (key, "_pos")
             )
+            if "Show feature plot?" in edited_table.columns:
+                selected_features.extend(edited_table[edited_table["Show feature plot?"]].index)
     else:
         if sort_by == "Absolute":
             to_show = to_show.reindex(
                 to_show["Contribution Value"].abs().sort_values(ascending=False).index
             )
-        if sort_by == "Ascending":
-            to_show = to_show.sort_values(by="Contribution Value", axis="index")
-        if sort_by == "Descending":
+        if sort_by == get_term("Positive"):
             to_show = to_show.sort_values(by="Contribution Value", axis="index", ascending=False)
+            to_show = to_show[to_show["Contribution Value"] > 0]
+        if sort_by == get_term("Negative"):
+            to_show = to_show.sort_values(by="Contribution Value", axis="index")
+            to_show = to_show[to_show["Contribution Value"] < 0]
         to_show = filtering.process_options(to_show)
-        helpers.show_table(to_show.drop("Contribution Value", axis="columns"), key=key)
+        edited_table = helpers.show_table(
+            to_show.drop("Contribution Value", axis="columns"), key=key
+        )
+        if "Show feature plot?" in edited_table.columns:
+            selected_features.extend(edited_table[edited_table["Show feature plot?"]].index)
+    return selected_features
 
 
 def format_contributions_to_view(eid, model_id, row_id=None, show_number=False):
@@ -62,7 +74,7 @@ def format_contributions_to_view(eid, model_id, row_id=None, show_number=False):
     return full_df
 
 
-def view(eid, model_id, row_id=None, save_space=False, key=None):
+def view(eid, model_id, key, row_id=None, save_space=False, include_feature_plot=False):
     """
     `eid_for_rows` is only used when `use_row_id` == True.
     `eid` are used as row_id when `use_row_id` == True
@@ -72,7 +84,7 @@ def view(eid, model_id, row_id=None, save_space=False, key=None):
         cols = st.columns(2)
         with cols[0]:
             sort_by = helpers.show_sort_options(
-                ["Absolute", "Ascending", "Descending", "Side-by-side"]
+                ["Absolute", get_term("Positive"), get_term("Negative"), "Side-by-side"]
             )
         with cols[1]:
             show_number = st.checkbox(
@@ -80,11 +92,15 @@ def view(eid, model_id, row_id=None, save_space=False, key=None):
                 help="Show the exact amount this feature contributes to the model prediction",
             )
     else:
-        sort_by = helpers.show_sort_options(["Absolute", "Ascending", "Descending"])
+        sort_by = helpers.show_sort_options(
+            ["Absolute", get_term("Positive"), get_term("Negative")]
+        )
 
     to_show = format_contributions_to_view(eid, model_id, row_id=row_id, show_number=show_number)
+    if include_feature_plot:
+        to_show["Show feature plot?"] = False
 
-    show_sorted_contributions(to_show, sort_by, key=key)
+    return show_sorted_contributions(to_show, sort_by, key=key)
 
 
 def view_instructions():

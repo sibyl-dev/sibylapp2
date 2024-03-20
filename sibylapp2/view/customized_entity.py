@@ -14,8 +14,8 @@ from sibylapp2.view.utils.helpers import show_text_input_side_by_side
 
 def view_feature_boxes(
     eid: str,
-    use_row_id: bool = False,
-    eid_for_rows: str | None = None,
+    use_row_id=False,
+    eid_for_rows=None,
 ):
     if "options_dict" not in st.session_state:
         st.session_state["categorical_values_dict"] = features.get_categorical_values()
@@ -108,11 +108,11 @@ def filter_different_rows(eid, to_show):
     return to_show_filtered
 
 
-def view(eid, changes, model_id, row_id=None, save_space=False):
+def view(eid, changes, model_id, row_id=None):
     """
     eid is used as `row_id` when use_row_id is True
     """
-    sort_by, show_number, show_contribution = view_compare_cases_helper(save_space=save_space)
+    sort_by, show_number, show_contribution = view_compare_cases_helper()
     if row_id is not None:
         original_contribution_df, original_values_df = contributions.get_contributions_for_rows(
             eid, [row_id], model_id=model_id
@@ -166,6 +166,7 @@ def view(eid, changes, model_id, row_id=None, save_space=False):
             changes,
             columns=["%s Value for modified %s" % (get_term("Feature"), get_term("Entity"))],
         ),
+        key="experiment_with_changes",
     )
 
 

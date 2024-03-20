@@ -18,7 +18,6 @@ def generate_feature_distribution_plot(eids, feature, model_id):
     if pd.api.types.is_numeric_dtype(pd.to_numeric(data, errors="ignore")):
         trace1 = go.Box(x=data, boxpoints="all", name="", marker_color="rgb(84, 31, 63)")
         fig = go.Figure(data=[trace1])
-        fig.update_layout(title="Distributions for '%s'" % feature)
         return fig
     else:
         fig = px.pie(
@@ -74,25 +73,52 @@ def generate_feature_plot(eids, predictions, feature, model_id, discrete=False):
         hover_data=hover_data,
     )
     fig.update_traces(opacity=0.7, marker=dict(size=10, line=dict(width=0.5, color="black")))
-    return fig
+    fig.update_layout(hovermode="closest")
+    if not discrete:
+        return fig, df["ID"]
+    else:
+        return fig, [df[df["Prediction"] == pred]["ID"] for pred in sorted(set(df["Prediction"]))]
 
 
-def view(eids, predictions, feature, model_id, discrete=False):
+def view(eids, predictions, feature, model_id, discrete=False, one_line=False):
+    if feature is None:
+        st.warning("Please select a feature to explore!")
+        return
     col1, col2 = st.columns(2)
     with col1:
-        fig1 = generate_feature_plot(eids, predictions, feature, model_id, discrete)
+        fig1, ids = generate_feature_plot(eids, predictions, feature, model_id, discrete)
         selected_index = plotly_events(fig1)
-        fig2 = generate_feature_distribution_plot(eids, feature, model_id=model_id)
-        st.plotly_chart(fig2)
-    with col2:
-        if len(selected_index) > 0:
-            eid = eids[selected_index[0]["pointIndex"]]
-            st.subheader(
-                "Contributions for {entity} {eid}".format(entity=get_term("Entity"), eid=eid)
-            )
-            feature_contribution.view(eid, model_id, save_space=True, key="explore_feature")
+        if not discrete:
+            selected_id = ids[selected_index[0]["pointIndex"]] if len(selected_index) > 0 else None
         else:
-            st.warning("Select a point in the plot to see all contributions!")
+            selected_id = (
+                ids[selected_index[0]["curveNumber"]][selected_index[0]["pointIndex"]]
+                if len(selected_index) > 0
+                else None
+            )
+        if not one_line:
+            fig2 = generate_feature_distribution_plot(eids, feature, model_id=model_id)
+            st.plotly_chart(fig2)
+    with col2:
+        if one_line:
+            fig2 = generate_feature_distribution_plot(eids, feature, model_id=model_id)
+            st.plotly_chart(fig2)
+        else:
+            if selected_id:
+                st.subheader(
+                    "Contributions for {entity} {eid}".format(
+                        entity=get_term("Entity"), eid=selected_id
+                    )
+                )
+                feature_contribution.view(
+                    selected_id,
+                    model_id,
+                    save_space=True,
+                    key="explore_feature",
+                    include_feature_plot=False,
+                )
+            else:
+                st.info("Select a point in the plot to see all contributions!")
 
 
 def view_instructions():
