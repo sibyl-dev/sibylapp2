@@ -48,19 +48,21 @@ def get_term(term, plural=False, with_a=False):
         The translated term, with the same case as the input term
     """
     terms = fetch_terms()
-    if term.lower() not in terms or not terms[term.lower()]:
-        new_term = term
-    elif term.islower():
-        new_term = terms[term]
-    elif term.isupper():
-        new_term = terms[term.lower()].upper()
-    elif term.istitle():
-        new_term = terms[term.lower()].title()
+    lower_term = term.lower()
+    if lower_term not in terms or not terms[lower_term]:
+        new_term = lower_term
     else:
-        new_term = terms[term.lower()]
+        new_term = terms[lower_term]
 
+    # Pluralize does not work correctly on capitalized words
     if plural:
         new_term = lang.plural(new_term)
+
+    if term.isupper():
+        new_term = new_term.upper()
+    elif term.istitle():
+        new_term = new_term.title()
+
     if with_a:
         new_term = lang.a(new_term)
     return new_term

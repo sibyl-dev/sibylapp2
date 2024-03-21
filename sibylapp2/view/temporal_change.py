@@ -4,7 +4,7 @@ from plotly.subplots import make_subplots
 
 from sibylapp2.compute import contributions, features, model
 from sibylapp2.compute.context import get_term
-from sibylapp2.config import TIME_UNIT
+from sibylapp2.config import TIME_UNIT, ROW_LABEL
 from sibylapp2.view.plots import charts
 from sibylapp2.view.utils import filtering, helpers
 
@@ -163,6 +163,7 @@ def plot_contributions_multirow(eid, row_ids, fig=None):
     This function displays the feature contributions over time (different models).
     """
     filtering.view_filtering()
+    type = st.radio("Data to Show", ["Values", "Contributions to Prediction"], horizontal=True)
     sort_by = helpers.show_filter_options([
         "Absolute",
         f"Most {get_term('Positive')}",
@@ -179,7 +180,9 @@ def plot_contributions_multirow(eid, row_ids, fig=None):
 
     wide_df = filter_contributions(contribution_df, sort_by, 10)
 
-    fig = charts.plot_temporal_line_charts(wide_df, value_df, fig, secondary_y=True)
+    fig = charts.plot_temporal_line_charts(
+        wide_df, value_df, fig, secondary_y=True, plot_values=type == "Values"
+    )
     return fig
 
 
@@ -187,6 +190,12 @@ def view_change_over_time(eid, row_ids):
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     fig = prediction_plot_multirow(fig, eid, row_ids)
     fig = plot_contributions_multirow(eid, row_ids, fig)
+    fig = charts.update_figure(
+        fig,
+        xaxis_label=ROW_LABEL,
+        yaxis_label=get_term("Prediction"),
+        yaxis2_label="Feature contribution",
+    )
     st.plotly_chart(fig, use_container_width=True)
 
 

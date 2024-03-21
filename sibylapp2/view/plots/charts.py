@@ -7,12 +7,7 @@ from sibylapp2.compute.context import get_term
 from sibylapp2.config import PREDICTION_TYPE, PredType, get_color_scheme, pred_format_func
 
 
-def plot_temporal_line_charts(
-    df,
-    value_df,
-    fig=None,
-    secondary_y=False,
-):
+def plot_temporal_line_charts(df, value_df, fig=None, secondary_y=False, plot_values=False):
     """
     Transform dataframe from wide form to long form for streamlit visualizations.
 
@@ -42,15 +37,18 @@ def plot_temporal_line_charts(
     for feature in df["feature"].unique():
         df_feature = df[df["feature"] == feature]
         values = value_df.loc[feature]
-        if df_feature["contribution"].mean() > 0:
-            color = pos_color
+        if plot_values:
+            color = "black"
         else:
-            color = neg_color
+            if df_feature["contribution"].mean() > 0:
+                color = pos_color
+            else:
+                color = neg_color
         customdata = np.stack((df_feature["feature"], values), axis=-1)
         fig.add_trace(
             go.Scatter(
                 x=df_feature["time"],
-                y=df_feature["contribution"],
+                y=df_feature["contribution"] if plot_values else values,
                 mode="lines+markers",
                 name=feature,
                 customdata=customdata,
