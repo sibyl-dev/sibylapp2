@@ -120,6 +120,7 @@ def main():
                     "Compare Entities",
                     "Experiment with Changes",
                     "Change over Time",
+                    "Predict into Future",
                     "Understand the Model",
                     "Edit Features",
                     "Settings",

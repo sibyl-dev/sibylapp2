@@ -12,13 +12,14 @@ def main():
     if SUPPORT_PROBABILITY:
         st.session_state["display_proba"] = True
     display.show_probability_select_box()
-    filtering.view_selection(include_rows=False)
+    filtering.view_selection()
     temporal_change.view_instructions()
     eid = st.session_state["eid"]
     row_ids = st.session_state["row_id_dict"][eid]
+    model_ids = st.session_state["model_ids"]
 
     # Global options ------------------------------
-    if len(row_ids) <= 1:
-        st.warning("Your application does not support predicting over time.")
+    if len(row_ids) <= 1 or len(model_ids) <= 1:
+        st.warning("Your application does not support predicting into future.")
     else:
-        temporal_change.view_change_over_time(eid, row_ids=row_ids)
+        temporal_change.view_future_predict(eid, st.session_state["row_id"], model_ids=model_ids)

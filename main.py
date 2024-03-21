@@ -3,6 +3,7 @@ import streamlit as st
 from sibylapp2.compute.context import get_term
 from sibylapp2.config import get_pages_to_show
 from sibylapp2.pages import (
+    Predict_into_Future,
     Change_over_Time,
     Compare_Entities,
     Edit_Features,
@@ -24,6 +25,7 @@ ALL_PAGES = {
     "Compare Entities": Compare_Entities,
     "Experiment with Changes": Experiment_with_Changes,
     "Change over Time": Change_over_Time,
+    "Predict into Future": Predict_into_Future,
     "Understand the Model": Understand_the_Model,
     "Edit Features": Edit_Features,
     "Settings": Settings,

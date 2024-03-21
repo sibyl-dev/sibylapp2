@@ -46,13 +46,10 @@ def get_contributions_variation(
     # store model predictions in the same order of the given models
     contributions_list = []
     values_list = []
-    feature_name = None
     for model_id in model_ids:
         contribution_df, value_df = contributions.get_contributions_for_rows(
             eid, [row_id], model_id=model_id
         )
-        if feature_name is None:
-            feature_name = contribution_df.columns
 
         contributions_list.append(contribution_df.iloc[0].rename(int(model_id[:-1])))
         values_list.append(value_df.iloc[0].rename(int(model_id[:-1])))
@@ -67,7 +64,7 @@ def get_contributions_variation(
     return contributions_table, values_table
 
 
-def plot_prediction_variation(
+def prediction_plot_multimodel(
     fig,
     eid,
     row_id,
@@ -111,7 +108,7 @@ def plot_prediction_variation(
     return fig
 
 
-def plot_contributions_variation(eid, row_id, model_ids, fig=None):
+def plot_contributions_multimodel(eid, row_id, model_ids, fig=None):
     """
     This function displays the feature contributions over time (different models).
     """
@@ -129,14 +126,14 @@ def plot_contributions_variation(eid, row_id, model_ids, fig=None):
     return fig
 
 
-def view(eid, row_id, model_ids):
+def view_future_predict(eid, row_id, model_ids):
     """
-    `row_ids` and `eid_for_rows` are only used when `use_row_ids` == True.
-    `eid` and `eid_comp` are used as row_id when `use_row_ids` == True
+    If row_ids is not None, visualize change over row ids
+    Else if model_ids is not None, visualize change over model ids
     """
     fig = make_subplots(specs=[[{"secondary_y": True}]])
-    fig = plot_prediction_variation(fig, eid, row_id, model_ids)
-    contribution_figure = plot_contributions_variation(eid, row_id, model_ids, fig)
+    fig = prediction_plot_multimodel(fig, eid, row_id, model_ids)
+    contribution_figure = plot_contributions_multimodel(eid, row_id, model_ids, fig)
     # combine two figures
     final_figure = charts.update_figure(
         contribution_figure,
@@ -146,6 +143,51 @@ def view(eid, row_id, model_ids):
     )
 
     st.plotly_chart(final_figure, use_container_width=True)
+
+
+def prediction_plot_multirow(fig, eid, row_ids):
+    prediction_values = model.get_predictions_for_rows(
+        eid, row_ids, return_proba=st.session_state["display_proba"]
+    )
+    if st.session_state["display_proba"]:
+        predictions = model.get_predictions_for_rows(eid, row_ids)
+        # TODO: convert to raw probabilities
+
+    df = pd.DataFrame({"time": prediction_values.keys(), "value": prediction_values.values()})
+    fig = charts.plot_prediction_regions(df, fig)
+    return fig
+
+
+def plot_contributions_multirow(eid, row_ids, fig=None):
+    """
+    This function displays the feature contributions over time (different models).
+    """
+    filtering.view_filtering()
+    sort_by = helpers.show_filter_options([
+        "Absolute",
+        f"Most {get_term('Positive')}",
+        f"Most {get_term('Negative')}",
+        "Greatest Change",
+    ])
+    contribution_df, value_df = contributions.get_contributions_for_rows(eid, row_ids)
+    feature_df = features.get_features()
+    contribution_df = pd.concat([feature_df, contribution_df.T], axis=1)
+
+    value_df = pd.concat([feature_df["Feature"], value_df.T], axis=1).set_index(
+        "Feature", drop=True
+    )
+
+    wide_df = filter_contributions(contribution_df, sort_by, 10)
+
+    fig = charts.plot_temporal_line_charts(wide_df, value_df, fig, secondary_y=True)
+    return fig
+
+
+def view_change_over_time(eid, row_ids):
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
+    fig = prediction_plot_multirow(fig, eid, row_ids)
+    fig = plot_contributions_multirow(eid, row_ids, fig)
+    st.plotly_chart(fig, use_container_width=True)
 
 
 def view_instructions():

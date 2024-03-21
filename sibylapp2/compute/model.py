@@ -39,3 +39,8 @@ def get_modified_prediction(
     return api.fetch_modified_prediction(
         eid, changes, row_id=row_id, model_id=model_id, return_proba=return_proba
     )
+
+
+def pred_prob_to_raw_prob(pred_prob, pred):
+    # Returns pred_prob if pred==1, 1-pred_prob otherwise
+    return (1 - pred) + (-1 + 2 * pred) * pred_prob

@@ -114,11 +114,6 @@ def prediction_table(
     show_table(df, key="prediction_table", button_size_mod=button_size_mod)
 
 
-def pred_prob_to_raw_prob(pred_prob, pred):
-    # Returns pred_prob if pred==1, 1-pred_prob otherwise
-    return (1 - pred) + (-1 + 2 * pred) * pred_prob
-
-
 def main():
     eids = st.session_state["eids"]
 
@@ -147,7 +142,7 @@ def main():
             # Convert the outcome probability to raw probability
             proba_predictions = {
                 eid: {
-                    row_id: pred_prob_to_raw_prob(
+                    row_id: model.pred_prob_to_raw_prob(
                         proba_predictions[eid][row_id], predictions[eid][row_id]
                     )
                     for row_id in proba_predictions[eid]

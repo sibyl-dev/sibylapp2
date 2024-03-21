@@ -130,14 +130,14 @@ def view_model_select(default=0):
         st.session_state["model_id"] = st.session_state["model_ids"][0]
 
 
-def view_selection():
+def view_selection(include_rows=True):
     """
     This function handles the display of entities selection.
     """
     view_entity_select()
     eid = st.session_state["eid"]
     row_ids = st.session_state["row_id_dict"][eid]
-    if len(row_ids) > 1:
+    if include_rows and len(row_ids) > 1:
         view_row_select(eid, row_ids, row_id_text="row_id")
         st.session_state["use_rows"] = True
     else:

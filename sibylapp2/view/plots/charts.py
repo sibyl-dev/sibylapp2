@@ -95,18 +95,25 @@ def plot_prediction_regions(df, fig=None, yaxis_range=None):
     if fig is None:
         fig = go.Figure()
 
-    for label in df["label"].unique():
-        section_df = df[df["label"] == label]
+    if "label" in df.columns:
+        section_dfs = {
+            f"{pred_format_func(label)}": df[df["label"] == label]
+            for label in df["label"].unique()
+        }
+    else:
+        section_dfs = {get_term("Prediction"): df}
+
+    for label in section_dfs:
+        section_df = section_dfs[label]
+        name = label
 
         if PREDICTION_TYPE != PredType.BOOLEAN:
             color = "rgba(183, 149, 230, .5)"
-            name = get_term("Prediction")
         else:
             if label > 0.5:
                 color = pos_color
             else:
                 color = neg_color
-            name = f"{pred_format_func(label)}"
 
         fig.add_trace(
             go.Bar(
