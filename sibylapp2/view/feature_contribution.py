@@ -8,6 +8,7 @@ from sibylapp2.view.helpers import show_legend
 
 def sort_and_show_contributions(to_show, sort_by, key):
     show_legend()
+    selected_features = []
 
     if sort_by == "Side-by-side":
         col1, col2 = st.columns(2)
@@ -17,18 +18,22 @@ def sort_and_show_contributions(to_show, sort_by, key):
                 by="Contribution", axis="index", ascending=False
             )
             to_show_neg = filtering.process_options(to_show_neg)
-            helpers.show_table(
+            edited_table = helpers.show_table(
                 to_show_neg.drop("Contribution Value", axis="columns"), key="%s%s" % (key, "_neg")
             )
+            if "Show feature plot?" in edited_table.columns:
+                selected_features.extend(edited_table[edited_table["Show feature plot?"]].index)
         with col2:
             st.subheader(get_term("Positive"))
             to_show_pos = to_show[to_show["Contribution Value"] >= 0].sort_values(
                 by="Contribution", axis="index", ascending=False
             )
             to_show_pos = filtering.process_options(to_show_pos)
-            helpers.show_table(
+            edited_table = helpers.show_table(
                 to_show_pos.drop("Contribution Value", axis="columns"), key="%s%s" % (key, "_pos")
             )
+            if "Show feature plot?" in edited_table.columns:
+                selected_features.extend(edited_table[edited_table["Show feature plot?"]].index)
     else:
         if sort_by == "Absolute":
             to_show = to_show.reindex(
@@ -41,7 +46,12 @@ def sort_and_show_contributions(to_show, sort_by, key):
             to_show = to_show.sort_values(by="Contribution Value", axis="index")
             to_show = to_show[to_show["Contribution Value"] < 0]
         to_show = filtering.process_options(to_show)
-        helpers.show_table(to_show.drop("Contribution Value", axis="columns"), key=key)
+        edited_table = helpers.show_table(
+            to_show.drop("Contribution Value", axis="columns"), key=key
+        )
+        if "Show feature plot?" in edited_table.columns:
+            selected_features.extend(edited_table[edited_table["Show feature plot?"]].index)
+    return selected_features
 
 
 def create_contribution_table(eid, model_id, row_id=None, show_number=False):
@@ -64,7 +74,7 @@ def create_contribution_table(eid, model_id, row_id=None, show_number=False):
     return full_df
 
 
-def view(eid, model_id, key, row_id=None, save_space=False):
+def view(eid, model_id, key, row_id=None, save_space=False, include_feature_plot=False):
     """
     Show the feature contributions for a given entity and model.
 
@@ -98,3 +108,9 @@ def view(eid, model_id, key, row_id=None, save_space=False):
     to_show = create_contribution_table(eid, model_id, row_id=row_id, show_number=show_number)
 
     sort_and_show_contributions(to_show, sort_by, key=key)
+    to_show = format_contributions_to_view(eid, model_id, row_id=row_id, show_number=show_number)
+    if include_feature_plot:
+        to_show["Show feature plot?"] = False
+
+    return show_sorted_contributions(to_show, sort_by, key=key)
+

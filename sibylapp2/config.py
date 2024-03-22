@@ -79,6 +79,8 @@ DISABLE_MODEL_SELECTION = select_config(
 
 MAX_FEATURES = select_config("MAX_FEATURES", "num_plot_features", 10)
 TIME_UNIT = select_config("TIME_UNIT", "time_unit", "days")
+USE_ROWS = select_config("USE_ROWS", "use_rows", False)
+ROW_LABEL = select_config("ROW_LABEL", "row_label", "Row")
 
 
 def pred_format_func(pred, display_proba=False):

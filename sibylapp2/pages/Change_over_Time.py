@@ -8,6 +8,7 @@ from sibylapp2.view.utils import display, filtering
 
 def main():
     # Sidebar ------------------------------------
+    st.session_state["display_proba"] = True
     display.show_probability_select_box()
     filtering.view_selection()
     temporal_change.view_instructions()

@@ -73,6 +73,10 @@ def main():
                 global_contributions.view(eids, st.session_state["model_id"])
 
     if tab == "4":
+
+        def feature_name_to_description(name):
+            return features_values.loc[name, "Feature"]
+
         with placeholder:
             if len(eids) == 0:
                 st.warning("Select predictions above to see explanation!")
@@ -80,6 +84,7 @@ def main():
                 feature = st.selectbox(
                     "Select a %s" % get_term("feature"),
                     filtering.process_search_on_features(features_values),
+                    format_func=feature_name_to_description,
                 )
                 explore_feature.view(
                     eids, predictions, feature, st.session_state["model_id"], discrete

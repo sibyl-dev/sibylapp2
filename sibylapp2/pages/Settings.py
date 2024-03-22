@@ -114,12 +114,14 @@ def main():
             with st.form("page_selection"):
                 st.write("Select pages to enable:")
                 all_pages = [
+                    "Prediction Summary",
                     "Explore a Prediction",
                     "Similar Entities",
                     "Compare Entities",
                     "Experiment with Changes",
                     "Change over Time",
                     "Understand the Model",
+                    "Edit Features",
                     "Settings",
                 ]
                 show_pages_bools = []

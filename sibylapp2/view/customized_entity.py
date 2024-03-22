@@ -14,8 +14,8 @@ from sibylapp2.view.helpers import show_text_input_side_by_side
 
 def view_feature_boxes(
     eid: str,
-    use_row_id: bool = False,
-    eid_for_rows: str | None = None,
+    use_row_id=False,
+    eid_for_rows=None,
 ):
     if "options_dict" not in st.session_state:
         st.session_state["categorical_values_dict"] = features.get_categorical_values()
