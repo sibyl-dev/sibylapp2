@@ -28,26 +28,21 @@ def set_up_sidebar(
     if row_select:
         view_row_select()
     if prediction:
-        if row_select:
-            view_prediction(st.session_state["eid"], st.session_state["row_id"])
-        else:
-            view_prediction(st.session_state["eid"])
+        view_prediction(st.session_state["eid"], st.session_state.get("row_id", None))
     if probability_select:
         show_probability_select_box()
 
 
 def view_prediction(eid, row_id=None):
-    if row_id is not None:
-        pred = model.get_predictions([eid], [row_id], model_id=st.session_state["model_id"])
-    else:
-        pred = model.get_predictions([eid], model_id=st.session_state["model_id"])
+    row_id = [row_id] if row_id is not None else None
+    pred = model.get_predictions([eid], row_id, model_id=st.session_state["model_id"])
     st.write(pred)
     if st.session_state["display_proba"]:
         pred_proba = model.get_predictions(
-            [eid], [row_id], model_id=st.session_state["model_id"], return_proba=True
+            [eid], row_id, model_id=st.session_state["model_id"], return_proba=True
         )
         pred_display = (
-            f"{config.pred_format_func(pred)} ({config.pred_format_func(pred_proba, display_proba=True)})"
+            f"{config.pred_format_func(pred)} ({config.pred_format_func(pred_proba, pred_is_probability=True)})"
         )
     else:
         pred_display = config.pred_format_func(pred)
@@ -77,7 +72,7 @@ def view_model_select(default=0):
 
 def view_entity_select(eid_text="eid", prefix=None, default=0):
     def format_func(eid):
-        return f"{context.get_term('Entity')} {eid} ({config.pred_format_func(predictions[eid])})"
+        return f"{eid} ({config.pred_format_func(predictions[eid])})"
 
     predictions = model.get_predictions(
         st.session_state["eids"], model_id=st.session_state["model_id"]
@@ -107,7 +102,7 @@ def view_row_select(eid=None, row_ids=None, row_id_text="row_id", prefix=None, d
         eid = st.session_state["eid"]
     if row_ids is None:
         row_ids = st.session_state["row_id_dict"][eid]
-    if config.DISABLE_ROW_SELECTION:
+    if config.DISABLE_ROW_SELECTION or not st.session_state["multirow"]:
         return
     if row_id_text not in st.session_state:
         st.session_state[f"select_{row_id_text}_index"] = default

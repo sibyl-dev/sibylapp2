@@ -83,8 +83,8 @@ USE_ROWS = select_config("USE_ROWS", "use_rows", False)
 ROW_LABEL = select_config("ROW_LABEL", "row_label", "Row")
 
 
-def pred_format_func(pred, display_proba=False):
-    if display_proba:
+def pred_format_func(pred, pred_is_probability=False):
+    if pred_is_probability:
         return f"{pred*100:.1f}%"
     if load_config().get("OVERRIDE_PRED_FORMAT"):
         return manual_pred_format_func(pred)

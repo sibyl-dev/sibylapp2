@@ -47,7 +47,7 @@ def view_prediction_difference(
         if not new_prediction:
             new_prediction_proba = 1 - new_prediction_proba
         difference = new_prediction_proba - old_prediction_proba
-        output_text = pred_format_func(difference, display_proba=True) + " " + POSITIVE_TERM
+        output_text = pred_format_func(difference, pred_is_probability=True) + " " + POSITIVE_TERM
         if difference > 0:
             output_text = "+" + output_text
 

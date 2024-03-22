@@ -31,7 +31,7 @@ def view_prediction(eid):
     if st.session_state["display_proba"]:
         pred_proba = predictions_proba[eid]
         pred_display = (
-            f"{pred_format_func(pred)} ({pred_format_func(pred_proba, display_proba=True)})"
+            f"{pred_format_func(pred)} ({pred_format_func(pred_proba, pred_is_probability=True)})"
         )
     else:
         pred_display = pred_format_func(pred)

@@ -23,12 +23,15 @@ def get_predictions(eids, row_ids=None, model_id=api.fetch_model_id(), return_pr
     Returns:
         dict: dictionary of predictions given as {eid: {row_id: prediction}}
     """
-    predictions = {}
-    for eid in eids:
-        predictions[eid] = api.fetch_predictions(
-            [eid], row_ids, model_id=model_id, return_proba=return_proba
-        )
-    return predictions
+    if row_ids is None:
+        return api.fetch_predictions(eids, model_id=model_id, return_proba=return_proba)
+    else:
+        predictions = {}
+        for eid in eids:
+            predictions[eid] = api.fetch_predictions(
+                [eid], row_ids, model_id=model_id, return_proba=return_proba
+            )
+        return predictions
 
 
 @st.cache_data(show_spinner="Getting model predictions...")

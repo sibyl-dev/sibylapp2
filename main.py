@@ -3,30 +3,30 @@ import streamlit as st
 from sibylapp2.compute.context import get_term
 from sibylapp2.config import get_pages_to_show
 from sibylapp2.pages import (
-    Change_over_Time,
-    Compare_Entities,
-    Edit_Features,
-    Experiment_with_Changes,
+    # Change_over_Time,
+    # Compare_Entities,
+    # Edit_Features,
+    # Experiment_with_Changes,
     Explore_a_Prediction,
-    Prediction_Summary,
-    Settings,
-    Similar_Entities,
-    Understand_the_Model,
+    # Prediction_Summary,
+    # Settings,
+    # Similar_Entities,
+    # Understand_the_Model,
 )
 from sibylapp2.view.utils import setup
 
-setup.setup_page(return_row_ids=True)
+setup.setup_app()
 
 ALL_PAGES = {
-    "Prediction Summary": Prediction_Summary,
+    # "Prediction Summary": Prediction_Summary,
     "Explore a Prediction": Explore_a_Prediction,
-    "Similar Entities": Similar_Entities,
-    "Compare Entities": Compare_Entities,
-    "Experiment with Changes": Experiment_with_Changes,
-    "Change over Time": Change_over_Time,
-    "Understand the Model": Understand_the_Model,
-    "Edit Features": Edit_Features,
-    "Settings": Settings,
+    # "Similar Entities": Similar_Entities,
+    # "Compare Entities": Compare_Entities,
+    # "Experiment with Changes": Experiment_with_Changes,
+    # "Change over Time": Change_over_Time,
+    # "Understand the Model": Understand_the_Model,
+    # "Edit Features": Edit_Features,
+    # "Settings": Settings,
 }
 
 pages_to_show = get_pages_to_show()

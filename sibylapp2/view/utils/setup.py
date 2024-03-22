@@ -6,19 +6,22 @@ from sibylapp2 import config
 from sibylapp2.compute import contributions, entities, features, importance, model
 
 
-def setup_page(return_row_ids=False):
+def setup_app():
     st.set_page_config(layout="wide")
     st.title("Sibyl")
 
     # Selecting eids -----------------------------
-    if return_row_ids:
-        if "eids" not in st.session_state or "row_id_dict" not in st.session_state:
-            st.session_state["eids"], st.session_state["row_id_dict"] = entities.get_eids(
-                max_entities=config.get_max_entities(), return_row_ids=True
-            )
+    if "eids" not in st.session_state or "row_id_dict" not in st.session_state:
+        st.session_state["eids"], st.session_state["row_id_dict"] = entities.get_eids(
+            max_entities=config.get_max_entities(), return_row_ids=True
+        )
+
+    if not config.DISABLE_ROW_SELECTION and any(
+        len(row_ids) > 1 for row_ids in st.session_state["row_id_dict"].values()
+    ):
+        st.session_state["multirow"] = True
     else:
-        if "eids" not in st.session_state:
-            st.session_state["eids"] = entities.get_eids(max_entities=config.get_max_entities())
+        st.session_state["multirow"] = False
 
     if "model_ids" not in st.session_state:
         # sort models in temporal order
@@ -38,11 +41,12 @@ def setup_page(return_row_ids=False):
     # Global display options ---------------------
     if "display_proba" not in st.session_state:
         st.session_state["display_proba"] = False
+
     # Populate cache -----------------------------
-    if config.get_load_upfront():
-        model.get_dataset_predictions()
-        contributions.get_dataset_contributions()
-        importance.compute_importance()
+    # if config.get_load_upfront():
+    #    model.get_dataset_predictions()
+    #    contributions.get_dataset_contributions()
+    #    importance.compute_importance()
 
 
 def sort_model_ids(unsorted_model_ids: list[str]):

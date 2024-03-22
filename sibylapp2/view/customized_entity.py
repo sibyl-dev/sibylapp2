@@ -75,7 +75,10 @@ def view_prediction(eid, changes, model_id, use_row_id=False, eid_for_rows=None)
                 eid, changes, model_id=model_id, return_proba=True
             )
         pred_display = (
-            pred_format_func(pred) + " (" + pred_format_func(pred_proba, display_proba=True) + ")"
+            pred_format_func(pred)
+            + " ("
+            + pred_format_func(pred_proba, pred_is_probability=True)
+            + ")"
         )
     else:
         pred_display = pred_format_func(pred)
