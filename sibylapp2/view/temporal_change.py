@@ -5,7 +5,7 @@ from plotly.subplots import make_subplots
 from sibylapp2.compute import contributions, features, model
 from sibylapp2.compute.context import get_term
 from sibylapp2.config import TIME_UNIT, ROW_LABEL
-from sibylapp2.view.plots import charts
+from sibylapp2.view.plots import temporal_plots
 from sibylapp2.view.utils import filtering, helpers
 
 
@@ -102,9 +102,9 @@ def prediction_plot_multimodel(
     df = pd.DataFrame({"time": timeindex, "value": probs, "label": predictions})
 
     if st.session_state["display_proba"]:
-        fig = charts.plot_prediction_regions(df, fig, yaxis_range=[0, 1])
+        fig = temporal_plots.plot_prediction_regions(df, fig, yaxis_range=[0, 1])
     else:
-        fig = charts.plot_prediction_regions(df, fig)
+        fig = temporal_plots.plot_prediction_regions(df, fig)
     return fig
 
 
@@ -122,7 +122,7 @@ def plot_contributions_multimodel(eid, row_id, model_ids, fig=None):
     wide_df, value_df = get_contributions_variation(eid, row_id, model_ids)
     wide_df = filter_contributions(wide_df, sort_by, 10)
 
-    fig = charts.plot_temporal_line_charts(wide_df, value_df, fig, secondary_y=True)
+    fig = temporal_plots.plot_temporal_line_charts(wide_df, value_df, fig, secondary_y=True)
     return fig
 
 
@@ -135,7 +135,7 @@ def view_future_predict(eid, row_id, model_ids):
     fig = prediction_plot_multimodel(fig, eid, row_id, model_ids)
     contribution_figure = plot_contributions_multimodel(eid, row_id, model_ids, fig)
     # combine two figures
-    final_figure = charts.update_figure(
+    final_figure = temporal_plots.update_figure(
         contribution_figure,
         xaxis_label=f"Lead time ({TIME_UNIT})",
         yaxis_label=get_term("Prediction"),
@@ -154,7 +154,7 @@ def prediction_plot_multirow(fig, eid, row_ids):
         # TODO: convert to raw probabilities
 
     df = pd.DataFrame({"time": prediction_values.keys(), "value": prediction_values.values()})
-    fig = charts.plot_prediction_regions(df, fig)
+    fig = temporal_plots.plot_prediction_regions(df, fig)
     return fig
 
 
@@ -172,16 +172,22 @@ def plot_contributions_multirow(eid, row_ids, fig=None):
     ])
     contribution_df, value_df = contributions.get_contributions_for_rows(eid, row_ids)
     feature_df = features.get_features()
-    contribution_df = pd.concat([feature_df, contribution_df.T], axis=1)
 
-    value_df = pd.concat([feature_df["Feature"], value_df.T], axis=1).set_index(
-        "Feature", drop=True
-    )
+    if type == "Values":
+        value_df = pd.concat([feature_df, value_df.T], axis=1)
+        df = filter_contributions(value_df, sort_by, 10)
+        value_df = None
+        y_label = "Feature Value"
+    else:
+        contribution_df = pd.concat([feature_df, contribution_df.T], axis=1)
+        value_df = pd.concat([feature_df["Feature"], value_df.T], axis=1).set_index(
+            "Feature", drop=True
+        )
+        df = filter_contributions(contribution_df, sort_by, 10)
+        y_label = "Feature contribution"
 
-    wide_df = filter_contributions(contribution_df, sort_by, 10)
-
-    fig = charts.plot_temporal_line_charts(
-        wide_df, value_df, fig, secondary_y=True, plot_values=type == "Values"
+    fig = temporal_plots.plot_temporal_line_charts(
+        df, value_df, fig=fig, secondary_y=True, y_label=y_label
     )
     return fig
 
@@ -190,11 +196,11 @@ def view_change_over_time(eid, row_ids):
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     fig = prediction_plot_multirow(fig, eid, row_ids)
     fig = plot_contributions_multirow(eid, row_ids, fig)
-    fig = charts.update_figure(
+    fig = temporal_plots.update_figure(
         fig,
         xaxis_label=ROW_LABEL,
         yaxis_label=get_term("Prediction"),
-        yaxis2_label="Feature contribution",
+        # yaxis2_label="Feature contribution",
     )
     st.plotly_chart(fig, use_container_width=True)
 

@@ -4,10 +4,18 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from sibylapp2.compute.context import get_term
-from sibylapp2.config import PREDICTION_TYPE, PredType, get_color_scheme, pred_format_func
+from sibylapp2.config import (
+    PREDICTION_TYPE,
+    PredType,
+    get_color_scheme,
+    pred_format_func,
+    ROW_LABEL,
+)
 
 
-def plot_temporal_line_charts(df, value_df, fig=None, secondary_y=False, plot_values=False):
+def plot_temporal_line_charts(
+    df, value_df=None, y_label="Contribution", fig=None, secondary_y=False
+):
     """
     Transform dataframe from wide form to long form for streamlit visualizations.
 
@@ -22,13 +30,12 @@ def plot_temporal_line_charts(df, value_df, fig=None, secondary_y=False, plot_va
 
     if "Category" in df.columns:
         df = df.drop(columns="Category")
-    df = df.set_index("Feature").transpose().reset_index(names=["time"])
-
+    df = df.set_index("Feature").transpose().reset_index(names=[ROW_LABEL])
     df = df.melt(
-        id_vars=["time"],
-        value_vars=set(df.columns) - set(["time"]),
+        id_vars=[ROW_LABEL],
+        value_vars=set(df.columns) - {ROW_LABEL},
         var_name="feature",
-        value_name="contribution",
+        value_name=y_label,
     )
 
     if fig is None:
@@ -36,27 +43,27 @@ def plot_temporal_line_charts(df, value_df, fig=None, secondary_y=False, plot_va
 
     for feature in df["feature"].unique():
         df_feature = df[df["feature"] == feature]
-        values = value_df.loc[feature]
-        if plot_values:
-            color = "black"
+        if value_df:
+            hovertemplate = (
+                "<b>%{customdata[0]}</b><br>Lead time: %{x}<br>Contribution:"
+                " %{y}<br>Value:%{customdata[0]}<extra></extra>"
+            )
+            customdata = np.stack((df_feature["feature"], value_df.loc[feature]), axis=-1)
         else:
-            if df_feature["contribution"].mean() > 0:
-                color = pos_color
-            else:
-                color = neg_color
-        customdata = np.stack((df_feature["feature"], values), axis=-1)
+            hovertemplate = (
+                "<b>%{customdata[0]}</b><br>Lead time: %{x}<br>Contribution: %{y}<extra></extra>"
+            )
+            customdata = df_feature[["feature"]]
+        color = "black"
         fig.add_trace(
             go.Scatter(
-                x=df_feature["time"],
-                y=df_feature["contribution"] if plot_values else values,
+                x=df_feature[ROW_LABEL],
+                y=df_feature[y_label],
                 mode="lines+markers",
                 name=feature,
                 customdata=customdata,
                 line=dict(color=color),
-                hovertemplate=(
-                    "<b>%{customdata[0]}</b><br>Lead time: %{x}<br>Contribution:"
-                    " %{y}<br>Value:%{customdata[1]}<extra></extra>"
-                ),
+                hovertemplate=hovertemplate,
                 legend="legend2",
             ),
             secondary_y=secondary_y,
@@ -65,10 +72,19 @@ def plot_temporal_line_charts(df, value_df, fig=None, secondary_y=False, plot_va
     fig.update_layout(
         xaxis=dict(
             tickmode="array",
-            tickvals=df["time"],
+            tickvals=df[ROW_LABEL],
             dtick=1,
         ),
         hoverdistance=50,
+    )
+    fig.update_yaxes(
+        title_text=y_label,
+        secondary_y=secondary_y,
+        tickfont=dict(size=20),
+        titlefont=dict(size=20),
+        overlaying="y",
+        side="right",
+        anchor="x",
     )
     return fig
 
@@ -161,14 +177,14 @@ def update_figure(
             titlefont=dict(size=20),
             anchor="x",
         ),
-        yaxis2=dict(
-            title=yaxis2_label,
-            tickfont=dict(size=20),
-            titlefont=dict(size=20),
-            overlaying="y",
-            side="right",
-            anchor="x",
-        ),
+        # yaxis2=dict(
+        #     title=yaxis2_label,
+        #     tickfont=dict(size=20),
+        #     titlefont=dict(size=20),
+        #     overlaying="y",
+        #     side="right",
+        #     anchor="x",
+        # ),
         legend1=dict(
             x=0, y=-0.2, traceorder="normal", orientation="h", title=get_term("Prediction")
         ),
