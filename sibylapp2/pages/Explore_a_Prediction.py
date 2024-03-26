@@ -62,38 +62,35 @@ def main():
         prediction=True,
         probability_select=True,
     )
-    # sidebar.show_probability_select_box()
-    # sidebar.view_model_select()
-    # sidebar.view_entity_and_row_select()
     view_instructions()
 
     # # Global options ------------------------------
-    # filtering.view_filtering()
-    #
-    # selected_features = feature_contribution.view(
-    #     st.session_state["eid"],
-    #     st.session_state["model_id"],
-    #     key="feature_contributions",
-    #     row_id=st.session_state["row_id"],
-    #     include_feature_plot=True,
-    # )
-    # if selected_features:
-    #     if "dataset_eids" not in st.session_state:
-    #         st.session_state["dataset_eids"] = entities.get_eids(
-    #             max_entities=config.get_dataset_size()
-    #         )
-    #     predictions = model.get_dataset_predictions(st.session_state["model_id"])
-    #     for selected_feature in selected_features:
-    #         discrete = config.PREDICTION_TYPE in (
-    #             config.PredType.BOOLEAN,
-    #             config.PredType.CATEGORICAL,
-    #         )
-    #         st.subheader(get_feature_description(selected_feature))
-    #         explore_feature.view(
-    #             st.session_state["dataset_eids"],
-    #             predictions,
-    #             selected_feature,
-    #             st.session_state["model_id"],
-    #             one_line=True,
-    #             discrete=discrete,
-    #         )
+    filtering.view_filtering()
+
+    selected_features = feature_contribution.view(
+        st.session_state["eid"],
+        st.session_state["model_id"],
+        key="feature_contributions",
+        row_id=st.session_state.get("row_id", None),
+        include_feature_plot=True,
+    )
+    if selected_features:
+        if "dataset_eids" not in st.session_state:
+            st.session_state["dataset_eids"] = entities.get_eids(
+                max_entities=config.get_dataset_size()
+            )
+        predictions = model.get_dataset_predictions(st.session_state["model_id"])
+        discrete = config.PREDICTION_TYPE in (
+            config.PredType.BOOLEAN,
+            config.PredType.CATEGORICAL,
+        )
+        for selected_feature in selected_features:
+            st.subheader(get_feature_description(selected_feature))
+            explore_feature.view(
+                st.session_state["dataset_eids"],
+                predictions,
+                selected_feature,
+                st.session_state["model_id"],
+                one_line=True,
+                discrete=discrete,
+            )

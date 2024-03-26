@@ -3,15 +3,22 @@
 import streamlit as st
 
 from sibylapp2.compute.context import get_term
-from sibylapp2.view import compare_entities, filtering
+from sibylapp2.view import compare_entities, filtering, sidebar
 from sibylapp2.view.utils import display
 
 
 def main():
     # Sidebar ------------------------------------
-    display.show_probability_select_box()
-    filtering.view_model_select()
-    filtering.view_entity_select(eid_text="eid")
+    sidebar.set_up_sidebar(
+        model_select=True,
+        entity_select=True,
+        row_select=True,
+        prediction=True,
+        probability_select=True,
+    )
+    # display.show_probability_select_box()
+    # filtering.view_model_select()
+    # filtering.view_entity_select(eid_text="eid")
 
     row_ids = st.session_state["row_id_dict"][st.session_state["eid"]]
 

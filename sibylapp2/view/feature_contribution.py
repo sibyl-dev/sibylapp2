@@ -107,10 +107,9 @@ def view(eid, model_id, key, row_id=None, save_space=False, include_feature_plot
 
     to_show = create_contribution_table(eid, model_id, row_id=row_id, show_number=show_number)
 
-    sort_and_show_contributions(to_show, sort_by, key=key)
-    to_show = format_contributions_to_view(eid, model_id, row_id=row_id, show_number=show_number)
+    # sort_and_show_contributions(to_show, sort_by, key=key)
+    # to_show = format_contributions_to_view(eid, model_id, row_id=row_id, show_number=show_number)
     if include_feature_plot:
         to_show["Show feature plot?"] = False
 
-    return show_sorted_contributions(to_show, sort_by, key=key)
-
+    return sort_and_show_contributions(to_show, sort_by, key=key)

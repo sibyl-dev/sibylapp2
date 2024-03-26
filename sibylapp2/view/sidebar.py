@@ -34,13 +34,21 @@ def set_up_sidebar(
 
 
 def view_prediction(eid, row_id=None):
-    row_id = [row_id] if row_id is not None else None
-    pred = model.get_predictions([eid], row_id, model_id=st.session_state["model_id"])
-    st.write(pred)
+    if row_id is None:
+        pred = model.get_predictions([eid], model_id=st.session_state["model_id"])[eid]
+    else:
+        pred = model.get_predictions([eid], row_id, model_id=st.session_state["model_id"])[eid][
+            row_id
+        ]
     if st.session_state["display_proba"]:
-        pred_proba = model.get_predictions(
-            [eid], row_id, model_id=st.session_state["model_id"], return_proba=True
-        )
+        if row_id is None:
+            pred_proba = model.get_predictions(
+                [eid], model_id=st.session_state["model_id"], return_proba=True
+            )[eid]
+        else:
+            pred_proba = model.get_predictions(
+                [eid], row_id, model_id=st.session_state["model_id"], return_proba=True
+            )[eid][row_id]
         pred_display = (
             f"{config.pred_format_func(pred)} ({config.pred_format_func(pred_proba, pred_is_probability=True)})"
         )
