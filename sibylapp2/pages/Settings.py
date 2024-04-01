@@ -8,6 +8,7 @@ from ruamel import yaml
 from sibylapp2 import config
 from sibylapp2.compute.contributions import get_dataset_contributions
 from sibylapp2.compute.model import get_dataset_predictions
+from sibylapp2.compute.features import get_features, get_feature_description
 from sibylapp2.view.utils.helpers import neg_em, pos_em
 
 UP_ARROW = "⬆"
@@ -58,7 +59,10 @@ def main():
         get_dataset_contributions.clear()  # clear cache to force reload with new settings
         get_dataset_predictions.clear()
 
-    st.title("Settings")
+    def _clear_feature_data():
+        get_features.clear()
+        get_feature_description.clear()
+
     loader = yaml.YAML()
 
     # Load existing configuration if available
@@ -90,6 +94,14 @@ def main():
 
     setting_col, _ = st.columns(2)
     with setting_col:
+        config_data["USE_ORIGINAL_FEATURE_NAMES"] = st.radio(
+            "Terms to use for features:",
+            [False, True],
+            index=1 if config.get_use_original_feature_names() else 0,
+            format_func=lambda x: "Shortened Names" if x else "Full descriptions",
+            horizontal=True,
+        )
+
         config_data["BAR_LENGTH"] = st.slider(
             "Length of bars:",
             min_value=4,

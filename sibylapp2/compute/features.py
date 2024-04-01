@@ -3,6 +3,7 @@ from __future__ import annotations
 import streamlit as st
 
 from sibylapp2.compute import api
+from sibylapp2 import config
 
 
 @st.cache_data(show_spinner="Fetching data...")
@@ -13,6 +14,8 @@ def get_features(include_type=False, include_values=False):
     if include_values:
         columns.append("Values")
     features = api.fetch_features()[columns]
+    if config.get_use_original_feature_names():
+        features["Feature"] = features.index
     return features
 
 

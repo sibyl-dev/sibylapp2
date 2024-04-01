@@ -46,6 +46,10 @@ def get_pages_to_show():
     return select_config("PAGES_TO_SHOW", "pages_to_show", "all")
 
 
+def get_use_original_feature_names():
+    return get_from_config("USE_ORIGINAL_FEATURE_NAMES", False)
+
+
 # APPLICATION-SPECIFIC CONFIGURATIONS =============================================================
 def select_config(name, api_name, default):
     if get_from_config(name) is not None:
