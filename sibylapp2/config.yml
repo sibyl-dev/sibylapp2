@@ -20,6 +20,6 @@ SUPPORT_PROBABILITY: # Only set this to True when model supports `predict_proba`
 PAGES_TO_SHOW: # Set to a list of pages or "all" to show all pages
 ALLOW_PAGE_SELECTION:  # If true, allow user to select which pages to show (requires settings page)
 
-# TIME-SERIES-SPECIFIC CONFIGUREATIONS ============================================================
+# TIME-SERIES-SPECIFIC CONFIGURATIONS =============================================================
 MAX_FEATURES: 10 # Maximum number of features to show on time-series explanation plots
 TIME_UNIT: days # unit of time used in application and plots
