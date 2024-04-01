@@ -1,10 +1,10 @@
+import matplotlib.cm as cm
 import numpy as np
 import plotly.graph_objects as go
 import streamlit as st
 
 from sibylapp2.compute.context import get_term
 from sibylapp2.config import PREDICTION_TYPE, PredType, get_color_scheme, pred_format_func
-import matplotlib.cm as cm
 
 
 def lighten(base, step):
