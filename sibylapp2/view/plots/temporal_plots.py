@@ -43,7 +43,7 @@ def plot_temporal_line_charts(
 
     for feature in df["feature"].unique():
         df_feature = df[df["feature"] == feature]
-        if value_df:
+        if value_df is not None:
             hovertemplate = (
                 "<b>%{customdata[0]}</b><br>Lead time: %{x}<br>Contribution:"
                 " %{y}<br>Value:%{customdata[0]}<extra></extra>"
