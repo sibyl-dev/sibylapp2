@@ -133,6 +133,14 @@ def main():
         ],
         default=1,
     )
+    pred_filter = None
+    if config.PREDICTION_TYPE == config.PredType.BOOLEAN:
+        pred_filter = st.radio(
+            get_term("Filter by prediction"),
+            ["all", 1, 0],
+            format_func=lambda x: ("all" if x == "all" else config.pred_format_func(x)),
+            horizontal=True,
+        )
     if config.USE_ROWS:
         predictions = {
             item[0]: model.get_predictions_for_rows(item[0], item[1])
@@ -154,12 +162,27 @@ def main():
                 }
                 for eid in proba_predictions
             }
+        if pred_filter and pred_filter != "all":
+            eids = [eid for eid in eids if any(predictions[eid].values()) == pred_filter]
+            predictions = {
+                eid: {row_id: predictions[eid][row_id] for row_id in predictions[eid]}
+                for eid in eids
+            }
+            if proba_predictions:
+                proba_predictions = {
+                    eid: {
+                        row_id: proba_predictions[eid][row_id] for row_id in proba_predictions[eid]
+                    }
+                    for eid in eids
+                }
         if tab == "1":
             multi_row_plot(predictions, proba_predictions)
         if tab == "2":
             prediction_table(predictions, proba_predictions, multirow=True)
     else:
         predictions = model.get_predictions(eids)
+        if pred_filter and pred_filter != "all":
+            eids = [eid for eid in eids if predictions[eid] == pred_filter]
         predictions = {eid: predictions[eid] for eid in eids}
         if tab == "1":
             single_row_plot(predictions)
