@@ -14,6 +14,7 @@ from sibylapp2.pages import (
     Understand_the_Model,
 )
 from sibylapp2.view.utils import setup
+from sibylapp2.compute.api import log
 
 setup.setup_page(return_row_ids=True)
 
@@ -52,7 +53,9 @@ pages = {
     for key in pages_to_show
 }
 
-page_select = st.sidebar.radio("Select an explanation", pages.keys())
+page_select = st.sidebar.radio(
+    "Select an explanation", pages.keys(), on_change=lambda: log(interface="main")
+)
 st.sidebar.divider()
 
 pages[page_select].main()

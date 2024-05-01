@@ -5,6 +5,7 @@ import pandas as pd
 import requests
 import streamlit as st
 import yaml
+from time import time
 
 with open(path.join(path.dirname(path.dirname(path.abspath(__file__))), "config.yml"), "r") as f:
     cfg = yaml.safe_load(f)
@@ -249,3 +250,44 @@ def fetch_context():
     context_id = api_get("contexts/")["contexts"][0]["context_id"]
     url = "context/" + context_id
     return api_get(url)["context"]
+
+
+def log(
+    timestamp=None,
+    user_id=None,
+    eid=None,
+    action=None,
+    element=None,
+    details=None,
+    interface=None,
+):
+    """
+    Log an action in the system
+    Args:
+        timestamp (int):
+            Time of the action. If not provided, current time is used.
+        user_id (str):
+            ID of the user that took the action
+        eid (str):
+            Entity ID the action was taken on
+        action (str):
+            Action taken
+        element (str):
+            Element the action was taken on
+        details (dict):
+            Details of the action
+        interface (str):
+            Interface the action was taken on
+    """
+    if timestamp is None:
+        timestamp = int(time())
+    json = {
+        "timestamp": timestamp,
+        "user_id": user_id,
+        "eid": eid,
+        "action": action,
+        "element": element,
+        "details": details,
+        "interface": interface,
+    }
+    api_post("log/", json)
