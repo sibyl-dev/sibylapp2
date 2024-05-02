@@ -54,7 +54,12 @@ pages = {
 }
 
 page_select = st.sidebar.radio(
-    "Select an explanation", pages.keys(), on_change=lambda: log(interface="main")
+    "Select an explanation",
+    pages.keys(),
+    key="page_select",
+    on_change=lambda: log(
+        interface="main", action="change_page", details={"page": st.session_state["page_select"]}
+    ),
 )
 st.sidebar.divider()
 
