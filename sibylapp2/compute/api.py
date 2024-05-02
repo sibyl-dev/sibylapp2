@@ -53,26 +53,6 @@ def api_post(url, json=None, data=None):
     return response.json()
 
 
-def api_put(url, json=None, data=None):
-    fetch_url = cfg["BASE_URL"] + url
-    try:
-        if data:
-            response = session.put(
-                fetch_url, data=data, headers={"Content-Type": "application/json"}
-            )
-        else:
-            response = session.put(fetch_url, json=json)
-    except requests.exceptions.RequestException as err:
-        st.error(f"Connection error. Please check your connection and refresh the page ({err})")
-        st.stop()
-    if response.status_code != 200:
-        st.error(
-            "Error with request (%s) %s: %s" % (fetch_url, response.status_code, response.reason)
-        )
-        st.stop()
-    return response.json()
-
-
 def fetch_models():
     models = api_get("models/")["models"]
     return [model["model_id"] for model in models]
@@ -285,9 +265,11 @@ def log(
         "timestamp": timestamp,
         "user_id": user_id,
         "eid": eid,
-        "action": action,
-        "element": element,
-        "details": details,
-        "interface": interface,
+        "event": {
+            "action": action,
+            "element": element,
+            "details": details,
+            "interface": interface,
+        },
     }
     api_post("log/", json)
