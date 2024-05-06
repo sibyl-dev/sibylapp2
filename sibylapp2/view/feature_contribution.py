@@ -2,9 +2,9 @@ import streamlit as st
 
 from sibylapp2.compute import contributions, features
 from sibylapp2.compute.context import get_term
+from sibylapp2.log import log
 from sibylapp2.view.utils import filtering, helpers
 from sibylapp2.view.utils.helpers import show_legend
-from sibylapp2.log import log
 
 
 def update_selected_features(edited_table, selected_features):

@@ -3,8 +3,8 @@ import streamlit as st
 
 from sibylapp2 import config
 from sibylapp2.compute import context, model
-from sibylapp2.view.utils import display
 from sibylapp2.log import log
+from sibylapp2.view.utils import display
 
 
 @st.cache_data

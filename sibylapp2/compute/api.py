@@ -1,6 +1,5 @@
 import json as json_encoder
 from os import path
-from time import time
 
 import pandas as pd
 import requests
