@@ -14,6 +14,7 @@ def log(
     element=None,
     details=None,
     interface=None,
+    tracking_key=None,
 ):
     """
     Log an action in the system
@@ -32,8 +33,17 @@ def log(
             Details of the action
         interface (str):
             Interface the action was taken on
+        tracking_key (str):
+            If provided, maintain the last value logged for this key to prevent double logging.
+            Recommended if not logging with on_change
     """
     if not ENABLE_LOGGING:
+        return
+    if (
+        tracking_key is not None
+        and tracking_key in st.session_state
+        and st.session_state[tracking_key] == details
+    ):
         return
     if timestamp is None:
         timestamp = int(time())
@@ -50,3 +60,5 @@ def log(
         details=details,
         interface=interface,
     )
+    if tracking_key is not None:
+        st.session_state[tracking_key] = details

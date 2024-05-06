@@ -54,14 +54,22 @@ def show_sort_options(options):
     )
 
 
-def show_filter_options(options):
+def show_filter_options(options, format_func=None):
     return st.radio(
         "Filter by",
         options,
         key="filter_by",
+        format_func=format_func,
         horizontal=True,
         on_change=lambda: log(
-            action="filter", details={"filter_by": st.session_state["filter_by"]}
+            action="filter",
+            details={
+                "filter_by": (
+                    format_func(st.session_state["filter_by"])
+                    if format_func
+                    else st.session_state["filter_by"]
+                )
+            },
         ),
     )
 

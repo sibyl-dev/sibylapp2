@@ -10,12 +10,11 @@ from sibylapp2.view.utils.helpers import show_legend
 def update_selected_features(edited_table, selected_features):
     if "Show feature plot?" in edited_table.columns:
         selected_features.extend(edited_table[edited_table["Show feature plot?"]].index)
-        if (
-            "last_logged_features" not in st.session_state
-            or st.session_state["last_logged_features"] != selected_features
-        ):
-            log(action="show_feature_plot", details={"features": selected_features})
-            st.session_state["last_logged_features"] = selected_features
+        log(
+            action="show_feature_plot",
+            details={"features": selected_features},
+            tracking_key="explore_a_feature_last_selected_features",
+        )
 
 
 def show_sorted_contributions(to_show, sort_by, key):

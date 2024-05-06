@@ -9,7 +9,8 @@ from streamlit_plotly_events import plotly_events
 from sibylapp2 import config
 from sibylapp2.compute import model
 from sibylapp2.compute.context import get_term
-from sibylapp2.view.utils.helpers import generate_bars, show_table
+from sibylapp2.log import log
+from sibylapp2.view.utils.helpers import generate_bars, show_filter_options, show_table
 
 
 def single_row_plot(predictions):
@@ -81,6 +82,11 @@ def multi_row_plot(predictions, proba_predictions=None):
             prediction_table(
                 predictions, proba_predictions, multirow=True, selected_eid=eid, save_space=True
             )
+            log(
+                action="show_table",
+                details={"eid": eid},
+                tracking_key="prediction_summary_last_eid_table",
+            )
 
 
 def prediction_table(
@@ -135,11 +141,9 @@ def main():
     )
     pred_filter = None
     if config.PREDICTION_TYPE == config.PredType.BOOLEAN:
-        pred_filter = st.radio(
-            get_term("Filter by prediction"),
+        pred_filter = show_filter_options(
             ["all", 1, 0],
             format_func=lambda x: ("all" if x == "all" else config.pred_format_func(x)),
-            horizontal=True,
         )
     if config.USE_ROWS:
         predictions = {
@@ -188,3 +192,9 @@ def main():
             single_row_plot(predictions)
         if tab == "2":
             prediction_table(predictions)
+
+    log(
+        action="change_tab",
+        details={"tab": tab},
+        tracking_key="prediction_summary_last_tab_logged",
+    )
