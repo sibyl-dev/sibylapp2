@@ -2,6 +2,7 @@ import streamlit as st
 
 from sibylapp2.compute.context import get_term
 from sibylapp2.config import get_pages_to_show
+from sibylapp2.log import log
 from sibylapp2.pages import (
     Change_over_Time,
     Compare_Entities,
@@ -14,7 +15,6 @@ from sibylapp2.pages import (
     Understand_the_Model,
 )
 from sibylapp2.view.utils import setup
-from sibylapp2.compute.api import log
 
 setup.setup_page(return_row_ids=True)
 
@@ -58,7 +58,9 @@ page_select = st.sidebar.radio(
     pages.keys(),
     key="page_select",
     on_change=lambda: log(
-        interface="main", action="change_page", details={"page": st.session_state["page_select"]}
+        interface=page_select,
+        action="change_page",
+        details={"page": st.session_state["page_select"]},
     ),
 )
 st.sidebar.divider()

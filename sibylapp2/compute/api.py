@@ -1,11 +1,13 @@
 import json as json_encoder
 from os import path
+from time import time
 
 import pandas as pd
 import requests
 import streamlit as st
 import yaml
-from time import time
+
+# from sibylapp2.config import ENABLE_LOGGING
 
 with open(path.join(path.dirname(path.dirname(path.abspath(__file__))), "config.yml"), "r") as f:
     cfg = yaml.safe_load(f)
@@ -42,6 +44,26 @@ def api_post(url, json=None, data=None):
             )
         else:
             response = session.post(fetch_url, json=json)
+    except requests.exceptions.RequestException as err:
+        st.error(f"Connection error. Please check your connection and refresh the page ({err})")
+        st.stop()
+    if response.status_code != 200:
+        st.error(
+            "Error with request (%s) %s: %s" % (fetch_url, response.status_code, response.reason)
+        )
+        st.stop()
+    return response.json()
+
+
+def api_put(url, json=None, data=None):
+    fetch_url = cfg["BASE_URL"] + url
+    try:
+        if data:
+            response = session.put(
+                fetch_url, data=data, headers={"Content-Type": "application/json"}
+            )
+        else:
+            response = session.put(fetch_url, json=json)
     except requests.exceptions.RequestException as err:
         st.error(f"Connection error. Please check your connection and refresh the page ({err})")
         st.stop()
@@ -233,7 +255,7 @@ def fetch_context():
 
 
 def log(
-    timestamp=None,
+    timestamp,
     user_id=None,
     eid=None,
     action=None,
@@ -245,7 +267,7 @@ def log(
     Log an action in the system
     Args:
         timestamp (int):
-            Time of the action. If not provided, current time is used.
+            Time of the action.
         user_id (str):
             ID of the user that took the action
         eid (str):
@@ -259,8 +281,6 @@ def log(
         interface (str):
             Interface the action was taken on
     """
-    if timestamp is None:
-        timestamp = int(time())
     json = {
         "timestamp": timestamp,
         "user_id": user_id,
