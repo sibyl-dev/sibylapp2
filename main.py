@@ -53,16 +53,16 @@ pages = {
     for key in pages_to_show
 }
 
-page_select = st.sidebar.radio(
+page_selected = st.sidebar.radio(
     "Select an explanation",
     pages.keys(),
-    key="page_select",
+    key="page_selected",
     on_change=lambda: log(
-        interface=page_select,
+        interface=page_selected,
         action="change_page",
-        details={"page": st.session_state["page_select"]},
+        details={"page": st.session_state["page_selected"]},
     ),
 )
 st.sidebar.divider()
 
-pages[page_select].main()
+pages[page_selected].main()

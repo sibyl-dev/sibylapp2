@@ -37,9 +37,9 @@ def log(
         return
     if timestamp is None:
         timestamp = int(time())
-    if interface is None and "change_page" in st.session_state:
-        interface = st.session_state["change_page"]
-    if eid is None is "eid" in st.session_state:
+    if interface is None and "page_selected" in st.session_state:
+        interface = st.session_state["page_selected"]
+    if eid is None and "eid" in st.session_state:
         eid = st.session_state["eid"]
     api_log(
         timestamp=timestamp,

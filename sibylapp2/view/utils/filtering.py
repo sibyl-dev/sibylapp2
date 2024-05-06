@@ -4,6 +4,7 @@ import streamlit as st
 from sibylapp2 import config
 from sibylapp2.compute import context, model
 from sibylapp2.view.utils import display
+from sibylapp2.log import log
 
 
 @st.cache_data
@@ -165,12 +166,20 @@ def view_filtering(include_show_more=False):
             "Search by %s" % context.get_term("Feature").lower(),
             key="search_term",
             value=st.session_state["search_term"],
+            on_change=lambda: log(
+                action="search",
+                details={"search_term": st.session_state["search_term"]},
+            ),
         )
         st.multiselect(
             "Filter by category",
             context.get_category_list(),
             key="filters",
             default=st.session_state["filters"],
+            on_change=lambda: log(
+                action="filter",
+                details={"categories": st.session_state["filters"]},
+            ),
         )
 
 
