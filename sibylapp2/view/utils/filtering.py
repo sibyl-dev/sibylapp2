@@ -70,6 +70,7 @@ def view_entity_select(eid_text="eid", prefix=None, default=0):
         format_func=format_func,
         index=st.session_state[f"select_{eid_text}_index"],
         key=eid_text,
+        on_change=lambda: log(action="select_entity", details={"eid": st.session_state[eid_text]}),
     )
 
 
@@ -91,6 +92,9 @@ def view_row_select(eid, row_ids, row_id_text="row_id", prefix=None, default=0):
         format_func=format_rowid_select,
         index=st.session_state[f"select_{row_id_text}_index"],
         key=row_id_text,
+        on_change=lambda: log(
+            action="select_row", details={row_id_text: st.session_state[row_id_text]}
+        ),
     )
     predictions = model.get_predictions_for_rows(
         eid, row_ids, model_id=st.session_state["model_id"]
@@ -126,6 +130,9 @@ def view_model_select(default=0):
             st.session_state["model_ids"],
             index=st.session_state["select_model_index"],
             key="model_id",
+            on_change=lambda: log(
+                action="select_model", details={"model_id": st.session_state["model_id"]}
+            ),
         )
     else:
         st.session_state["model_id"] = st.session_state["model_ids"][0]

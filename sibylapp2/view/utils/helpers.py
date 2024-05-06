@@ -54,11 +54,14 @@ def show_sort_options(options):
     )
 
 
-def show_filter_options(options, format_func=None):
+def show_filter_options(options, format_func=None, help_text=None, title="Filter by"):
+    if format_func is None:
+        format_func = lambda x: x
     return st.radio(
-        "Filter by",
+        title,
         options,
         key="filter_by",
+        help=help_text,
         format_func=format_func,
         horizontal=True,
         on_change=lambda: log(
