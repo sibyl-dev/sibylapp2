@@ -15,6 +15,7 @@ from sibylapp2.config import (
     get_bar_length,
     get_color_scheme,
 )
+from sibylapp2.log import log
 
 NEUT_EM = "🟪"
 BLANK_EM = "⬜"
@@ -44,11 +45,25 @@ def neg_em(color_scheme=None):
 
 
 def show_sort_options(options):
-    return st.radio("Sort/Filter by", options, horizontal=True)
+    return st.radio(
+        "Sort/Filter by",
+        options,
+        horizontal=True,
+        key="sort_by",
+        on_change=lambda: log(action="sort", details={"sort_by": st.session_state["sort_by"]}),
+    )
 
 
 def show_filter_options(options):
-    return st.radio("Filter by", options, horizontal=True)
+    return st.radio(
+        "Filter by",
+        options,
+        key="filter_by",
+        horizontal=True,
+        on_change=lambda: log(
+            action="filter", details={"filter_by": st.session_state["filter_by"]}
+        ),
+    )
 
 
 def show_text_input_side_by_side(
@@ -134,7 +149,14 @@ def show_table(df, key, style_function=None, button_size_mod=4):
         page_size_key = "per_page_key"
         if key is not None:
             page_size_key = "%s%s" % (key, "_per_page")
-        page_size = st.selectbox("Rows per page", [10, 25, 50], key=page_size_key)
+        page_size = st.selectbox(
+            "Rows per page",
+            [10, 25, 50],
+            key=page_size_key,
+            on_change=lambda: log(
+                action="change_page_size", details={"page_size": st.session_state[page_size_key]}
+            ),
+        )
     with col1:
         page_key = "page_key"
         if key is not None:
@@ -146,6 +168,9 @@ def show_table(df, key, style_function=None, button_size_mod=4):
             min_value=1,
             max_value=int(df.shape[0] / page_size) + 1,
             key=page_key,
+            on_change=lambda: log(
+                action="change_page", details={"page": st.session_state[page_key]}
+            ),
         )
 
     df = df[(page - 1) * page_size : page * page_size]
