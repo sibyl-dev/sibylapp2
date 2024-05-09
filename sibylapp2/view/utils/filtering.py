@@ -26,10 +26,17 @@ def view_prediction_selection(predictions, disabled=False):
     if config.PREDICTION_TYPE in (config.PredType.BOOLEAN, config.PredType.CATEGORICAL):
         chosen_preds = st.multiselect(
             "Predictions to visualize",
-            list(np.unique(pred_values)),
+            np.unique(pred_values),
             default=np.unique(pred_values),
             format_func=config.pred_format_func,
             disabled=disabled,
+            key="log_chosen_preds",
+            on_change=lambda: log(
+                action="filter_predictions",
+                details={
+                    "predictions": [str(pred) for pred in st.session_state["log_chosen_preds"]]
+                },
+            ),
         )
         eids = get_relevant_eids(chosen_preds, predictions)
     else:
@@ -41,6 +48,11 @@ def view_prediction_selection(predictions, disabled=False):
             max_pred,
             (min_pred, max_pred),
             disabled=disabled,
+            key="log_chosen_preds",
+            on_change=lambda: log(
+                action="filter_predictions",
+                details={"prediction_range": st.session_state["log_chosen_preds"]},
+            ),
         )
         eids = get_relevant_eids_range(pred_range, predictions)
     return eids
