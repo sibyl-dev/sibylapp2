@@ -35,11 +35,10 @@ def view(eid, model_id):
     y.index = ["y"]  # Used to prevent bug in data_editor where index is assumed to be numeric
     to_show, neighbor_names, selected_col_name = format_similar_entities(x, y)
     options = ["No filtering"] + neighbor_names
-    show_different = st.radio(
-        "Apply filtering by differences?",
+    show_different = helpers.show_filter_options(
         options,
-        horizontal=True,
-        help="Show only rows where value differs from selected",
+        help_text="Show only rows where value differs from selected",
+        title="Apply filtering by differences?",
     )
     if show_different == "No filtering":
         pass

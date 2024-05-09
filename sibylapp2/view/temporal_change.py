@@ -5,6 +5,7 @@ from plotly.subplots import make_subplots
 from sibylapp2.compute import contributions, features, model
 from sibylapp2.compute.context import get_term
 from sibylapp2.config import TIME_UNIT
+from sibylapp2.log import log
 from sibylapp2.view.plots import charts
 from sibylapp2.view.utils import filtering, helpers
 
@@ -134,8 +135,16 @@ def view(eid, row_id, model_ids):
     for model_id in model_ids:
         times.append(int(model_id[:-1]))
     bounds_form = st.form("bounds_form")
-    bounds = bounds_form.select_slider("Lead times", options=times, value=(times[0], times[-1]))
-    bounds_form.form_submit_button("Update")
+    bounds = bounds_form.select_slider(
+        "Lead times", options=times, key="log_lead_time_bounds", value=(times[0], times[-1])
+    )
+    bounds_form.form_submit_button(
+        "Update",
+        on_click=lambda: log(
+            action="filter_lead_times",
+            details={"bounds": st.session_state["log_lead_time_bounds"]},
+        ),
+    )
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     fig = plot_prediction_variation(fig, eid, row_id, model_ids, bounds)
     contribution_figure = plot_contributions_variation(

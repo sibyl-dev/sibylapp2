@@ -2,6 +2,7 @@ import streamlit as st
 
 from sibylapp2.compute import context, model
 from sibylapp2.config import SUPPORT_PROBABILITY, pred_format_func
+from sibylapp2.log import log
 
 
 def show_probability_select_box(sidebar=True):
@@ -15,6 +16,10 @@ def show_probability_select_box(sidebar=True):
             value=st.session_state["display_proba"],
             help="Display prediction in terms of probability",
             key="display_proba",
+            on_change=lambda: log(
+                action="toggle_probability",
+                details={"display_proba": st.session_state["display_proba"]},
+            ),
         )
 
 

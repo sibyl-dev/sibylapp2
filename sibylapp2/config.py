@@ -78,6 +78,7 @@ NEGATIVE_TERM = select_config("NEGATIVE_TERM", "output_neg_label", "False")
 PRED_FORMAT_STRING = select_config("PRED_FORMAT_STRING", "output_format_string", "{}")
 SUPPORT_PROBABILITY = select_config("SUPPORT_PROBABILITY", "show_probs", False)
 ALLOW_PAGE_SELECTION = select_config("ALLOW_PAGE_SELECTION", "allow_page_selection", False)
+ENABLE_LOGGING = select_config("ENABLE_LOGGING", "enable_logging", False)
 
 MAX_FEATURES = select_config("MAX_FEATURES", "num_plot_features", 10)
 TIME_UNIT = select_config("TIME_UNIT", "time_unit", "days")

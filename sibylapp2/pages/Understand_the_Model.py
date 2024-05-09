@@ -6,6 +6,7 @@ import streamlit as st
 from sibylapp2 import config
 from sibylapp2.compute import contributions, features, model
 from sibylapp2.compute.context import get_term
+from sibylapp2.log import log
 from sibylapp2.view import explore_feature, feature_importance, global_contributions
 from sibylapp2.view.utils import filtering
 
@@ -86,7 +87,17 @@ def main():
                     "Select a %s" % get_term("feature"),
                     filtering.process_search_on_features(features_values),
                     format_func=feature_name_to_description,
+                    key="log_feature_select",
+                    on_change=lambda: log(
+                        action="select_feature",
+                        details={"feature": st.session_state["log_feature_select"]},
+                    ),
                 )
                 explore_feature.view(
                     eids, predictions, feature, st.session_state["model_id"], discrete
                 )
+    log(
+        action="change_tab",
+        details={"tab": tab},
+        tracking_key="understand_model_last_tab_logged",
+    )

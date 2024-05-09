@@ -4,6 +4,7 @@ import streamlit as st
 from sibylapp2.compute import contributions, features, model
 from sibylapp2.compute.context import get_term
 from sibylapp2.config import POSITIVE_TERM, PREDICTION_TYPE, PredType, pred_format_func
+from sibylapp2.log import log
 from sibylapp2.view.utils import filtering, helpers
 from sibylapp2.view.utils.formatting import format_two_contributions_to_view
 
@@ -78,14 +79,16 @@ def view_compare_cases_helper():
             ["Absolute Change", f"More {get_term('Positive')}", f"More {get_term('Negative')}"]
         )
     with cols[1]:
-        show_number = st.checkbox(
-            "Show numeric contributions?",
-            help="Show the exact amount this feature contributes to the model prediction",
-        )
+        show_number = helpers.show_contributions_checkbox()
         show_contribution = st.checkbox(
             "Show original contributions?",
             help="Show the original %s contributions for both %s"
             % (get_term("Feature"), get_term("Entity", plural=True)),
+            key="show_original_contributions",
+            on_change=lambda: log(
+                action="show_original_contributions",
+                details={"show": st.session_state["show_original_contributions"]},
+            ),
         )
     return sort_by, show_number, show_contribution
 
@@ -182,11 +185,10 @@ def view(model_id, eid, eid_comp=None, row_id=None, row_id_comp=None):
     )
 
     options = ["No filtering", "Show same values only", "Show different values only"]
-    show_different = st.radio(
-        "Apply filtering?",
+
+    show_different = helpers.show_filter_options(
         options,
-        horizontal=True,
-        help="Show only rows where %s values of two %s are identical"
+        help_text="Show only rows where %s values of two %s are identical"
         % (get_term("feature"), get_term("entity", plural=True)),
     )
     if show_different == "Show same values only":

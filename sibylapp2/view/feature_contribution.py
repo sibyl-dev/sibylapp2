@@ -2,8 +2,19 @@ import streamlit as st
 
 from sibylapp2.compute import contributions, features
 from sibylapp2.compute.context import get_term
+from sibylapp2.log import log
 from sibylapp2.view.utils import filtering, helpers
 from sibylapp2.view.utils.helpers import show_legend
+
+
+def update_selected_features(edited_table, selected_features):
+    if "Show feature plot?" in edited_table.columns:
+        selected_features.extend(edited_table[edited_table["Show feature plot?"]].index)
+        log(
+            action="show_feature_plot",
+            details={"features": selected_features},
+            tracking_key="explore_a_feature_last_selected_features",
+        )
 
 
 def show_sorted_contributions(to_show, sort_by, key):
@@ -21,8 +32,7 @@ def show_sorted_contributions(to_show, sort_by, key):
             edited_table = helpers.show_table(
                 to_show_neg.drop("Contribution Value", axis="columns"), key="%s%s" % (key, "_neg")
             )
-            if "Show feature plot?" in edited_table.columns:
-                selected_features.extend(edited_table[edited_table["Show feature plot?"]].index)
+            update_selected_features(edited_table, selected_features)
         with col2:
             st.subheader(get_term("Positive"))
             to_show_pos = to_show[to_show["Contribution Value"] >= 0].sort_values(
@@ -32,8 +42,7 @@ def show_sorted_contributions(to_show, sort_by, key):
             edited_table = helpers.show_table(
                 to_show_pos.drop("Contribution Value", axis="columns"), key="%s%s" % (key, "_pos")
             )
-            if "Show feature plot?" in edited_table.columns:
-                selected_features.extend(edited_table[edited_table["Show feature plot?"]].index)
+            update_selected_features(edited_table, selected_features)
     else:
         if sort_by == "Absolute":
             to_show = to_show.reindex(
@@ -49,8 +58,7 @@ def show_sorted_contributions(to_show, sort_by, key):
         edited_table = helpers.show_table(
             to_show.drop("Contribution Value", axis="columns"), key=key
         )
-        if "Show feature plot?" in edited_table.columns:
-            selected_features.extend(edited_table[edited_table["Show feature plot?"]].index)
+        update_selected_features(edited_table, selected_features)
     return selected_features
 
 
@@ -87,10 +95,7 @@ def view(eid, model_id, key, row_id=None, save_space=False, include_feature_plot
                 ["Absolute", get_term("Positive"), get_term("Negative"), "Side-by-side"]
             )
         with cols[1]:
-            show_number = st.checkbox(
-                "Show numeric contributions?",
-                help="Show the exact amount this feature contributes to the model prediction",
-            )
+            show_number = helpers.show_contributions_checkbox()
     else:
         sort_by = helpers.show_sort_options(
             ["Absolute", get_term("Positive"), get_term("Negative")]

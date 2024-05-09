@@ -3,6 +3,7 @@ import streamlit as st
 
 from sibylapp2 import config
 from sibylapp2.compute import context, model
+from sibylapp2.log import log
 from sibylapp2.view.utils import display
 
 
@@ -25,10 +26,17 @@ def view_prediction_selection(predictions, disabled=False):
     if config.PREDICTION_TYPE in (config.PredType.BOOLEAN, config.PredType.CATEGORICAL):
         chosen_preds = st.multiselect(
             "Predictions to visualize",
-            list(np.unique(pred_values)),
+            np.unique(pred_values),
             default=np.unique(pred_values),
             format_func=config.pred_format_func,
             disabled=disabled,
+            key="log_chosen_preds",
+            on_change=lambda: log(
+                action="filter_predictions",
+                details={
+                    "predictions": [str(pred) for pred in st.session_state["log_chosen_preds"]]
+                },
+            ),
         )
         eids = get_relevant_eids(chosen_preds, predictions)
     else:
@@ -40,6 +48,11 @@ def view_prediction_selection(predictions, disabled=False):
             max_pred,
             (min_pred, max_pred),
             disabled=disabled,
+            key="log_chosen_preds",
+            on_change=lambda: log(
+                action="filter_predictions",
+                details={"prediction_range": st.session_state["log_chosen_preds"]},
+            ),
         )
         eids = get_relevant_eids_range(pred_range, predictions)
     return eids
@@ -69,6 +82,7 @@ def view_entity_select(eid_text="eid", prefix=None, default=0):
         format_func=format_func,
         index=st.session_state[f"select_{eid_text}_index"],
         key=eid_text,
+        on_change=lambda: log(action="select_entity", details={"eid": st.session_state[eid_text]}),
     )
 
 
@@ -90,6 +104,9 @@ def view_row_select(eid, row_ids, row_id_text="row_id", prefix=None, default=0):
         format_func=format_rowid_select,
         index=st.session_state[f"select_{row_id_text}_index"],
         key=row_id_text,
+        on_change=lambda: log(
+            action="select_row", details={row_id_text: st.session_state[row_id_text]}
+        ),
     )
     predictions = model.get_predictions_for_rows(
         eid, row_ids, model_id=st.session_state["model_id"]
@@ -125,6 +142,9 @@ def view_model_select(default=0):
             st.session_state["model_ids"],
             index=st.session_state["select_model_index"],
             key="model_id",
+            on_change=lambda: log(
+                action="select_model", details={"model_id": st.session_state["model_id"]}
+            ),
         )
     else:
         st.session_state["model_id"] = st.session_state["model_ids"][0]
@@ -165,12 +185,20 @@ def view_filtering(include_show_more=False):
             "Search by %s" % context.get_term("Feature").lower(),
             key="search_term",
             value=st.session_state["search_term"],
+            on_change=lambda: log(
+                action="search",
+                details={"search_term": st.session_state["search_term"]},
+            ),
         )
         st.multiselect(
             "Filter by category",
             context.get_category_list(),
             key="filters",
             default=st.session_state["filters"],
+            on_change=lambda: log(
+                action="filter_by_category",
+                details={"categories": st.session_state["filters"]},
+            ),
         )
 
 

@@ -7,6 +7,7 @@ from streamlit_plotly_events import plotly_events
 from sibylapp2 import config
 from sibylapp2.compute import contributions
 from sibylapp2.compute.context import get_term
+from sibylapp2.log import log
 from sibylapp2.view import feature_contribution
 
 
@@ -95,6 +96,11 @@ def view(eids, predictions, feature, model_id, discrete=False, one_line=False):
                 ids[selected_index[0]["curveNumber"]][selected_index[0]["pointIndex"]]
                 if len(selected_index) > 0
                 else None
+            )
+            log(
+                action="investigate_entity",
+                details={"entity": selected_id},
+                tracking_key="log_explore_feature_investigate_entity",
             )
         if not one_line:
             fig2 = generate_feature_distribution_plot(eids, feature, model_id=model_id)
