@@ -80,19 +80,31 @@ def show_filter_options(options, format_func=None, help_text=None, title="Filter
     )
 
 
-def show_text_input_side_by_side(
-    label: str,
+def show_feature_change_box(
+    feature: str,
     options=None,
     default_input=None,
     numeric=False,
     **input_params,
 ):
     col1, col2 = st.columns([2, 2])
+    label = f"New value for **{feature}**"
     col1.markdown(label)
 
     if numeric:
         return col2.number_input(
-            "hidden", value=default_input, label_visibility="collapsed", key=label, **input_params
+            "hidden",
+            value=default_input,
+            label_visibility="collapsed",
+            key=label,
+            on_change=lambda: log(
+                action="change_feature",
+                details={
+                    "feature": feature,
+                    "new_value": st.session_state[label],
+                },
+            ),
+            **input_params,
         )
     else:
         if options is None:
@@ -101,6 +113,13 @@ def show_text_input_side_by_side(
                 value=default_input,
                 label_visibility="collapsed",
                 key=label,
+                on_change=lambda: log(
+                    action="change_feature",
+                    details={
+                        "feature": feature,
+                        "new_value": st.session_state[label],
+                    },
+                ),
                 **input_params,
             )
         else:
@@ -111,6 +130,13 @@ def show_text_input_side_by_side(
                 index=index,
                 label_visibility="collapsed",
                 key=label,
+                on_change=lambda: log(
+                    action="change_feature",
+                    details={
+                        "feature": feature,
+                        "new_value": st.session_state[label],
+                    },
+                ),
                 **input_params,
             )
 

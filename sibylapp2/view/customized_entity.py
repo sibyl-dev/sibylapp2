@@ -6,10 +6,11 @@ import streamlit as st
 from sibylapp2.compute import contributions, features, model
 from sibylapp2.compute.context import get_term
 from sibylapp2.config import pred_format_func
+from sibylapp2.log import log
 from sibylapp2.view.compare_entities import sort_contributions, view_compare_cases_helper
 from sibylapp2.view.utils import helpers
 from sibylapp2.view.utils.formatting import format_two_contributions_to_view
-from sibylapp2.view.utils.helpers import show_text_input_side_by_side
+from sibylapp2.view.utils.helpers import show_feature_change_box
 
 
 def view_feature_boxes(
@@ -34,6 +35,10 @@ def view_feature_boxes(
         format_func=lambda feat: features_df.loc[feat, "Feature"],
         key="selected_features",
         placeholder="Select one or multiple %s" % get_term("feature", plural=True),
+        on_change=lambda: log(
+            action="select_features",
+            details={"selected_features": st.session_state["selected_features"]},
+        ),
     )
     for feature in selected_features:
         # Sibyl-api expects the raw feature names as input for changes
@@ -47,8 +52,8 @@ def view_feature_boxes(
             numeric = False
             options = st.session_state["categorical_values_dict"][feature]
 
-        changes[feature] = show_text_input_side_by_side(
-            f"New value for **{features_df.loc[feature, 'Feature'].strip()}**",
+        changes[feature] = show_feature_change_box(
+            features_df.loc[feature, "Feature"].strip(),
             options=options,
             default_input=default_input,
             numeric=numeric,
