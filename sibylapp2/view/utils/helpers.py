@@ -46,7 +46,7 @@ def neg_em(color_scheme=None):
 
 def show_sort_options(options):
     return st.radio(
-        "Sort/Filter by",
+        "Sort by",
         options,
         horizontal=True,
         key="sort_by",
@@ -56,7 +56,10 @@ def show_sort_options(options):
 
 def show_filter_options(options, format_func=None, help_text=None, title="Filter by"):
     if format_func is None:
-        format_func = lambda x: x
+
+        def format_func(x):
+            return x
+
     return st.radio(
         title,
         options,
@@ -289,4 +292,16 @@ def show_legend(similar_entities=False):
         (neg_em() + neg_change + " " + model_pred)
         + separator
         + (pos_em() + pos_change + " " + model_pred)
+    )
+
+
+def show_contributions_checkbox():
+    return st.checkbox(
+        "Show numeric contributions?",
+        help="Show the exact amount this feature contributes to the model prediction",
+        key="show_numeric_contributions",
+        on_change=lambda: log(
+            action="show_numeric_contributions",
+            details={"show": st.session_state["show_numeric_contributions"]},
+        ),
     )

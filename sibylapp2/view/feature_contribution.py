@@ -95,15 +95,7 @@ def view(eid, model_id, key, row_id=None, save_space=False, include_feature_plot
                 ["Absolute", get_term("Positive"), get_term("Negative"), "Side-by-side"]
             )
         with cols[1]:
-            show_number = st.checkbox(
-                "Show numeric contributions?",
-                help="Show the exact amount this feature contributes to the model prediction",
-                key="show_numeric_contributions",
-                on_change=lambda: log(
-                    action="show_numeric_contributions",
-                    details={"show": st.session_state["show_numeric_contributions"]},
-                ),
-            )
+            show_number = helpers.show_contributions_checkbox()
     else:
         sort_by = helpers.show_sort_options(
             ["Absolute", get_term("Positive"), get_term("Negative")]
