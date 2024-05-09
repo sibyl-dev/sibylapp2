@@ -184,7 +184,7 @@ def view_filtering(include_show_more=False):
             key="filters",
             default=st.session_state["filters"],
             on_change=lambda: log(
-                action="filter",
+                action="filter_by_category",
                 details={"categories": st.session_state["filters"]},
             ),
         )
