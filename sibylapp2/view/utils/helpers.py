@@ -93,8 +93,10 @@ def show_feature_change_box(
 
     def log_helper():
         details = {"feature": feature}
-        if st.session_state[label]:
+        if not pd.isna(st.session_state[label]):
             details["new_value"] = st.session_state[label]
+        else:
+            details["new_value"] = None
         log(
             action="change_feature",
             details=details,
