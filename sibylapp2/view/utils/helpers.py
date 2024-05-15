@@ -91,19 +91,24 @@ def show_feature_change_box(
     label = f"New value for **{feature}**"
     col1.markdown(label)
 
+    def log_helper():
+        details = {"feature": feature}
+        if not pd.isna(st.session_state[label]):
+            details["new_value"] = st.session_state[label]
+        else:
+            details["new_value"] = None
+        log(
+            action="change_feature",
+            details=details,
+        )
+
     if numeric:
         return col2.number_input(
             "hidden",
             value=default_input,
             label_visibility="collapsed",
             key=label,
-            on_change=lambda: log(
-                action="change_feature",
-                details={
-                    "feature": feature,
-                    "new_value": st.session_state[label],
-                },
-            ),
+            on_change=log_helper,
             **input_params,
         )
     else:
@@ -113,13 +118,7 @@ def show_feature_change_box(
                 value=default_input,
                 label_visibility="collapsed",
                 key=label,
-                on_change=lambda: log(
-                    action="change_feature",
-                    details={
-                        "feature": feature,
-                        "new_value": st.session_state[label],
-                    },
-                ),
+                on_change=log_helper,
                 **input_params,
             )
         else:
@@ -130,13 +129,7 @@ def show_feature_change_box(
                 index=index,
                 label_visibility="collapsed",
                 key=label,
-                on_change=lambda: log(
-                    action="change_feature",
-                    details={
-                        "feature": feature,
-                        "new_value": st.session_state[label],
-                    },
-                ),
+                on_change=log_helper,
                 **input_params,
             )
 

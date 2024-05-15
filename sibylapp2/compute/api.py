@@ -44,6 +44,7 @@ def api_post(url, json=None, data=None):
         else:
             response = session.post(fetch_url, json=json)
     except requests.exceptions.RequestException as err:
+        st.write(fetch_url, json)
         st.error(f"Connection error. Please check your connection and refresh the page ({err})")
         st.stop()
     if response.status_code != 200:
