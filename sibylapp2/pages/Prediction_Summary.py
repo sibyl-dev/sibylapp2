@@ -1,6 +1,5 @@
 # pylint: disable=invalid-name
 
-import extra_streamlit_components as stx
 import pandas as pd
 import plotly.express as px
 import streamlit as st
@@ -79,6 +78,7 @@ def multi_row_plot(predictions, proba_predictions=None):
     with col2:
         if len(selected) > 0:
             eid = list(predictions.keys())[selected[0]["curveNumber"]]
+            st.session_state["eid"] = eid
             prediction_table(
                 predictions, proba_predictions, multirow=True, selected_eid=eid, save_space=True
             )
@@ -128,17 +128,7 @@ def pred_prob_to_raw_prob(pred_prob, pred):
 def main():
     eids = st.session_state["eids"]
 
-    tab = stx.tab_bar(
-        data=[
-            stx.TabBarItemData(id=1, title=get_term("Summary"), description=""),
-            stx.TabBarItemData(
-                id=2,
-                title="Interactive Table",
-                description="",
-            ),
-        ],
-        default=1,
-    )
+    tab = "1"
     pred_filter = None
     if config.PREDICTION_TYPE == config.PredType.BOOLEAN:
         pred_filter = show_filter_options(
@@ -198,3 +188,4 @@ def main():
         details={"tab": tab},
         tracking_key="prediction_summary_last_tab_logged",
     )
+    st.sidebar.write(f"Selected {get_term('Entity')}: {st.session_state['eid']}")
