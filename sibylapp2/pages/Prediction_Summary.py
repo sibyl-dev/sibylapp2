@@ -188,4 +188,5 @@ def main():
         details={"tab": tab},
         tracking_key="prediction_summary_last_tab_logged",
     )
-    st.sidebar.write(f"Selected {get_term('Entity')}: {st.session_state['eid']}")
+    if "eid" in st.session_state:
+        st.sidebar.write(f"Selected {get_term('Entity')}: {st.session_state['eid']}")
