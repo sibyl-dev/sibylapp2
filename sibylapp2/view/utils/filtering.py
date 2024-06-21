@@ -88,7 +88,11 @@ def view_entity_select(eid_text="eid", prefix=None, default=0):
 
 def view_row_select(eid, row_ids, row_id_text="row_id", prefix=None, default=0):
     def format_rowid_select(row_id):
-        return str(row_id)
+        return f"{str(row_id)} ({config.pred_format_func(predictions[row_id])})"
+
+    predictions = model.get_predictions_for_rows(
+        eid, row_ids, model_id=st.session_state["model_id"]
+    )
 
     if row_id_text not in st.session_state:
         st.session_state[f"select_{row_id_text}_index"] = default
