@@ -85,6 +85,8 @@ TIME_UNIT = select_config("TIME_UNIT", "time_unit", "days")
 USE_ROWS = select_config("USE_ROWS", "use_rows", False)
 ROW_LABEL = select_config("ROW_LABEL", "row_label", "Row")
 
+MANUAL_EIDS = select_config("MANUAL_EIDS", "manual_eids", None)
+
 
 def pred_format_func(pred, display_proba=False):
     if display_proba:
