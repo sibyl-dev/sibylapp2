@@ -8,6 +8,7 @@ MAX_ENTITIES: 11 # Maximum number of entities to select from. Set this to None t
 DATASET_SIZE: 1000 # Max number of entities to use for dataset-wide visualizations
 LOAD_UPFRONT: true # If true, run heavy computations on initial load, else greedily run as needed
 ENABLE_LOGGING: true # If true, log actions to database
+MANUAL_EIDS: # List of entity IDs to show
 
 # APPLICATION-SPECIFIC CONFIGURATIONS (overrides API context) =====================================
 FLIP_COLORS: # deprecated (use COLOR_SCHEME) keeping for api support
