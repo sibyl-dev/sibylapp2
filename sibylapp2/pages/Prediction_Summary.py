@@ -132,8 +132,8 @@ def main():
     pred_filter = None
     if config.PREDICTION_TYPE == config.PredType.BOOLEAN:
         pred_filter = show_filter_options(
-            ["all", 1, 0],
-            format_func=lambda x: ("all" if x == "all" else config.pred_format_func(x)),
+            ["All", 1, 0],
+            format_func=lambda x: "All" if x == "All" else "Failures" if x == 1 else "No Failures",
         )
     if config.USE_ROWS:
         predictions = {
@@ -156,8 +156,11 @@ def main():
                 }
                 for eid in proba_predictions
             }
-        if pred_filter and pred_filter != "all":
-            eids = [eid for eid in eids if any(predictions[eid].values()) == pred_filter]
+        if pred_filter is not None and pred_filter != "All":
+            if pred_filter == 1:
+                eids = [eid for eid in eids if any(predictions[eid].values())]
+            if pred_filter == 0:
+                eids = [eid for eid in eids if not any(predictions[eid].values())]
             predictions = {
                 eid: {row_id: predictions[eid][row_id] for row_id in predictions[eid]}
                 for eid in eids

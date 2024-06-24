@@ -60,11 +60,8 @@ def view_prediction_selection(predictions, disabled=False):
 
 def view_entity_select(eid_text="eid", prefix=None, default=0):
     def format_func(eid):
-        return f"{context.get_term('Entity')} {eid} ({config.pred_format_func(predictions[eid])})"
+        return f"{context.get_term('Entity')} {eid}"
 
-    predictions = model.get_predictions(
-        st.session_state["eids"], model_id=st.session_state["model_id"]
-    )
     if eid_text in st.session_state:
         st.session_state[f"select_{eid_text}_index"] = st.session_state["eids"].index(
             st.session_state[eid_text]
