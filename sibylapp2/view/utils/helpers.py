@@ -122,7 +122,8 @@ def show_feature_change_box(
                 **input_params,
             )
         else:
-            index = options.index(default_input) if default_input in options else None
+            index = options.index(str(default_input)) if str(default_input) in options else None
+
             return col2.selectbox(
                 "hidden",
                 options=options,
