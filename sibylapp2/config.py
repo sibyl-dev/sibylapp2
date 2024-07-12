@@ -5,6 +5,8 @@ import streamlit as st
 import yaml
 
 from sibylapp2.compute.context import get_config as get_api_config
+import math
+import numpy as np
 
 
 def get_from_config(key, default=None):
@@ -102,7 +104,32 @@ def pred_format_func(pred, display_proba=False):
 
 def manual_pred_format_func(pred):
     # Not used unless config.OVERRIDE_PRED_FORMAT == True
-    return str(pred)
+    # Thresholds is a list with these values:
+    thresholds = [
+        0.01174609,
+        0.01857239,
+        0.0241622,
+        0.0293587,
+        0.03448975,
+        0.0396932,
+        0.04531139,
+        0.051446,
+        0.05834176,
+        0.06616039,
+        0.07549515,
+        0.08624243,
+        0.09912388,
+        0.11433409,
+        0.13370343,
+        0.15944484,
+        0.19579651,
+        0.25432879,
+        0.36464856,
+        1.0,
+    ]
+    probs = 1 / (1 + math.exp(-pred))
+    bins = np.digitize(probs, thresholds) + 1
+    return bins
 
 
 def get_color_scheme():

@@ -12,12 +12,12 @@ MANUAL_EIDS: # List of entity IDs to show
 
 # APPLICATION-SPECIFIC CONFIGURATIONS (overrides API context) =====================================
 FLIP_COLORS: # deprecated (use COLOR_SCHEME) keeping for api support
-COLOR_SCHEME: # Standard: positive is blue. Reversed: positive is red. Neutral: Neither
+COLOR_SCHEME: Standard # Standard: positive is blue. Reversed: positive is red. Neutral: Neither
 PREDICTION_TYPE: # One of "numeric", "boolean", "categorical"
 POSITIVE_TERM: # Term to use for a True prediction for boolean models
 NEGATIVE_TERM: # Term to use for a False prediction for boolean models
 PRED_FORMAT_STRING: # fstring for formatting numeric model outputs
-OVERRIDE_PRED_FORMAT: # If True, use "config.manual_pred_format_func" to format preds, ignoring previous 3 configs
+OVERRIDE_PRED_FORMAT: True # If True, use "config.manual_pred_format_func" to format preds, ignoring previous 3 configs
 SUPPORT_PROBABILITY: # Only set this to True when model supports `predict_proba`
 PAGES_TO_SHOW: # Set to a list of pages or "all" to show all pages
 ALLOW_PAGE_SELECTION:  # If true, allow user to select which pages to show (requires settings page)
