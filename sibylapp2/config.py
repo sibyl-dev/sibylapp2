@@ -84,6 +84,7 @@ MAX_FEATURES = select_config("MAX_FEATURES", "num_plot_features", 10)
 TIME_UNIT = select_config("TIME_UNIT", "time_unit", "days")
 USE_ROWS = select_config("USE_ROWS", "use_rows", False)
 ROW_LABEL = select_config("ROW_LABEL", "row_label", "Row")
+MODEL_LABEL = select_config("MODEL_LABEL", "model_label", "Model")
 
 MANUAL_EIDS = select_config("MANUAL_EIDS", "manual_eids", None)
 

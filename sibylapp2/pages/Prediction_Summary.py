@@ -3,6 +3,7 @@
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+from pandas.errors import ParserError
 from streamlit_plotly_events import plotly_events
 
 from sibylapp2 import config
@@ -40,7 +41,7 @@ def single_row_plot(predictions):
     st.plotly_chart(fig, use_container_width=True)
 
 
-def multi_row_plot(predictions, proba_predictions=None):
+def multi_row_plot(predictions, proba_predictions=None, x_label="X"):
     col1, col2 = st.columns((2, 1))
     with col1:
         if proba_predictions:
@@ -52,15 +53,16 @@ def multi_row_plot(predictions, proba_predictions=None):
         df = pd.DataFrame.from_dict(
             {(i, j): [vals[i][j]] for i in vals.keys() for j in vals[i].keys()}
         ).T.reset_index()
-        df.columns = [get_term("Entity"), config.ROW_LABEL, label]
-        # df[config.ROW_LABEL] = pd.to_datetime(
-        #    df[config.ROW_LABEL]
-        # )  # Convert time to datetime format
-
+        df.columns = [get_term("Entity"), x_label, label]
+        # If the x-axis has times, convert to datetime to sort correctly
+        df[x_label] = pd.to_datetime(df[x_label], errors="ignore")
+        # If the x-axis is numeric, convert to numeric to sort correctly
+        df[x_label] = pd.to_numeric(df[x_label], errors="ignore")
+        df.sort_values(by=x_label, inplace=True)
         # Create the line plot
         fig = px.line(
             df,
-            x=config.ROW_LABEL,
+            x=x_label,
             y=label,
             color=get_term("Entity"),
             markers=True,
@@ -69,7 +71,7 @@ def multi_row_plot(predictions, proba_predictions=None):
 
         # Update layout for better readability
         fig.update_layout(
-            xaxis_title=config.ROW_LABEL, legend_title=get_term("Entity"), hovermode="closest"
+            xaxis_title=x_label, legend_title=get_term("Entity"), hovermode="closest"
         )
         if proba_predictions:
             fig.update_layout(yaxis_range=[0, 1])
@@ -99,7 +101,6 @@ def prediction_table(
             )
         else:
             eid = selected_eid
-            st.write(eid)
         predictions = predictions[eid]
         if proba_predictions:
             proba_predictions = proba_predictions[eid]
@@ -137,14 +138,21 @@ def main():
         )
 
     params = config.PREDICTIONS_PARAMS
-
+    proba_predictions = None
     if params == "rows" or "models":
         if params == "rows":
+            x_label = config.ROW_LABEL
             predictions = {
                 item[0]: model.get_predictions_for_rows(item[0], item[1])
                 for item in st.session_state["row_id_dict"].items()
             }
-        else:
+            if config.SUPPORT_PROBABILITY:
+                proba_predictions = {
+                    item[0]: model.get_predictions_for_rows(item[0], item[1], return_proba=True)
+                    for item in st.session_state["row_id_dict"].items()
+                }
+        elif params == "models":
+            x_label = config.MODEL_LABEL
             predictions = {
                 model_id: model.get_predictions(eids, model_id=model_id)
                 for model_id in model.get_models()
@@ -153,16 +161,7 @@ def main():
                 eid: {model_id: predictions[model_id][eid] for model_id in predictions}
                 for eid in predictions[next(iter(predictions))]
             }
-
-            st.write(predictions)
-        proba_predictions = None
-        if config.SUPPORT_PROBABILITY:
-            if params == "rows":
-                proba_predictions = {
-                    item[0]: model.get_predictions_for_rows(item[0], item[1], return_proba=True)
-                    for item in st.session_state["row_id_dict"].items()
-                }
-            else:
+            if config.SUPPORT_PROBABILITY:
                 proba_predictions = {
                     model_id: model.get_predictions(eids, model_id=model_id, return_proba=True)
                     for model_id in model.get_models()
@@ -174,33 +173,36 @@ def main():
                     }
                     for eid in proba_predictions[next(iter(proba_predictions))]
                 }
-            # Convert the outcome probability to raw probability
-            proba_predictions = {
-                eid: {
-                    item: pred_prob_to_raw_prob(
-                        proba_predictions[eid][item], predictions[eid][item]
-                    )
-                    for item in proba_predictions[eid]
-                }
-                for eid in proba_predictions
-            }
-        if pred_filter and pred_filter != "all":
-            eids = [eid for eid in eids if any(predictions[eid].values()) == pred_filter]
-            predictions = {
-                eid: {row_id: predictions[eid][row_id] for row_id in predictions[eid]}
-                for eid in eids
-            }
-            if proba_predictions:
+
+            if proba_predictions is not None:
+                # Convert the outcome probability to raw probability
                 proba_predictions = {
                     eid: {
-                        row_id: proba_predictions[eid][row_id] for row_id in proba_predictions[eid]
+                        item: pred_prob_to_raw_prob(
+                            proba_predictions[eid][item], predictions[eid][item]
+                        )
+                        for item in proba_predictions[eid]
                     }
+                    for eid in proba_predictions
+                }
+            if pred_filter and pred_filter != "all":
+                eids = [eid for eid in eids if any(predictions[eid].values()) == pred_filter]
+                predictions = {
+                    eid: {row_id: predictions[eid][row_id] for row_id in predictions[eid]}
                     for eid in eids
                 }
-        if tab == "1":
-            multi_row_plot(predictions, proba_predictions)
-        if tab == "2":
-            prediction_table(predictions, proba_predictions, multirow=True)
+                if proba_predictions:
+                    proba_predictions = {
+                        eid: {
+                            row_id: proba_predictions[eid][row_id]
+                            for row_id in proba_predictions[eid]
+                        }
+                        for eid in eids
+                    }
+            if tab == "1":
+                multi_row_plot(predictions, proba_predictions, x_label)
+            if tab == "2":
+                prediction_table(predictions, proba_predictions, multirow=True)
     elif params is None:
         predictions = model.get_predictions(eids)
         if pred_filter and pred_filter != "all":
