@@ -87,6 +87,8 @@ ROW_LABEL = select_config("ROW_LABEL", "row_label", "Row")
 
 MANUAL_EIDS = select_config("MANUAL_EIDS", "manual_eids", None)
 
+PREDICTIONS_PARAMS = select_config("PREDICTIONS_PARAMS", "predictions_params", None)
+
 
 def pred_format_func(pred, display_proba=False):
     if display_proba:
