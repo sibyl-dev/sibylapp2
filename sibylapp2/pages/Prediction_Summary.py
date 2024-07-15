@@ -151,7 +151,7 @@ def main():
                     item[0]: model.get_predictions_for_rows(item[0], item[1], return_proba=True)
                     for item in st.session_state["row_id_dict"].items()
                 }
-        elif params == "models":
+        else:  # params == "models"
             x_label = config.MODEL_LABEL
             predictions = {
                 model_id: model.get_predictions(eids, model_id=model_id)
@@ -174,35 +174,34 @@ def main():
                     for eid in proba_predictions[next(iter(proba_predictions))]
                 }
 
-            if proba_predictions is not None:
-                # Convert the outcome probability to raw probability
+        if proba_predictions is not None:
+            # Convert the outcome probability to raw probability
+            proba_predictions = {
+                eid: {
+                    item: pred_prob_to_raw_prob(
+                        proba_predictions[eid][item], predictions[eid][item]
+                    )
+                    for item in proba_predictions[eid]
+                }
+                for eid in proba_predictions
+            }
+        if pred_filter and pred_filter != "all":
+            eids = [eid for eid in eids if any(predictions[eid].values()) == pred_filter]
+            predictions = {
+                eid: {row_id: predictions[eid][row_id] for row_id in predictions[eid]}
+                for eid in eids
+            }
+            if proba_predictions:
                 proba_predictions = {
                     eid: {
-                        item: pred_prob_to_raw_prob(
-                            proba_predictions[eid][item], predictions[eid][item]
-                        )
-                        for item in proba_predictions[eid]
+                        row_id: proba_predictions[eid][row_id] for row_id in proba_predictions[eid]
                     }
-                    for eid in proba_predictions
-                }
-            if pred_filter and pred_filter != "all":
-                eids = [eid for eid in eids if any(predictions[eid].values()) == pred_filter]
-                predictions = {
-                    eid: {row_id: predictions[eid][row_id] for row_id in predictions[eid]}
                     for eid in eids
                 }
-                if proba_predictions:
-                    proba_predictions = {
-                        eid: {
-                            row_id: proba_predictions[eid][row_id]
-                            for row_id in proba_predictions[eid]
-                        }
-                        for eid in eids
-                    }
-            if tab == "1":
-                multi_row_plot(predictions, proba_predictions, x_label)
-            if tab == "2":
-                prediction_table(predictions, proba_predictions, multirow=True)
+        if tab == "1":
+            multi_row_plot(predictions, proba_predictions, x_label)
+        if tab == "2":
+            prediction_table(predictions, proba_predictions, multirow=True)
     elif params is None:
         predictions = model.get_predictions(eids)
         if pred_filter and pred_filter != "all":

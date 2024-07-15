@@ -21,7 +21,7 @@ OVERRIDE_PRED_FORMAT: # If True, use "config.manual_pred_format_func" to format 
 SUPPORT_PROBABILITY: # Only set this to True when model supports `predict_proba`
 PAGES_TO_SHOW: # Set to a list of pages or "all" to show all pages
 ALLOW_PAGE_SELECTION:  # If true, allow user to select which pages to show (requires settings page)
-PREDICTIONS_PARAMS: "models"  # Parameters to categorize by on the Prediction Summary page. Options: "rows", "models", None (will only show EIDs)
+PREDICTIONS_PARAMS: "rows"  # Parameters to categorize by on the Prediction Summary page. Options: "rows", "models", None (will only show EIDs)
 MODEL_LABEL:  "Lead Time (days)" # How to label models
 ROW_LABEL:  # How to label rows
 
