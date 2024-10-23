@@ -4,7 +4,18 @@ from os import path
 import streamlit as st
 import yaml
 
-from sibylapp2.compute.context import get_config
+from sibylapp2.compute.context import get_config as get_api_config
+
+
+def get_from_config(key, default=None):
+    """
+    Returns a value from the config, or a default value if the key is not present or if
+    the value in the config is None.
+    """
+    cfg = load_config()
+    if key not in cfg or cfg[key] is None:
+        return default
+    return cfg[key]
 
 
 @st.cache_data(show_spinner=False)
@@ -16,24 +27,19 @@ def load_config():
 
 # GENERAL CONFIGURATIONS ==========================================================================
 def get_bar_length():
-    return load_config().get("BAR_LENGTH", 8)
+    return get_from_config("BAR_LENGTH", 8)
 
 
 def get_max_entities():
-    return load_config().get("MAX_ENTITIES", 11)
+    return get_from_config("MAX_ENTITIES", 11)
 
 
 def get_dataset_size():
-    return load_config().get("DATASET_SIZE", 1000)
+    return get_from_config("DATASET_SIZE", 1000)
 
 
 def get_load_upfront():
-    return load_config().get("LOAD_UPFRONT", True)
-
-
-def get_color_scheme():
-    flip_colors = load_config().get("FLIP_COLORS", False)
-    return load_config().get("COLOR_SCHEME", "Reversed" if flip_colors else "Standard")
+    return get_from_config("LOAD_UPFRONT", True)
 
 
 def get_pages_to_show():
@@ -42,10 +48,10 @@ def get_pages_to_show():
 
 # APPLICATION-SPECIFIC CONFIGURATIONS =============================================================
 def select_config(name, api_name, default):
-    if load_config().get(name) is not None:
-        return load_config().get(name)
-    if get_config(api_name) is not None:
-        return get_config(api_name)
+    if get_from_config(name) is not None:
+        return get_from_config(name)
+    if get_api_config(api_name) is not None:
+        return get_api_config(api_name)
     return default
 
 
@@ -72,17 +78,20 @@ NEGATIVE_TERM = select_config("NEGATIVE_TERM", "output_neg_label", "False")
 PRED_FORMAT_STRING = select_config("PRED_FORMAT_STRING", "output_format_string", "{}")
 SUPPORT_PROBABILITY = select_config("SUPPORT_PROBABILITY", "show_probs", False)
 ALLOW_PAGE_SELECTION = select_config("ALLOW_PAGE_SELECTION", "allow_page_selection", False)
+ENABLE_LOGGING = select_config("ENABLE_LOGGING", "enable_logging", False)
 
 MAX_FEATURES = select_config("MAX_FEATURES", "num_plot_features", 10)
 TIME_UNIT = select_config("TIME_UNIT", "time_unit", "days")
 USE_ROWS = select_config("USE_ROWS", "use_rows", False)
 ROW_LABEL = select_config("ROW_LABEL", "row_label", "Row")
 
+MANUAL_EIDS = select_config("MANUAL_EIDS", "manual_eids", None)
+
 
 def pred_format_func(pred, display_proba=False):
     if display_proba:
         return f"{pred*100:.1f}%"
-    if load_config().get("OVERRIDE_PRED_FORMAT"):
+    if get_from_config("OVERRIDE_PRED_FORMAT"):
         return manual_pred_format_func(pred)
     if PREDICTION_TYPE == PredType.NUMERIC:
         return PRED_FORMAT_STRING.format(pred)
@@ -94,3 +103,7 @@ def pred_format_func(pred, display_proba=False):
 def manual_pred_format_func(pred):
     # Not used unless config.OVERRIDE_PRED_FORMAT == True
     return str(pred)
+
+
+def get_color_scheme():
+    return get_from_config("COLOR_SCHEME", "Reversed" if FLIP_COLORS else "Standard")

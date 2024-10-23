@@ -8,6 +8,7 @@ from ruamel import yaml
 from sibylapp2 import config
 from sibylapp2.compute.contributions import get_dataset_contributions
 from sibylapp2.compute.model import get_dataset_predictions
+from sibylapp2.log import log
 from sibylapp2.view.utils.helpers import neg_em, pos_em
 
 UP_ARROW = "⬆"
@@ -34,6 +35,11 @@ def save_config(loader, config_data, existing_config):
     with open(CONFIG_FILEPATH, "w") as yaml_file:
         loader.dump(existing_config, yaml_file)
     if old_config != existing_config:
+        # print differences between old_config and existing_config
+        changed = {
+            k: existing_config[k] for k in existing_config if existing_config[k] != old_config[k]
+        }
+        log(action="changed_setting", details=changed)
         st.toast("Configuration saved successfully!", icon="✅")
         st.toast("Refresh the page to see the changes.", icon="🔄")
 

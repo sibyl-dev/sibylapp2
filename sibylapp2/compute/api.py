@@ -6,6 +6,8 @@ import requests
 import streamlit as st
 import yaml
 
+# from sibylapp2.config import ENABLE_LOGGING
+
 with open(path.join(path.dirname(path.dirname(path.abspath(__file__))), "config.yml"), "r") as f:
     cfg = yaml.safe_load(f)
 
@@ -42,6 +44,7 @@ def api_post(url, json=None, data=None):
         else:
             response = session.post(fetch_url, json=json)
     except requests.exceptions.RequestException as err:
+        st.write(fetch_url, json)
         st.error(f"Connection error. Please check your connection and refresh the page ({err})")
         st.stop()
     if response.status_code != 200:
@@ -82,23 +85,12 @@ def fetch_model_id():
     return model_id
 
 
-def fetch_eids(
-    max_entities=None,
-    return_row_ids=False,
-):
+def fetch_eids():
     """
     Return corresponding row_ids in the form of a dictionary where the keys are the eids
     and the values are the lists of row_ids for each eid, when specified.
     """
-    entities = api_get("entities/")["entities"]
-    if max_entities is not None:
-        entities = entities[:max_entities]
-    if return_row_ids:
-        return [entry["eid"] for entry in entities], {
-            entry["eid"]: entry["row_ids"] for entry in entities
-        }
-    else:
-        return [entry["eid"] for entry in entities]
+    return api_get("entities/")["entities"]
 
 
 def fetch_modified_prediction(
@@ -249,3 +241,44 @@ def fetch_context():
     context_id = api_get("contexts/")["contexts"][0]["context_id"]
     url = "context/" + context_id
     return api_get(url)["context"]
+
+
+def log(
+    timestamp,
+    user_id=None,
+    eid=None,
+    action=None,
+    element=None,
+    details=None,
+    interface=None,
+):
+    """
+    Log an action in the system
+    Args:
+        timestamp (int):
+            Time of the action.
+        user_id (str):
+            ID of the user that took the action
+        eid (str):
+            Entity ID the action was taken on
+        action (str):
+            Action taken
+        element (str):
+            Element the action was taken on
+        details (dict):
+            Details of the action
+        interface (str):
+            Interface the action was taken on
+    """
+    json = {
+        "timestamp": timestamp,
+        "user_id": user_id,
+        "eid": eid,
+        "event": {
+            "action": action,
+            "element": element,
+            "details": details,
+            "interface": interface,
+        },
+    }
+    api_post("log/", json)

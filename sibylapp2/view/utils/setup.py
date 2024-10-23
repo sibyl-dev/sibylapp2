@@ -14,11 +14,15 @@ def setup_page(return_row_ids=False):
     if return_row_ids:
         if "eids" not in st.session_state or "row_id_dict" not in st.session_state:
             st.session_state["eids"], st.session_state["row_id_dict"] = entities.get_eids(
-                max_entities=config.get_max_entities(), return_row_ids=True
+                max_entities=config.get_max_entities(),
+                return_row_ids=True,
+                defaults=config.MANUAL_EIDS,
             )
     else:
         if "eids" not in st.session_state:
-            st.session_state["eids"] = entities.get_eids(max_entities=config.get_max_entities())
+            st.session_state["eids"] = entities.get_eids(
+                max_entities=config.get_max_entities(), defaults=config.MANUAL_EIDS
+            )
 
     if "model_ids" not in st.session_state:
         # sort models in temporal order

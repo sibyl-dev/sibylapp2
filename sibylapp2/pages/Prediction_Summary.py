@@ -1,6 +1,5 @@
 # pylint: disable=invalid-name
 
-import extra_streamlit_components as stx
 import pandas as pd
 import plotly.express as px
 import streamlit as st
@@ -9,7 +8,8 @@ from streamlit_plotly_events import plotly_events
 from sibylapp2 import config
 from sibylapp2.compute import model
 from sibylapp2.compute.context import get_term
-from sibylapp2.view.utils.helpers import generate_bars, show_table
+from sibylapp2.log import log
+from sibylapp2.view.utils.helpers import generate_bars, show_filter_options, show_table
 
 
 def single_row_plot(predictions):
@@ -78,8 +78,14 @@ def multi_row_plot(predictions, proba_predictions=None):
     with col2:
         if len(selected) > 0:
             eid = list(predictions.keys())[selected[0]["curveNumber"]]
+            st.session_state["eid"] = eid
             prediction_table(
                 predictions, proba_predictions, multirow=True, selected_eid=eid, save_space=True
+            )
+            log(
+                action="show_table",
+                details={"eid": eid},
+                tracking_key="prediction_summary_last_eid_table",
             )
 
 
@@ -122,17 +128,13 @@ def pred_prob_to_raw_prob(pred_prob, pred):
 def main():
     eids = st.session_state["eids"]
 
-    tab = stx.tab_bar(
-        data=[
-            stx.TabBarItemData(id=1, title=get_term("Summary"), description=""),
-            stx.TabBarItemData(
-                id=2,
-                title="Interactive Table",
-                description="",
-            ),
-        ],
-        default=1,
-    )
+    tab = "1"
+    pred_filter = None
+    if config.PREDICTION_TYPE == config.PredType.BOOLEAN:
+        pred_filter = show_filter_options(
+            ["all", 1, 0],
+            format_func=lambda x: ("all" if x == "all" else config.pred_format_func(x)),
+        )
     if config.USE_ROWS:
         predictions = {
             item[0]: model.get_predictions_for_rows(item[0], item[1])
@@ -154,14 +156,37 @@ def main():
                 }
                 for eid in proba_predictions
             }
+        if pred_filter and pred_filter != "all":
+            eids = [eid for eid in eids if any(predictions[eid].values()) == pred_filter]
+            predictions = {
+                eid: {row_id: predictions[eid][row_id] for row_id in predictions[eid]}
+                for eid in eids
+            }
+            if proba_predictions:
+                proba_predictions = {
+                    eid: {
+                        row_id: proba_predictions[eid][row_id] for row_id in proba_predictions[eid]
+                    }
+                    for eid in eids
+                }
         if tab == "1":
             multi_row_plot(predictions, proba_predictions)
         if tab == "2":
             prediction_table(predictions, proba_predictions, multirow=True)
     else:
         predictions = model.get_predictions(eids)
+        if pred_filter and pred_filter != "all":
+            eids = [eid for eid in eids if predictions[eid] == pred_filter]
         predictions = {eid: predictions[eid] for eid in eids}
         if tab == "1":
             single_row_plot(predictions)
         if tab == "2":
             prediction_table(predictions)
+
+    log(
+        action="change_tab",
+        details={"tab": tab},
+        tracking_key="prediction_summary_last_tab_logged",
+    )
+    if "eid" in st.session_state:
+        st.sidebar.write(f"Selected {get_term('Entity')}: {st.session_state['eid']}")

@@ -1,10 +1,43 @@
+import matplotlib.cm as cm
 import numpy as np
-import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
 from sibylapp2.compute.context import get_term
 from sibylapp2.config import PREDICTION_TYPE, PredType, get_color_scheme, pred_format_func
+
+
+def lighten(base, step):
+    """
+    Lighten a color by a number of steps.
+    """
+    if base.startswith("rgba"):
+        color = base.split("(")[1].split(")")[0].split(",")
+        color = [int(c) for c in color]
+        color = [int(min(255, c + step)) for c in color]
+        color = "rgba(%d, %d, %d, %d)" % (color[0], color[1], color[2], 1)
+    else:
+        color = base.lstrip("#")
+        color = tuple(int(color[i : i + 2], 16) for i in (0, 2, 4))
+        color = tuple(int(min(255, c + step)) for c in color)
+        color = "#%02x%02x%02x" % color
+    return color
+
+
+def interpolate(color1, color2, steps=10):
+    """
+    Interpolate between color1 and color2, both in rgba format, with the given number of steps
+    """
+    color1 = color1.split("(")[1].split(")")[0].split(",")
+    color1 = [int(c) for c in color1]
+    color2 = color2.split("(")[1].split(")")[0].split(",")
+    color2 = [int(c) for c in color2]
+    colors = []
+    for i in range(steps):
+        color = [int(color1[j] + (color2[j] - color1[j]) * i / steps) for j in range(3)]
+        color = "rgba(%d, %d, %d, %d)" % (color[0], color[1], color[2], 1)
+        colors.append(color)
+    return colors
 
 
 def plot_temporal_line_charts(
@@ -18,13 +51,6 @@ def plot_temporal_line_charts(
 
     Plot line charts for data.
     """
-    pos_color = (
-        "rgba(194, 17, 17, 1)" if get_color_scheme() == "Reversed" else "rgba(24, 74, 201, 1)"
-    )
-    neg_color = (
-        "rgba(24, 74, 201, 1)" if get_color_scheme() == "Reversed" else "rgba(194, 17, 17, 1)"
-    )
-
     if "Category" in df.columns:
         df = df.drop(columns="Category")
     df = df.set_index("Feature").transpose().reset_index(names=["time"])
@@ -39,13 +65,15 @@ def plot_temporal_line_charts(
     if fig is None:
         fig = go.Figure()
 
-    for feature in df["feature"].unique():
+    features = df["feature"].unique()
+
+    colors = [cm.viridis(i / len(features)) for i in range(len(features))]
+    colors = [f"rgba({int(c[0]*255)}, {int(c[1]*255)}, {int(c[2]*255)}, 1)" for c in colors]
+
+    for step, feature in enumerate(features):
         df_feature = df[df["feature"] == feature]
         values = value_df.loc[feature]
-        if df_feature["contribution"].mean() > 0:
-            color = pos_color
-        else:
-            color = neg_color
+        color = colors[step]
         customdata = np.stack((df_feature["feature"], values), axis=-1)
         fig.add_trace(
             go.Scatter(

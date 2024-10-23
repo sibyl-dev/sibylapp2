@@ -5,6 +5,7 @@ from plotly.subplots import make_subplots
 from sibylapp2.compute import contributions, features, model
 from sibylapp2.compute.context import get_term
 from sibylapp2.config import TIME_UNIT
+from sibylapp2.log import log
 from sibylapp2.view.plots import charts
 from sibylapp2.view.utils import filtering, helpers
 
@@ -32,11 +33,7 @@ def filter_contributions(to_show, sort_by, num_features=8):
     return to_show.iloc[0:num_features, :]
 
 
-def get_contributions_variation(
-    eid,
-    row_id,
-    model_ids,
-):
+def get_contributions_variation(eid, row_id, model_ids, bounds=None):
     """
     This function displays the contributions change over time(different models).
 
@@ -48,6 +45,8 @@ def get_contributions_variation(
     values_list = []
     feature_name = None
     for model_id in model_ids:
+        if int(model_id[:-1]) < bounds[0] or int(model_id[:-1]) > bounds[1]:
+            continue
         contribution_df, value_df = contributions.get_contributions_for_rows(
             eid, [row_id], model_id=model_id
         )
@@ -67,12 +66,7 @@ def get_contributions_variation(
     return contributions_table, values_table
 
 
-def plot_prediction_variation(
-    fig,
-    eid,
-    row_id,
-    model_ids,
-):
+def plot_prediction_variation(fig, eid, row_id, model_ids, bounds=None):
     """
     This function displays the prediction change over time (different models).
     """
@@ -82,6 +76,8 @@ def plot_prediction_variation(
     predictions = []
 
     for model_id in model_ids:
+        if int(model_id[:-1]) < bounds[0] or int(model_id[:-1]) > bounds[1]:
+            continue
         prediction_value = model.get_predictions_for_rows(
             eid, [row_id], model_id=model_id, return_proba=st.session_state["display_proba"]
         )[row_id]
@@ -111,18 +107,11 @@ def plot_prediction_variation(
     return fig
 
 
-def plot_contributions_variation(eid, row_id, model_ids, fig=None):
+def plot_contributions_variation(eid, row_id, model_ids, sort_by, fig=None, bounds=None):
     """
     This function displays the feature contributions over time (different models).
     """
-    filtering.view_filtering()
-    sort_by = helpers.show_filter_options([
-        "Absolute",
-        f"Most {get_term('Positive')}",
-        f"Most {get_term('Negative')}",
-        "Greatest Change",
-    ])
-    wide_df, value_df = get_contributions_variation(eid, row_id, model_ids)
+    wide_df, value_df = get_contributions_variation(eid, row_id, model_ids, bounds)
     wide_df = filter_contributions(wide_df, sort_by, 10)
 
     fig = charts.plot_temporal_line_charts(wide_df, value_df, fig, secondary_y=True)
@@ -134,9 +123,33 @@ def view(eid, row_id, model_ids):
     `row_ids` and `eid_for_rows` are only used when `use_row_ids` == True.
     `eid` and `eid_comp` are used as row_id when `use_row_ids` == True
     """
+    filtering.view_filtering()
+    sort_by = helpers.show_filter_options([
+        "Absolute",
+        f"Most {get_term('Positive')}",
+        f"Most {get_term('Negative')}",
+        "Greatest Change",
+    ])
+    fig_spot = st.empty()
+    times = []
+    for model_id in model_ids:
+        times.append(int(model_id[:-1]))
+    bounds_form = st.form("bounds_form")
+    bounds = bounds_form.select_slider(
+        "Lead times", options=times, key="log_lead_time_bounds", value=(times[0], times[-1])
+    )
+    bounds_form.form_submit_button(
+        "Update",
+        on_click=lambda: log(
+            action="filter_lead_times",
+            details={"bounds": st.session_state["log_lead_time_bounds"]},
+        ),
+    )
     fig = make_subplots(specs=[[{"secondary_y": True}]])
-    fig = plot_prediction_variation(fig, eid, row_id, model_ids)
-    contribution_figure = plot_contributions_variation(eid, row_id, model_ids, fig)
+    fig = plot_prediction_variation(fig, eid, row_id, model_ids, bounds)
+    contribution_figure = plot_contributions_variation(
+        eid, row_id, model_ids, sort_by, fig, bounds
+    )
     # combine two figures
     final_figure = charts.update_figure(
         contribution_figure,
@@ -145,7 +158,7 @@ def view(eid, row_id, model_ids):
         yaxis2_label="Feature contribution",
     )
 
-    st.plotly_chart(final_figure, use_container_width=True)
+    fig_spot.plotly_chart(final_figure, use_container_width=True)
 
 
 def view_instructions():
