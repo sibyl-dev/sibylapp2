@@ -4,6 +4,7 @@ from sibylapp2.compute.context import get_term
 from sibylapp2.config import get_pages_to_show
 from sibylapp2.log import log
 from sibylapp2.pages import (
+    Assistant,
     Change_over_Time,
     Compare_Entities,
     Edit_Features,
@@ -19,6 +20,7 @@ from sibylapp2.view.utils import setup
 setup.setup_page(return_row_ids=True)
 
 ALL_PAGES = {
+    "Assistant": Assistant,
     "Prediction Summary": Prediction_Summary,
     "Explore a Prediction": Explore_a_Prediction,
     "Similar Entities": Similar_Entities,
